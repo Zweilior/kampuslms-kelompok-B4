@@ -1,4 +1,4 @@
-# Tugas 1 – Pemrograman
+# Tugas 1 – Pemrograman Web
 **Nama:** Laudya Aprilia Khoirum  
 **NIM:** 10241038  
 **Program Studi:** Sistem Informasi  
