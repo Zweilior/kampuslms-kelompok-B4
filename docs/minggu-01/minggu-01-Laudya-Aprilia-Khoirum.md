@@ -10,14 +10,17 @@
 Jawaban: 
 
 - Berkas ini mencatat waktu mulai eksekusi aplikasi dan memeriksa apakah sistem sedang dalam mode pemeliharaan (maintenance mode).
-![Soal 1.1](img/week.1.1.1.png)
+  
+    ![Soal 1.1](img/week.1.1.1.png)
 
 - Selanjutnya, berkas memuat autoloader Composer untuk mengimpor seluruh dependensi serta menginisialisasi pustaka bootstrap aplikasi Laravel.
-![Soal 1.2](img/week.1.1.2.png)
+  
+    ![Soal 1.2](img/week.1.1.2.png)
 
 - Terakhir, berkas menangkap request HTTP yang masuk dari pengguna dan memprosesnya untuk mengembalikan respons web.
-![Soal 1.3](img/week.1.1.3.png)
-
+  
+    ![Soal 1.3](img/week.1.1.3.png)
+ 
 ---
 
 ## 2. Buka `bootstrap/app.php`. Identifikasi bagian mana yang mengurus route, mana yang mengurus middleware, mana yang mengurus exception.
@@ -25,13 +28,16 @@ Jawaban:
 Jawaban:
 
 - Routing: Ditangani oleh metode ->withRouting(...), di mana rute-rute aplikasi (seperti web.php dan console.php) didaftarkan.
-![Soal 2.1](img/week.1.2.1.png)
+  
+    ![Soal 2.1](img/week.1.2.1.png)
 
 - Middleware: Ditangani oleh metode ->withMiddleware(function (Middleware $middleware) { ... }), tempat kita dapat mengonfigurasi atau menambahkan middleware global/kelompok.
-![Soal 2.2](img/week.1.2.2.png)
+  
+    ![Soal 2.2](img/week.1.2.2.png)
 
 - Exception: Ditangani oleh metode ->withExceptions(function (Exceptions $exceptions) { ... }), tempat pengaturan penanganan error dan exception kustom dilakukan.
-![Soal 2.3](img/week.1.2.3.png)
+  
+    ![Soal 2.3](img/week.1.2.3.png)
 
 ---
 
@@ -40,16 +46,20 @@ Jawaban:
 Jawaban:
 
 - Jadi ketika `routes/web.php` baru dibuka isinya seperti ini, terlihat bahwa terdapat bagian `view('welcome')`
-![Soal 3.1](img/week.1.3.1.png)
+
+    ![Soal 3.1](img/week.1.3.1.png)
 
 - Pada tulisan `view('welcome')` tersebut kita ubah menjadi tulisan "Halo semuanya, saya laudya dan saya suka boneka"
-![Soal 3.2](img/week.1.3.2.png)
+
+    ![Soal 3.2](img/week.1.3.2.png)
 
 - Setelah itu dapat kita refresh halaman chrome kita dan tampilannya akan berubah jadi plain seperti ini
-![Soal 3.3](img/week.1.3.3.png)
+
+    ![Soal 3.3](img/week.1.3.3.png)
 
 - Ada lagi jika kita buka laman asli dashboard laravel kita akan ditemukan oleh tampilan seperti dibawah
-![Soal 3.4](img/week.1.3.4.png)
+
+    ![Soal 3.4](img/week.1.3.4.png)
 
 - Tulisan "Let's get started" dapat kita ubah jika kita buka `resources/view/welcome.blade.php`.
 
@@ -59,6 +69,7 @@ Jawaban:
     ![Soal 3.6](img/week.1.3.6.png)
 
 - Sehingga jika kita cari kalimat "Let's get started" dan menggantinya dengan kalimat lain maka tulisannya juga akan berubah
+    
     ![Soal 3.7](img/week.1.3.7.png)
 
     ![Soal 3.8](img/week.1.3.8.png)
