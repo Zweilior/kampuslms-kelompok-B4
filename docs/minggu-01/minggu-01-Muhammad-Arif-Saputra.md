@@ -5,7 +5,7 @@
 
 ## 1. `public/index.php`
 
-Berkas tersebut berfungsi sebagai jalan masuk yang menerima semua request yang masuk dari browser pengguna. Selanjutnya file `index.php` memanggil laravel melalui `bootstrap/app.php`. lalu memproses routing dan mengirim balik ke browserr.
+Berkas tersebut berfungsi sebagai jalan masuk yang menerima semua request yang masuk dari browser pengguna. Selanjutnya file `index.php` memanggil laravel melalui `bootstrap/app.php`. lalu memproses routing dan mengirim balik ke browser.
 
 ---
 
