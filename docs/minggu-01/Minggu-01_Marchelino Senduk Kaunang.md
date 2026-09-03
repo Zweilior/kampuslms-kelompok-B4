@@ -92,3 +92,7 @@ Bagian ini merupakan kode untuk melihat daftar route yang ada pada laravel dan m
 karena route yang ada di nomor 3 terlihat pada hasil `php artisan route:list` menunjukkan route `/` yang terdapat pada `web.php` terdaftar dan dikenali oleh laravel.
 
 yang berarti `web.php` memiliki kecocokan yang berhasil dikenali oleh laravel dan sesuai dengan isi `routes/web.php`
+
+## 5. Perkenalkan Identitas kamu
+
+Nama saya marchelino senduk kaunang, nim 10241040, asal bontang, sekarang umur 20 tahun
