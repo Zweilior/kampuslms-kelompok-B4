@@ -3,7 +3,7 @@
 ### NIM  : 10241040
 ---
 
-## 1. `public/index.php`
+#### 1. `public/index.php`
 ```php
 <?php
 
@@ -28,9 +28,10 @@ $app->handleRequest(Request::capture());
 ```
 
 Jadi, `index.php` berfungsi sebagai gerbang awal aplikasi Laravel. File ini bukan tempat utama untuk membuat fitur aplikasi, tetapi bertugas menghubungkan request dari pengguna dengan sistem Laravel agar request tersebut dapat diproses dan menghasilkan response yang sesuai.
----
 
-## 2. Buka `bootstrap/app.php`. Identifikasi bagian mana yang mengurus route, mana yang mengurus middleware, mana yang mengurus exception.
+
+#### 2. Buka `bootstrap/app.php`. Identifikasi bagian mana yang mengurus route, mana yang mengurus middleware, mana yang mengurus exception.
+
 ```php
 <?php
 
@@ -56,7 +57,7 @@ Pada file `bootstrap/app.php`, terdapat beberapa bagian yang memiliki fungsi ber
 
 ---
 
-## 3.  Buka `routes/web.php`. Temukan route yang menghasilkan halaman selamat datang. Ubah teksnya, muat ulang browser, pastikan berubah.
+#### 3.  Buka `routes/web.php`. Temukan route yang menghasilkan halaman selamat datang. Ubah teksnya, muat ulang browser, pastikan berubah.
 
 Route bawaan yang menghasilkan selamat datang dibagian
 
@@ -81,7 +82,7 @@ dan setelah diganti pada pada bagian return `view('welcome')` "menjadi selamat d
 
 ---
 
-## 4. Jalankan `php artisan route:list`. Cocokkan keluarannya dengan isi `routes/web.php`.
+#### 4. Jalankan `php artisan route:list`. Cocokkan keluarannya dengan isi `routes/web.php`.
 
 
 Bagian ini merupakan kode untuk melihat daftar route yang ada pada laravel dan memiliki hasil 
@@ -92,3 +93,18 @@ Bagian ini merupakan kode untuk melihat daftar route yang ada pada laravel dan m
 karena route yang ada di nomor 3 terlihat pada hasil `php artisan route:list` menunjukkan route `/` yang terdapat pada `web.php` terdaftar dan dikenali oleh laravel.
 
 yang berarti `web.php` memiliki kecocokan yang berhasil dikenali oleh laravel dan sesuai dengan isi `routes/web.php`
+
+
+# 1.3 BREAK
+
+Lakukan satu per satu, catat pesan errornya, lalu kembalikan:
+
+| # | Yang dirusak                                   | Prediksi Anda sebelum mencoba | Pesan error sebenarnya |
+|---|------------------------------------------------|-------------------------------|------------------------|
+| 1 | Ganti nama `.env` menjadi `.env.bak`           |Aplikasi kemungkinan tidak dapat membaca konfigurasi .env sehingga terjadi error atau konfigurasi tidak ditemukan.                                           |                                                        |
+| 2 | Kosongkan nilai `APP_KEY` di `.env`            |                               |                        |
+| 3 | Ubah `DB_DATABASE` menjadi nama yang tidak ada |                               |                        |
+| 4 | Ubah `APP_DEBUG=false`, lalu ulangi nomor 3    |                               |                        |
+
+
+
