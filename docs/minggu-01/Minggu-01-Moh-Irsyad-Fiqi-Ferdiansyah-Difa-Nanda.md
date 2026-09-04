@@ -1,7 +1,6 @@
 # 1.3 Read → Break → Fix → Build
 
 ### READ — Bedah instalasi Anda sendiri (45 menit)
-
 Setelah instalasi selesai dan halaman selamat datang Laravel muncul, kerjakan **tanpa AI**:
 
 1. Buka `public/index.php`. Baca dari atas ke bawah. Tulis dalam 3 kalimat apa yang dilakukan berkas ini.
@@ -34,5 +33,18 @@ return Application::configure(basePath: dirname(__DIR__))
 <br> Masuk ke file *web.php* pada folder routes cari baris `return view('welcome');` lalu ubah menjadi `return "Belajar Pemrograman Web ASIK";` untuk mengubah tampilan menjadi blank putih dengan teks *Belajar Pemrograman Web ASIK* seperti gambar berikut: <img src= "img/preview-html-rsy.png">
 <br> Jika ingin mengubah teks dengan tampilan template Laravel dapat diubah dengan masuk ke file *welcome.blade.php* cari bagian `<h1 class="mb-1 font-medium">Let's get started</h1>` ubah menjadi `<h1 class="mb-1 font-medium">Belajar Pemrograman Web ASIK</h1>` agar tampilannya seperti gambar berikut: <img src= "img/preview-after-rsy.png">
 4. Cocokan output `php artisan route:list` dengan `routes/web.php`
-<br> <img src= "img/preview-phpartisan-rsy.png"> dari gambar diatas diperoleh kecocokan
-- Route / → Cocok dengan routes/web.php baris 5, yaitu route Route::get('/') yang kita buat untuk halaman welcome.
+<br> <img src= "img/preview-phpartisan-rsy.png"> dari gambar diatas ditemukan kecocokan berupa
+- Route / → Cocok dengan routes/web.php baris 5, yaitu route Route::get('/') yang ada pada  `routes/web.php`.
+
+### BREAK — Rusak dengan sengaja (30 menit)
+
+Lakukan satu per satu, catat pesan errornya, lalu kembalikan:
+
+| # | Yang dirusak | Prediksi Anda sebelum mencoba | Pesan error sebenarnya |
+|---|--------------|-------------------------------|------------------------|
+| 1 | Ganti nama `.env` menjadi `.env.bak` | akan error karena file .env hilang. |500 Server Error |
+| 2 | Kosongkan nilai `APP_KEY` di `.env` |akan error karena APP_KEY kosong. |No application encryption key has been specified. |
+| 3 | Ubah `DB_DATABASE` menjadi nama yang tidak ada |akan error karena database tidak bisa dibuka |SQLSTATE[HY000] [1049] Unknown database 'kampus' |
+| 4 | Ubah `APP_DEBUG=false`, lalu ulangi nomor 3 |pesan error tidak akan ditampilkan detailnya |500 Server Error |
+
+Nomor 4 adalah yang terpenting. Perhatikan bedanya: dengan `APP_DEBUG=true` Anda melihat seluruh isi konfigurasi dan jejak kode; dengan `false` Anda hanya melihat halaman 500 kosong. **Di server produksi nanti, `APP_DEBUG=true` berarti membocorkan kredensial database Anda kepada siapa pun yang memicu error.** Ini akan diuji di minggu 12.
