@@ -97,11 +97,11 @@ yang berarti `web.php` memiliki kecocokan yang berhasil dikenali oleh laravel da
 
 # 1.3 BREAK
 
+Lakukan satu per satu, catat pesan errornya, lalu kembalikan:
+
 | # | Yang dirusak | Prediksi Anda sebelum mencoba | Pesan error sebenarnya |
 |---|---|---|---|
 | 1 | Ganti nama `.env` menjadi `.env.bak` | Aplikasi tidak dapat membaca konfigurasi dari file `.env`, sehingga kemungkinan terjadi error karena variabel environment tidak ditemukan. | Aplikasi mengalami error karena file `.env` tidak ditemukan atau konfigurasi environment seperti `APP_KEY` dan database tidak dapat dibaca. |
 | 2 | Kosongkan nilai `APP_KEY` di `.env` | Laravel akan mengalami error karena `APP_KEY` digunakan untuk enkripsi aplikasi. | **`No application encryption key has been specified.`** |
 | 3 | Ubah `DB_DATABASE` menjadi nama yang tidak ada | Aplikasi tidak dapat terhubung ke database karena database yang disebutkan tidak tersedia. | **`SQLSTATE[HY000] [1049] Unknown database 'nama_database'`** |
 | 4 | Ubah `APP_DEBUG=false`, lalu ulangi nomor 3 | Error database tetap terjadi, tetapi detail error tidak akan ditampilkan secara lengkap karena mode debug dimatikan. | **HTTP 500 – Server Error / 500 Internal Server Error**. Detail penyebab error disembunyikan. |
-
-
