@@ -25,5 +25,5 @@ Route::get('/tentang', function () {
 4. Belum ada kode yang membungkus file `tentang.blade.php` karena dalam file `tentang.blade.php` hanya berisi kode html  murni
 
 5. Hasil dari `php artisan route:list --path=tentang` adalah 
-![route:list](./img/php-artisan-rsy.png)
+<br> ![route:list](./img/php-artisan-rsy.png)
 gambar tersebut menampilkan bahwa route /tentang telah terdaftar dan dapat dibaca oleh laravel dengan benar
