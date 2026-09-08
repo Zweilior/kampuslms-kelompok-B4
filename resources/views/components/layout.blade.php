@@ -178,10 +178,9 @@
             <div class="flex items-center gap-space-sm px-space-sm">
                 <span class="material-symbols-outlined text-primary text-headline-lg">school</span>
                 <div class="flex flex-col">
-                    <span class="font-headline-sm text-headline-sm tracking-tight leading-none">Akademia</span>
+                    <span class="font-headline-sm text-headline-sm tracking-tight leading-none">EduSpace</span>
                     <span
-                        class="font-label-sm text-label-sm text-primary tracking-wider uppercase mt-space-2xs">Academic
-                        OS</span>
+                        class="font-label-sm text-label-sm text-primary tracking-wider uppercase mt-space-2xs">Learning Management</span>
                 </div>
             </div>
 
