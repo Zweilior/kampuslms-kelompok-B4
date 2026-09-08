@@ -26,4 +26,4 @@ Route::get('/tentang', function () {
 
 5. Hasil dari `php artisan route:list --path=tentang` adalah 
 <br> ![route:list](./img/php-artisan-rsy.png)
-gambar tersebut menampilkan bahwa route /tentang telah terdaftar dan dapat dibaca oleh laravel dengan benar
+<br> gambar tersebut menampilkan bahwa route /tentang telah terdaftar dan dapat dibaca oleh laravel dengan benar
