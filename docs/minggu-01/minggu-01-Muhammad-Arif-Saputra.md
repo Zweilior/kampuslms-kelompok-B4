@@ -53,3 +53,16 @@ Bagian ini merupakan kode untuk melihat daftar route yang ada pada laravel dan m
 karena diminta untuk mencocokkan dengan route yang ada di nomor 3 terlihat pada hasil `php artisan route:list` menunjukkan route `/` yang terdapat pada `web.php` terdaftar dan dikenali oleh laravel.
 
 yang berarti `web.php` memiliki kecocokan yang berhasil dikenali oleh laravel.  
+
+
+
+----
+
+# BREAK
+
+| # | Yang dirusak | Prediksi Anda sebelum mencoba | Pesan error sebenarnya |
+|---|--------------|-------------------------------|------------------------|
+| 1 | Ganti nama `.env` menjadi `.env.bak` | Kemungkinan besar bakalan mengalami eror karena laravel ga bisa membaca konfig yang ada di `env` | menampilkan pesan error 500 Server Error |
+| 2 | Kosongkan nilai `APP_KEY` di `.env` | kemungkinan terjadi error yang menampilkan bahwa laravel membutuhkan kredensial key dari `APP_KEY` tersebut | No Application encryption key has been specified |
+| 3 | Ubah `DB_DATABASE` menjadi nama yang tidak ada | bakal terjadi error yang menunjukkan tidak ada path untuk ke database | Database file at path [lara] does not exist. |
+| 4 | Ubah `APP_DEBUG=false`, lalu ulangi nomor 3 | perbedaan dengan nomor 3 tadi yaitu error tetap ada namun tidak ditampilkan dan laravel tetap berjalan | Menampilkan halaman depan laravel |
