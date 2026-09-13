@@ -1,75 +1,92 @@
-/* ============================================
-   LAYOUT - Sidebar & Main Wrapper
-   ============================================ */
-
-/* Body dasar (opsional, kalau tidak mau pakai utility Tailwind di body) */
-body.app-body {
-    background-color: #0f150e; /* surface */
-    color: #dee4d9;            /* on-surface */
-    font-family: "Plus Jakarta Sans", sans-serif;
-    font-size: 14px;
-    line-height: 20px;
-    -webkit-font-smoothing: antialiased;
+html,
+body {
+    margin: 0;
+    padding: 0;
 }
 
-/* Sidebar */
-.app-sidebar {
+body {
+    overscroll-behavior: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+* {
+    scrollbar-width: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.material-symbols-outlined {
+    font-variation-settings:
+        'FILL' 0,
+        'wght' 400,
+        'GRAD' 0,
+        'opsz' 24;
+}
+
+/* ---------- Transisi halus ---------- */
+a,
+button {
+    transition: all 0.2s ease;
+}
+
+.sidebar {
     position: fixed;
-    left: 0;
     top: 0;
-    height: 100%;
-    width: 16rem; /* w-64 */
-    background-color: #171d16; /* surface-container-low */
-    z-index: 50;
+    left: 0;
+    height: 100vh;
+    width: 16rem; /* sama dengan w-64 Tailwind */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    padding: 1.5rem 1rem; /* py-space-lg px-space-md */
+    padding: 1.5rem 1rem;
+    background-color: #171d16; /* surface-container-low */
     box-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
+    z-index: 50;
 }
 
-/* Link navigasi */
-.nav-link {
+.sidebar-nav {
     display: flex;
-    align-items: center;
-    gap: 0.75rem; /* gap-space-sm */
-    padding: 0.75rem 1rem; /* py-space-sm px-space-md */
-    border-radius: 0.75rem; /* rounded-xl */
-    transition: all 0.2s ease;
-    color: #c4c8b9; /* on-surface-variant */
+    flex-direction: column;
+    gap: 0.25rem;
+    overflow-y: auto;
 }
 
-.nav-link:hover {
-    background-color: #252c24; /* surface-container-high */
-    color: #dee4d9;            /* on-surface */
+.sidebar-nav::-webkit-scrollbar {
+    display: none;
 }
 
-.nav-link.active {
-    background-color: #355116; /* secondary-container */
-    color: #a1c37b;            /* on-secondary-container */
-    font-weight: 600;
-    box-shadow: 0 0 16px rgba(175, 209, 136, 0.15);
-}
-
-/* Konten utama */
-.app-main-wrapper {
-    padding-left: 16rem; /* pl-64 — geser konten karena ada sidebar fixed */
-}
-
-.app-main {
-    width: 100%;
+.main-content {
+    margin-left: 16rem; /* w-64 */
+    width: calc(100% - 16rem);
     min-height: 100vh;
-    padding: 1.5rem 2rem; /* py-space-lg px-page-margin-desktop */
+    padding: 1.5rem 2rem;
     background-color: #0f150e; /* surface */
 }
 
-/* Kartu status sistem di bawah sidebar */
-.system-status {
-    background-color: #1b211a; /* surface-container */
-    padding: 1rem;
-    border-radius: 0.75rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.12);
+@media (max-width: 1023px) {
+    .sidebar {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+    }
+
+    .sidebar.open {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 1rem;
+    }
+}
+
+@keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse-soft {
+    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
