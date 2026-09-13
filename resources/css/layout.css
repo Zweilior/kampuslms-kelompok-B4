@@ -1,0 +1,75 @@
+/* ============================================
+   LAYOUT - Sidebar & Main Wrapper
+   ============================================ */
+
+/* Body dasar (opsional, kalau tidak mau pakai utility Tailwind di body) */
+body.app-body {
+    background-color: #0f150e; /* surface */
+    color: #dee4d9;            /* on-surface */
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 14px;
+    line-height: 20px;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Sidebar */
+.app-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 16rem; /* w-64 */
+    background-color: #171d16; /* surface-container-low */
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.5rem 1rem; /* py-space-lg px-space-md */
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Link navigasi */
+.nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem; /* gap-space-sm */
+    padding: 0.75rem 1rem; /* py-space-sm px-space-md */
+    border-radius: 0.75rem; /* rounded-xl */
+    transition: all 0.2s ease;
+    color: #c4c8b9; /* on-surface-variant */
+}
+
+.nav-link:hover {
+    background-color: #252c24; /* surface-container-high */
+    color: #dee4d9;            /* on-surface */
+}
+
+.nav-link.active {
+    background-color: #355116; /* secondary-container */
+    color: #a1c37b;            /* on-secondary-container */
+    font-weight: 600;
+    box-shadow: 0 0 16px rgba(175, 209, 136, 0.15);
+}
+
+/* Konten utama */
+.app-main-wrapper {
+    padding-left: 16rem; /* pl-64 — geser konten karena ada sidebar fixed */
+}
+
+.app-main {
+    width: 100%;
+    min-height: 100vh;
+    padding: 1.5rem 2rem; /* py-space-lg px-page-margin-desktop */
+    background-color: #0f150e; /* surface */
+}
+
+/* Kartu status sistem di bawah sidebar */
+.system-status {
+    background-color: #1b211a; /* surface-container */
+    padding: 1rem;
+    border-radius: 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.12);
+}

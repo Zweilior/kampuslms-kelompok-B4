@@ -232,3 +232,11 @@
     </div>
 
 </x-layout>
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+@endpush
+
+<x-layout title="Dashboard - Akademia LMS" active-nav="dashboard">
+    {{-- ... isi dashboard tetap seperti semula ... --}}
+</x-layout>
