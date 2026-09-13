@@ -22,7 +22,8 @@ Route::get('/tentang', function () {
 
 3. View yang dikembalikan adalah `return view('tentang');` sehingga laravel akan mengakses path `resources/views/tentang.blade.php`
 
-4. Dibungkus oleh `layout.blade.php` karena dalam file `tentang.blade.php` hanya berisi kode html 
+4. Belum ada kode yang membungkus file `tentang.blade.php` karena dalam file `tentang.blade.php` hanya berisi kode html  murni
 
-5. Hasil dari `php artisan route:list --path=tentang` adalah ![route:list](./img/php-artisan-rsy.png)
-gambar tersebut menampilkan bahwa route /tentang telah terdaftar dan dapat dibaca oleh laravel dengan benar
+5. Hasil dari `php artisan route:list --path=tentang` adalah 
+<br> ![route:list](./img/php-artisan-rsy.png)
+<br> gambar tersebut menampilkan bahwa route /tentang telah terdaftar dan dapat dibaca oleh laravel dengan benar
