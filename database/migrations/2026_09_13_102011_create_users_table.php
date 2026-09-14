@@ -14,13 +14,17 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('password');
 
-            $table->enum('role', ['admin', 'dosen', 'mahasiswa']);
+            $table->enum('role', ['admin', 'dosen', 'mahasiswa'])
+                ->index();
 
-            $table->string('nim_nip')->unique()->nullable();
+            $table->string('nim_nip')
+                ->unique()
+                ->nullable();
 
             $table->timestamp('email_verified_at')->nullable();
 
             $table->timestamps();
+            
             $table->softDeletes();
         });
     }

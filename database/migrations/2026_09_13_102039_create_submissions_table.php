@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('user_id')
                 ->constrained('users');
 
+            $table->unique(['assignment_id', 'user_id']);
+
             $table->string('file_path');
 
             $table->string('original_name');

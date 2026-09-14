@@ -21,6 +21,8 @@ return new class extends Migration
 
             $table->string('letter_grade');
 
+            $table->unique(['course_id', 'user_id']);
+
             $table->timestamps();
         });
     }

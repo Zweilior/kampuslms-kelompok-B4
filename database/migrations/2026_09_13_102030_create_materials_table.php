@@ -12,10 +12,13 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('course_id')
-                ->constrained('courses');
+                ->constrained('courses')
+                ->cascadeOnDelete();
 
             $table->foreignId('uploaded_by')
                 ->constrained('users');
+
+            $table->index('course_id');
 
             $table->string('title');
 

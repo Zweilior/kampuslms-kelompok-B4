@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\UserController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -15,8 +16,6 @@ Route::get('/dashboard', function () {
     return view('dashboard');
 })->name('dashboard');
 
-Route::get('/courses', [CourseController::class, 'index'])
-    ->name('courses.index');
+Route::resource('courses', CourseController::class);
 
-Route::get('/courses/{course}', [CourseController::class, 'show'])
-    ->name('courses.show');
+Route::resource('users', UserController::class);
