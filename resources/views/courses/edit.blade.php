@@ -1,24 +1,24 @@
-<x-layout title="Tambah Mata Kuliah" active-nav="courses">
+<x-layout title="Edit Mata Kuliah" active-nav="courses">
 
     <div class="mb-space-lg">
 
         <a
-            href="{{ route('courses.index') }}"
+            href="{{ route('courses.show', $course) }}"
             class="inline-flex items-center gap-space-xs text-on-surface-variant hover:text-primary transition-colors"
         >
             <span class="material-symbols-outlined text-sm">
                 arrow_back
             </span>
 
-            Kembali ke daftar mata kuliah
+            Kembali ke detail
         </a>
 
         <h1 class="font-headline-lg text-headline-lg tracking-tight mt-space-md">
-            Tambah Mata Kuliah
+            Edit Mata Kuliah
         </h1>
 
         <p class="font-body-md text-body-md text-on-surface-variant mt-1">
-            Tambahkan mata kuliah baru ke dalam sistem.
+            Perbarui informasi mata kuliah {{ $course->name }}.
         </p>
 
     </div>
@@ -27,12 +27,14 @@
     <div class="bg-surface-container-low p-space-lg rounded-2xl shadow-md max-w-3xl">
 
         <form
-            action="{{ route('courses.store') }}"
+            action="{{ route('courses.update', $course) }}"
             method="POST"
             class="space-y-space-md"
         >
 
             @csrf
+            @method('PUT')
+
 
             {{-- Kode --}}
             <div>
@@ -48,8 +50,7 @@
                     id="code"
                     name="code"
                     type="text"
-                    value="{{ old('code') }}"
-                    placeholder="Contoh: SI251406"
+                    value="{{ old('code', $course->code) }}"
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
 
@@ -76,8 +77,7 @@
                     id="name"
                     name="name"
                     type="text"
-                    value="{{ old('name') }}"
-                    placeholder="Contoh: Pemrograman Web"
+                    value="{{ old('name', $course->name) }}"
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
 
@@ -104,9 +104,8 @@
                     id="description"
                     name="description"
                     rows="5"
-                    placeholder="Deskripsi mata kuliah..."
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
-                >{{ old('description') }}</textarea>
+                >{{ old('description', $course->description) }}</textarea>
 
                 @error('description')
                     <p class="text-red-500 text-sm mt-1">
@@ -132,7 +131,7 @@
                     name="sks"
                     type="number"
                     min="1"
-                    value="{{ old('sks', 3) }}"
+                    value="{{ old('sks', $course->sks) }}"
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
 
@@ -161,15 +160,11 @@
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
 
-                    <option value="">
-                        -- Pilih Dosen --
-                    </option>
-
                     @foreach ($lecturers as $lecturer)
 
                         <option
                             value="{{ $lecturer->id }}"
-                            @selected(old('lecturer_id') == $lecturer->id)
+                            @selected(old('lecturer_id', $course->lecturer_id) == $lecturer->id)
                         >
                             {{ $lecturer->name }}
                         </option>
@@ -205,14 +200,14 @@
 
                     <option
                         value="active"
-                        @selected(old('status', 'active') === 'active')
+                        @selected(old('status', $course->status) === 'active')
                     >
                         Active
                     </option>
 
                     <option
                         value="inactive"
-                        @selected(old('status') === 'inactive')
+                        @selected(old('status', $course->status) === 'inactive')
                     >
                         Inactive
                     </option>
@@ -232,7 +227,7 @@
             <div class="flex items-center gap-space-sm pt-space-sm">
 
                 <a
-                    href="{{ route('courses.index') }}"
+                    href="{{ route('courses.show', $course) }}"
                     class="px-space-md py-2.5 rounded-xl bg-surface-container-high text-on-surface font-label-lg"
                 >
                     Batal
@@ -242,7 +237,7 @@
                     type="submit"
                     class="px-space-md py-2.5 rounded-xl bg-primary text-on-primary font-label-lg hover:bg-primary-container transition-all"
                 >
-                    Simpan Mata Kuliah
+                    Simpan Perubahan
                 </button>
 
             </div>

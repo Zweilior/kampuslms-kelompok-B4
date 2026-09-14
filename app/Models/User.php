@@ -28,12 +28,12 @@ class User extends Authenticatable
         ];
     }
 
-    public function courses(): HasMany
+    public function taughtCourses(): HasMany
     {
         return $this->hasMany(Course::class, 'lecturer_id');
     }
 
-    public function enrolledCourses(): BelongsToMany
+    public function courses(): BelongsToMany
     {
         return $this->belongsToMany(Course::class, 'course_user')
             ->withPivot('enrolled_at')
@@ -50,7 +50,7 @@ class User extends Authenticatable
         return $this->hasMany(Material::class, 'uploaded_by');
     }
 
-    public function grades(): HasMany
+    public function gradesGiven(): HasMany
     {
         return $this->hasMany(Grade::class, 'graded_by');
     }

@@ -11,6 +11,8 @@ class Grade extends Model
     use HasFactory;
 
     protected $fillable = [
+        'submission_id',
+        'graded_by',
         'score',
         'feedback',
     ];
