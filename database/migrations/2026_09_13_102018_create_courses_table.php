@@ -20,7 +20,8 @@ return new class extends Migration
             $table->tinyInteger('sks');
 
             $table->foreignId('lecturer_id')
-                ->constrained('users');
+                ->constrained('users')
+                ->restrictOnDelete();
 
             $table->enum('status', [
                 'draft',
