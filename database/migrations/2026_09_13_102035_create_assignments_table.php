@@ -12,7 +12,8 @@ return new class extends Migration
             $table->id();
 
             $table->foreignId('course_id')
-                ->constrained('courses');
+                ->constrained('courses')
+                ->cascadeOnDelete();
 
             $table->foreignId('grade_component_id')
                 ->nullable()
@@ -37,6 +38,8 @@ return new class extends Migration
                 'draft',
                 'published'
             ])->default('draft');
+
+            $table->index(['course_id', 'due_at']);
 
             $table->timestamps();
         });
