@@ -17,7 +17,12 @@ class CourseController extends Controller
             ->orderBy('code')
             ->get();
 
-        return view('courses.index', compact('courses'));
+        // Ambil data dosen untuk modal tambah mata kuliah
+        $lecturers = User::where('role', 'dosen')
+            ->orderBy('name')
+            ->get();
+
+        return view('courses.index', compact('courses', 'lecturers'));
     }
 
     /**
@@ -58,7 +63,12 @@ class CourseController extends Controller
     {
         $course->load('lecturer');
 
-        return view('courses.show', compact('course'));
+        // Ambil data dosen agar dropdown dosen di modal edit terisi
+        $lecturers = User::where('role', 'dosen')
+            ->orderBy('name')
+            ->get();
+
+        return view('courses.show', compact('course', 'lecturers'));
     }
 
     /**

@@ -15,6 +15,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="{{ asset('js/tailwind-config.js') }}"></script>
 
+    {{-- Alpine.js CDN --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
     {{-- Custom CSS --}}
     @vite('resources/css/app.css')
     
