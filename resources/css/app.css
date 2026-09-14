@@ -1,6 +1,11 @@
 @import 'tailwindcss';
 @import './layout.css';
 @import './dashboard.css';
+@import './users/index.css';
+@import './users/create.css';
+@import './users/edit.css';
+@import './users/show.css';
+@import './users/modal.css'; 
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
