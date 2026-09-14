@@ -3,8 +3,8 @@
 
 <head>
     <meta charset="utf-8" />
-    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>{{ $title ?? 'Akademia LMS' }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ $title ?? 'KampusLMS' }}</title>
 
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -15,14 +15,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="{{ asset('js/tailwind-config.js') }}"></script>
 
-    {{-- Custom CSS (via Vite) --}}
+    {{-- Custom CSS --}}
     @vite('resources/css/app.css')
+    
+    <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
 </head>
 
 <body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
 
     {{-- SIDEBAR --}}
-    @include('components.partials.sidebar')
+    @include('components.navbar')
 
     {{-- KONTEN UTAMA --}}
     <div class="main-content">
