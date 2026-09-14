@@ -114,7 +114,7 @@
             </a>
         </div>
 
-        <div class="overflow-x-auto">
+        <div style="overflow: visible;">
             <table class="course-table">
                 <thead>
                     <tr>
