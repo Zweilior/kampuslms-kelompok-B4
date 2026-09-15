@@ -1,0 +1,142 @@
+/* ============================================
+   USERS / CREATE.CSS — Tambah User
+   ============================================ */
+
+.users-create {
+    max-width: 640px;
+    margin: 0 auto;
+    animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.users-create__header {
+    margin-bottom: 1.5rem;
+}
+
+.users-create__eyebrow {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--primary);
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.users-create__title {
+    margin: 0 0 0.25rem 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 1.875rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+.users-create__subtitle {
+    margin: 0;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+/* ---------- Card ---------- */
+.users-create__card {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 1.75rem;
+}
+
+/* ---------- Form ---------- */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.25rem;
+}
+
+.form-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
+
+.form-label .material-symbols-outlined {
+    font-size: 1rem;
+    color: var(--primary);
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    background-color: var(--bg-base);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-md);
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+.form-input:hover,
+.form-select:hover {
+    border-color: var(--border-hover);
+}
+
+.form-input:focus,
+.form-select:focus {
+    border-color: var(--primary);
+    background-color: var(--bg-elevated);
+    box-shadow: 0 0 0 4px rgba(139, 174, 102, 0.15);
+}
+
+.form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%233d6b1f' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 1rem center;
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+.form-error {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #b14545;
+}
+
+/* ---------- Actions ---------- */
+.users-create__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-hairline);
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+    .users-create__card { padding: 1.25rem; }
+    .users-create__title { font-size: 1.5rem; }
+    .users-create__actions { flex-direction: column-reverse; }
+    .users-create__actions .btn { width: 100%; justify-content: center; }
+}
