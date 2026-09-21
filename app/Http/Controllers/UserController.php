@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -31,15 +32,23 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'nim_nip' => $request->nim_nip,
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+            'nim_nip' => ['required', 'string', 'max:50', 'unique:users,nim_nip'],
+            'role' => ['required', 'in:admin,dosen,mahasiswa'],
         ]);
 
-        // Role sengaja diberikan secara eksplisit.
-        $user->role = $request->role;
+        $user = User::create([
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
+            'nim_nip' => $validated['nim_nip'],
+        ]);
+
+        // Role tetap diberikan secara eksplisit.
+        $user->role = $validated['role'];
         $user->save();
 
         return redirect()
@@ -68,18 +77,36 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => [
+                'required',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($user->id),
+            ],
+            'password' => ['nullable', 'string', 'min:8'],
+            'nim_nip' => [
+                'required',
+                'string',
+                'max:50',
+                Rule::unique('users', 'nim_nip')->ignore($user->id),
+            ],
+            'role' => ['required', 'in:admin,dosen,mahasiswa'],
+        ]);
+
         $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'nim_nip' => $request->nim_nip,
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'nim_nip' => $validated['nim_nip'],
         ]);
 
         // Role tetap diberikan secara eksplisit.
-        $user->role = $request->role;
+        $user->role = $validated['role'];
 
         // Password hanya diubah kalau diisi.
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
         }
 
         $user->save();

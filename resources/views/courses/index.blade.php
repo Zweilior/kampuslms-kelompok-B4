@@ -299,8 +299,9 @@
                         <div>
                             <label for="status" class="block font-label-md text-label-md mb-1">Status</label>
                             <select id="status" name="status" class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary">
-                                <option value="active" @selected(old('status', 'active') === 'active')>Active</option>
-                                <option value="inactive" @selected(old('status') === 'inactive')>Inactive</option>
+                                <option value="draft">Draft</option>
+                                <option value="active">Active</option>
+                                <option value="archived">Archived</option>
                             </select>
                             @if(!$errors->has('edit_id'))
                                 @error('status') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
