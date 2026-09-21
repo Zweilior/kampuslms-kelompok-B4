@@ -22,11 +22,20 @@
     @vite('resources/css/app.css')
     
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
+
+    <style>
+        /* Memastikan konten utama tidak tertutup navbar */
+        .main-content {
+            padding-top: 80px; /* Sesuaikan dengan tinggi navbar Anda */
+            min-height: 100vh;
+            background-color: #0f0f0f; /* Warna background gelap */
+        }
+    </style>
 </head>
 
 <body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
 
-    {{-- SIDEBAR --}}
+    {{-- NAVBAR --}}
     @include('components.navbar')
 
     {{-- KONTEN UTAMA --}}

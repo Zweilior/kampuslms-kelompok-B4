@@ -4,10 +4,10 @@
     $navItems = [
         ['path' => 'dashboard',  'icon' => 'grid_view',      'label' => 'Dashboard',     'route' => 'dashboard'],
         ['path' => 'courses',    'icon' => 'menu_book',      'label' => 'Mata Kuliah',   'route' => 'courses.index'],
-        ['path' => 'jadwal',     'icon' => 'calendar_today', 'label' => 'Jadwal Kuliah', 'route' => null],
-        ['path' => 'tugas',      'icon' => 'assignment',     'label' => 'Tugas & Kuis',  'route' => null],
-        ['path' => 'nilai',      'icon' => 'grade',          'label' => 'Nilai & KHS',   'route' => null],
-        ['path' => 'pengumuman', 'icon' => 'campaign',       'label' => 'Pengumuman',    'route' => null],
+        ['path' => 'users',      'icon' => 'campaign',       'label' => 'Manajemen User',          'route' => 'users.index'],
+        ['path' => 'jadwal',     'icon' => 'calendar_today', 'label' => 'Materi', 'route' => null],
+        ['path' => 'tugas',      'icon' => 'assignment',     'label' => 'Tugas',  'route' => null],
+        ['path' => 'nilai',      'icon' => 'grade',          'label' => 'Monitoring Nilai',   'route' => null],
     ];
 @endphp
 
