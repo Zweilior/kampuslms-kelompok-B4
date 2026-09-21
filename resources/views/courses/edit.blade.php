@@ -184,7 +184,6 @@
 
             {{-- Status --}}
             <div>
-
                 <label
                     for="status"
                     class="block font-label-md text-label-md mb-1"
@@ -197,6 +196,12 @@
                     name="status"
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
+                    <option
+                        value="draft"
+                        @selected(old('status', $course->status) === 'draft')
+                    >
+                        Draft
+                    </option>
 
                     <option
                         value="active"
@@ -206,12 +211,11 @@
                     </option>
 
                     <option
-                        value="inactive"
-                        @selected(old('status', $course->status) === 'inactive')
+                        value="archived"
+                        @selected(old('status', $course->status) === 'archived')
                     >
-                        Inactive
+                        Archived
                     </option>
-
                 </select>
 
                 @error('status')
@@ -219,7 +223,6 @@
                         {{ $message }}
                     </p>
                 @enderror
-
             </div>
 
 

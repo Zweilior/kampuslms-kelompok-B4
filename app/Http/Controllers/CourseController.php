@@ -5,19 +5,40 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
+// use Illuminate\Validation\Rule;
+use App\Http\Requests\StoreCourseRequest;
+use App\Http\Requests\UpdateCourseRequest;
 
 class CourseController extends Controller
 {
     /**
      * Menampilkan daftar semua mata kuliah.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $courses = Course::with('lecturer')
-            ->orderBy('code')
-            ->get();
+        $query = Course::with('lecturer');
 
-        // Ambil data dosen untuk modal tambah mata kuliah
+        // Pencarian berdasarkan kode atau nama mata kuliah
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('code', 'like', "%{$search}%")
+                ->orWhere('name', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter berdasarkan status
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $courses = $query
+            ->orderBy('code')
+            ->paginate(15)
+            ->withQueryString();
+
+        // Data dosen untuk form tambah/edit
         $lecturers = User::where('role', 'dosen')
             ->orderBy('name')
             ->get();
@@ -40,16 +61,18 @@ class CourseController extends Controller
     /**
      * Menyimpan mata kuliah baru.
      */
-    public function store(Request $request)
+    public function store(StoreCourseRequest $request)
     {
-        $course = Course::create([
-            'code' => $request->code,
-            'name' => $request->name,
-            'description' => $request->description,
-            'sks' => $request->sks,
-            'lecturer_id' => $request->lecturer_id,
-            'status' => $request->status,
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:255', 'unique:courses,code'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'sks' => ['required', 'integer', 'min:1'],
+            'lecturer_id' => ['required', 'exists:users,id'],
+            'status' => ['required', 'in:draft,active,archived'],
         ]);
+
+        $course = Course::create($request->validated());
 
         return redirect()
             ->route('courses.show', $course)
@@ -86,16 +109,23 @@ class CourseController extends Controller
     /**
      * Memperbarui mata kuliah.
      */
-    public function update(Request $request, Course $course)
+    public function update(UpdateCourseRequest $request, Course $course)
     {
-        $course->update([
-            'code' => $request->code,
-            'name' => $request->name,
-            'description' => $request->description,
-            'sks' => $request->sks,
-            'lecturer_id' => $request->lecturer_id,
-            'status' => $request->status,
+        $validated = $request->validate([
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('courses', 'code')->ignore($course->id),
+            ],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'sks' => ['required', 'integer', 'min:1'],
+            'lecturer_id' => ['required', 'exists:users,id'],
+            'status' => ['required', 'in:draft,active,archived'],
         ]);
+
+        $course->update($request->validated());
 
         return redirect()
             ->route('courses.show', $course)

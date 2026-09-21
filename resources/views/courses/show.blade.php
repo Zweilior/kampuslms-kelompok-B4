@@ -1,7 +1,10 @@
 <x-layout title="Detail Mata Kuliah" active-nav="courses">
 
-    {{-- WRAPPER ALPINE JS UNTUK KONTROL MODAL --}}
-    <div x-data="{ openEditModal: {{ $errors->any() ? 'true' : 'false' }} }">
+    {{-- WRAPPER ALPINE JS UNTUK KONTROL MODAL EDIT DAN DELETE --}}
+    <div x-data="{ 
+        openEditModal: {{ $errors->any() ? 'true' : 'false' }},
+        openDeleteModal: false 
+    }">
 
         {{-- KEMBALI KE DAFTAR --}}
         <div class="mb-space-md">
@@ -61,7 +64,7 @@
                         </span>
                     </div>
 
-                    {{-- Deskripsi Mata Kuliah (Ditambahkan di bawah Box Dosen) --}}
+                    {{-- Deskripsi Mata Kuliah --}}
                     <div class="pt-space-xs border-t border-outline/10">
                         <span class="block text-xs font-bold uppercase tracking-wider text-on-surface-variant mb-1">
                             Deskripsi Mata Kuliah
@@ -126,18 +129,15 @@
                             <span>Edit Mata Kuliah</span>
                         </button>
 
-                        {{-- Tombol Hapus Mata Kuliah --}}
-                        <form action="{{ route('courses.destroy', $course) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus mata kuliah ini?');">
-                            @csrf
-                            @method('DELETE')
-                            <button 
-                                type="submit" 
-                                class="w-full py-3 px-space-md rounded-xl bg-surface-container-high hover:bg-red-500/10 text-red-600 font-semibold text-sm transition-all flex items-center justify-center gap-2"
-                            >
-                                <span class="material-symbols-outlined text-sm">delete</span>
-                                <span>Hapus Mata Kuliah</span>
-                            </button>
-                        </form>
+                        {{-- Tombol Trigger Delete Pop-up --}}
+                        <button 
+                            type="button" 
+                            @click="openDeleteModal = true"
+                            class="w-full py-3 px-space-md rounded-xl bg-surface-container-high hover:bg-red-500/10 text-red-600 font-semibold text-sm transition-all flex items-center justify-center gap-2"
+                        >
+                            <span class="material-symbols-outlined text-sm">delete</span>
+                            <span>Hapus Mata Kuliah</span>
+                        </button>
                     </div>
                 </div>
 
@@ -147,7 +147,7 @@
 
 
         {{-- ============================================ --}}
-        {{-- MODAL POP-UP EDIT FORM (DI TENGAH LAYAR) --}}
+        {{-- MODAL POP-UP EDIT FORM --}}
         {{-- ============================================ --}}
         <div 
             x-show="openEditModal" 
@@ -243,8 +243,9 @@
                                 Status
                             </label>
                             <select id="status" name="status" class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary">
+                                <option value="draft" @selected(old('status', $course->status) === 'draft')>Draft</option>
                                 <option value="active" @selected(old('status', $course->status) === 'active')>Active</option>
-                                <option value="inactive" @selected(old('status', $course->status) === 'inactive')>Inactive</option>
+                                <option value="archived" @selected(old('status', $course->status) === 'archived')>Archived</option>
                             </select>
                             @error('status')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
@@ -287,6 +288,74 @@
                         </button>
                     </div>
 
+                </form>
+            </div>
+        </div>
+
+
+        {{-- ============================================ --}}
+        {{-- MODAL POP-UP CONFIRMATION DELETE             --}}
+        {{-- ============================================ --}}
+        <div 
+            x-show="openDeleteModal" 
+            x-transition:enter="transition ease-out duration-300"
+            x-transition:enter-start="opacity-0"
+            x-transition:enter-end="opacity-100"
+            x-transition:leave="transition ease-in duration-200"
+            x-transition:leave-start="opacity-100"
+            x-transition:leave-end="opacity-0"
+            class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm overflow-y-auto"
+            style="display: none;"
+        >
+            <div 
+                @click.away="openDeleteModal = false"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 scale-95"
+                x-transition:enter-end="opacity-100 scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 scale-100"
+                x-transition:leave-end="opacity-0 scale-95"
+                class="bg-surface-container-low p-space-lg rounded-2xl shadow-2xl w-full max-w-md my-auto relative border border-outline/10 text-left space-y-space-md"
+            >
+                {{-- Header / Icon --}}
+                <div class="flex items-center gap-3 text-red-600">
+                    <div class="p-2.5 rounded-xl bg-red-500/10 flex items-center justify-center">
+                        <span class="material-symbols-outlined text-2xl">warning</span>
+                    </div>
+                    <div>
+                        <h2 class="font-headline-md text-lg font-bold tracking-tight text-on-surface">
+                            Hapus Mata Kuliah?
+                        </h2>
+                        <p class="text-xs text-on-surface-variant">
+                            Tindakan ini tidak dapat dibatalkan.
+                        </p>
+                    </div>
+                </div>
+
+                {{-- Deskripsi Konfirmasi --}}
+                <p class="text-sm text-on-surface-variant leading-relaxed">
+                    Apakah Anda yakin ingin menghapus mata kuliah <strong class="text-on-surface">{{ $course->name }}</strong> ({{ $course->code }})? Semua data terkait mata kuliah ini akan hilang.
+                </p>
+
+                {{-- Form & Action Buttons --}}
+                <form action="{{ route('courses.destroy', $course) }}" method="POST" class="flex items-center justify-end gap-space-sm pt-space-sm border-t border-outline/10">
+                    @csrf
+                    @method('DELETE')
+                    
+                    <button 
+                        type="button" 
+                        @click="openDeleteModal = false"
+                        class="px-space-md py-2.5 rounded-xl bg-surface-container-high text-on-surface font-label-lg hover:bg-surface-container transition-all"
+                    >
+                        Batal
+                    </button>
+                    
+                    <button 
+                        type="submit"
+                        class="px-space-md py-2.5 rounded-xl bg-red-600 text-white font-label-lg hover:bg-red-700 transition-all shadow-sm"
+                    >
+                        Ya, Hapus Data
+                    </button>
                 </form>
             </div>
         </div>
