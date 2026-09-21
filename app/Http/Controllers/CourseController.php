@@ -61,7 +61,7 @@ class CourseController extends Controller
     /**
      * Menyimpan mata kuliah baru.
      */
-    public function store(Request $request)
+    public function store(StoreCourseRequest $request)
     {
         $validated = $request->validate([
             'code' => ['required', 'string', 'max:255', 'unique:courses,code'],
@@ -109,7 +109,7 @@ class CourseController extends Controller
     /**
      * Memperbarui mata kuliah.
      */
-    public function update(Request $request, Course $course)
+    public function update(UpdateCourseRequest $request, Course $course)
     {
         $validated = $request->validate([
             'code' => [

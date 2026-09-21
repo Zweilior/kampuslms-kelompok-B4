@@ -12,9 +12,30 @@ class UserController extends Controller
     /**
      * Menampilkan daftar user.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::orderBy('name')->get();
+        $query = User::query();
+
+        // Pencarian berdasarkan nama atau email
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter berdasarkan role
+        if ($request->filled('role')) {
+            $query->where('role', $request->input('role'));
+        }
+
+        // Pagination 15 data per halaman dan mempertahankan filter
+        $users = $query
+            ->orderBy('name')
+            ->paginate(15)
+            ->withQueryString();
 
         return view('users.index', compact('users'));
     }
