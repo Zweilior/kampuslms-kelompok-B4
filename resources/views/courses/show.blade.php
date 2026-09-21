@@ -243,8 +243,30 @@
                                 Status
                             </label>
                             <select id="status" name="status" class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary">
-                                <option value="active" @selected(old('status', $course->status) === 'active')>Active</option>
-                                <option value="inactive" @selected(old('status', $course->status) === 'inactive')>Inactive</option>
+                                id="status"
+                                name="status"
+                                class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
+                            >
+                                <option
+                                    value="draft"
+                                    @selected(old('status', $course->status) === 'draft')
+                                >
+                                    Draft
+                                </option>
+
+                                <option
+                                    value="active"
+                                    @selected(old('status', $course->status) === 'active')
+                                >
+                                    Active
+                                </option>
+
+                                <option
+                                    value="archived"
+                                    @selected(old('status', $course->status) === 'archived')
+                                >
+                                    Archived
+                                </option>
                             </select>
                             @error('status')
                                 <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
