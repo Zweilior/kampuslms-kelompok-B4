@@ -1,28 +1,15 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar User</title>
+{{-- Bungkus dengan komponen layout, set activeNav ke 'users' agar menu navbar menyala --}}
+<x-layout activeNav="users">
 
-    {{-- Google Fonts --}}
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-
-    {{-- Material Symbols --}}
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
-
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-
+    {{-- Style khusus untuk halaman ini (Modal, Grid, dll) --}}
     <style>
         /* =========================================
-           CSS MODAL (Diperbarui: Warna & Layout)
+           CSS MODAL
            ========================================= */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.8); /* Lebih gelap */
+            background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(8px);
             display: flex;
             align-items: center;
@@ -43,7 +30,7 @@
             border: 1px solid #333;
             border-radius: 16px;
             width: 100%;
-            max-width: 700px; /* Ukuran standar untuk semua modal */
+            max-width: 700px;
             max-height: 90vh;
             overflow-y: auto;
             transform: translateY(20px) scale(0.95);
@@ -57,19 +44,17 @@
             transform: translateY(0) scale(1);
         }
 
-        /* Modal Khusus Hapus (Lebih Kecil) */
         .modal-content.modal-sm {
             max-width: 450px;
         }
 
-        /* Header Berwarna */
+        /* Header Modal */
         .modal-header {
             padding: 20px 28px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid #333;
-            /* Default Header */
             background: linear-gradient(to right, #222, #1a1a1a);
         }
         .modal-header h2 {
@@ -121,139 +106,58 @@
             justify-content: center;
             transition: all 0.2s;
         }
-        .modal-close:hover { 
-            background: rgba(255,255,255,0.1);
-            color: #fff; 
-        }
+        .modal-close:hover { background: rgba(255,255,255,0.1); color: #fff; }
 
-        .modal-body {
-            padding: 28px;
-        }
+        .modal-body { padding: 28px; }
 
-        /* Form Layout Grid 2 Kolom */
-        .modal-form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+        /* Form Grid */
+        .modal-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .modal-form-group { margin-bottom: 0; }
         .modal-form-group.full-width { grid-column: span 2; }
-        
-        .modal-form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #ccc;
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
+        .modal-form-group label { display: block; margin-bottom: 8px; color: #ccc; font-size: 0.85rem; font-weight: 500; }
         .modal-form-group input, .modal-form-group select {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            background: #222;
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            font-size: 0.95rem;
-            transition: all 0.2s;
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #444;
+            background: #222; color: #fff; font-family: 'Inter', sans-serif; font-size: 0.95rem; transition: all 0.2s;
         }
         .modal-form-group input:focus, .modal-form-group select:focus {
-            outline: none;
-            border-color: #a3e635;
-            background: #2a2a2a;
-            box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.1);
+            outline: none; border-color: #a3e635; background: #2a2a2a; box-shadow: 0 0 0 3px rgba(163, 230, 53, 0.1);
         }
 
-        /* =========================================
-           STYLE KHUSUS DETAIL USER (BARU)
-           ========================================= */
-        .detail-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
+        /* Detail Grid */
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .detail-item {
-            background: #222;
-            border: 1px solid #333;
-            border-radius: 12px;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            transition: border-color 0.2s;
+            background: #222; border: 1px solid #333; border-radius: 12px; padding: 16px;
+            display: flex; flex-direction: column; gap: 6px; transition: border-color 0.2s;
         }
-        .detail-item:hover {
-            border-color: #444;
-        }
-        .detail-item.full-width {
-            grid-column: span 2;
-        }
-        .detail-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #888;
-            font-weight: 600;
-        }
-        .detail-value {
-            font-size: 1rem;
-            color: #fff;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-        }
-        .detail-value.role-badge {
-            display: inline-block;
-            width: fit-content;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            text-transform: capitalize;
-        }
+        .detail-item:hover { border-color: #444; }
+        .detail-item.full-width { grid-column: span 2; }
+        .detail-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: #888; font-weight: 600; }
+        .detail-value { font-size: 1rem; color: #fff; font-weight: 500; font-family: 'Inter', sans-serif; }
+        .detail-value.role-badge { display: inline-block; width: fit-content; padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; text-transform: capitalize; }
 
-        /* Warna Badge Role di Detail */
+        /* Badge Role */
         .role-badge--admin { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
         .role-badge--dosen { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
         .role-badge--mahasiswa { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
 
-
-        /* Footer */
+        /* Footer Modal */
         .modal-footer {
-            padding: 20px 28px;
-            background: #161616;
-            border-top: 1px solid #333;
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            border-radius: 0 0 16px 16px;
+            padding: 20px 28px; background: #161616; border-top: 1px solid #333;
+            display: flex; justify-content: flex-end; gap: 12px; border-radius: 0 0 16px 16px;
         }
-        .modal-footer.center {
-            justify-content: center;
-        }
+        .modal-footer.center { justify-content: center; }
 
         .btn-secondary {
-            background: #2a2a2a;
-            color: #ccc;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s;
+            background: #2a2a2a; color: #ccc; padding: 10px 20px; border-radius: 8px;
+            border: 1px solid #444; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;
         }
-        .btn-secondary:hover { 
-            background: #333;
-            color: #fff;
-            border-color: #555;
-        }
+        .btn-secondary:hover { background: #333; color: #fff; border-color: #555; }
 
-        /* Tombol Aksi Khusus */
+        /* Tombol Aksi */
         .btn-action-create { background: #a3e635; color: #000; border: none; }
         .btn-action-create:hover { background: #84cc16; }
-        
         .btn-action-edit { background: #3b82f6; color: #fff; border: none; }
         .btn-action-edit:hover { background: #2563eb; }
-
         .btn-action-delete { background: #ef4444; color: #fff; border: none; }
         .btn-action-delete:hover { background: #dc2626; }
 
@@ -263,145 +167,116 @@
             .modal-form-group.full-width, .detail-item.full-width { grid-column: span 1; }
             .modal-content { margin: 10px; }
         }
+
+        /* Container Utama Halaman User */
+        .users-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 0 32px;
+        }
     </style>
-</head>
-<body>
 
-    <div class="main-content">
-        <div class="users-index">
-
-            {{-- Header --}}
-            <div class="users-index__header">
-                <div class="users-index__title-group">
-                    <span class="users-index__eyebrow">Manajemen Pengguna</span>
-                    <h1 class="users-index__title">Daftar User</h1>
-                    <p class="users-index__subtitle">
-                        Kelola akun admin, dosen, dan mahasiswa di sini.
-                    </p>
-                </div>
-
-                <button type="button" class="btn btn--primary" onclick="openCreateModal()">
-                    <span class="material-symbols-outlined">person_add</span>
-                    Tambah User
-                </button>
+    {{-- KONTEN UTAMA --}}
+    <div class="users-container">
+        
+        {{-- Header Halaman --}}
+        <div class="users-index__header" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+            <div class="users-index__title-group">
+                <span class="users-index__eyebrow" style="color: #a3e635; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem;">Manajemen Pengguna</span>
+                <h1 class="users-index__title" style="font-size: 2.5rem; color: #fff; margin: 5px 0 10px 0; font-family: 'Plus Jakarta Sans', sans-serif;">Daftar User</h1>
+                <p class="users-index__subtitle" style="color: #aaa; margin: 0;">Kelola akun admin, dosen, dan mahasiswa di sini.</p>
             </div>
 
-            {{-- Alert --}}
-            @if (session('success'))
-                <div class="alert alert--success">
-                    <span class="material-symbols-outlined">check_circle</span>
-                    {{ session('success') }}
-                </div>
-            @endif
+            <button type="button" class="btn btn--primary" onclick="openCreateModal()" style="background: #a3e635; color: #000; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+                <span class="material-symbols-outlined">person_add</span>
+                Tambah User
+            </button>
+        </div>
 
-            {{-- Card --}}
-            <div class="users-index__card">
-                <div class="users-index__card-header">
-                    <h2 class="users-index__card-title">
-                        <span class="material-symbols-outlined">group</span>
-                        Semua Pengguna
-                    </h2>
-                    <span class="users-index__count">
-                        {{ $users->count() }} user
-                    </span>
-                </div>
+        {{-- Alert --}}
+        @if (session('success'))
+            <div class="alert alert--success" style="background: rgba(163, 230, 53, 0.1); border: 1px solid #a3e635; color: #a3e635; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-outlined">check_circle</span>
+                {{ session('success') }}
+            </div>
+        @endif
 
-                <div class="users-table-wrapper">
-                    <table class="users-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nama</th>
-                                <th>Email</th>
-                                <th>NIM/NIP</th>
-                                <th>Role</th>
-                                <th>Aksi</th>
+        {{-- Card Tabel --}}
+        <div class="users-index__card" style="background: #1a1a1a; border: 1px solid #333; border-radius: 16px; overflow: hidden;">
+            <div class="users-index__card-header" style="padding: 20px 24px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+                <h2 class="users-index__card-title" style="color: #fff; margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
+                    <span class="material-symbols-outlined" style="color: #a3e635;">group</span>
+                    Semua Pengguna
+                </h2>
+                <span class="users-index__count" style="background: #333; color: #ccc; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
+                    {{ $users->count() }} user
+                </span>
+            </div>
+
+            <div class="users-table-wrapper" style="overflow-x: auto;">
+                <table class="users-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead>
+                        <tr style="background: #222; border-bottom: 1px solid #333;">
+                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">ID</th>
+                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">Nama</th>
+                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">Email</th>
+                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">NIM/NIP</th>
+                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">Role</th>
+                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($users as $user)
+                            <tr style="border-bottom: 1px solid #2a2a2a;">
+                                <td style="padding: 16px 24px; color: #888;">#{{ str_pad($user->id, 3, '0', STR_PAD_LEFT) }}</td>
+                                <td style="padding: 16px 24px; color: #fff; font-weight: 500;">{{ $user->name }}</td>
+                                <td style="padding: 16px 24px; color: #aaa;">{{ $user->email }}</td>
+                                <td style="padding: 16px 24px; color: #aaa;">{{ $user->nim_nip ?? '—' }}</td>
+                                <td style="padding: 16px 24px;">
+                                    <span class="role-badge role-badge--{{ $user->role }}" style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; text-transform: capitalize;">
+                                        {{ $user->role }}
+                                    </span>
+                                </td>
+                                <td style="padding: 16px 24px;">
+                                    <div style="display: flex; gap: 8px;">
+                                        {{-- Tombol Detail --}}
+                                        <button type="button" onclick="openDetailModal('{{ $user->id }}', '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', '{{ $user->nim_nip ?? '-' }}', '{{ $user->role }}')" style="background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem;">
+                                            <span class="material-symbols-outlined" style="font-size: 1rem;">visibility</span> Detail
+                                        </button>
+                                        {{-- Tombol Edit --}}
+                                        <button type="button" onclick="openEditModal('{{ $user->id }}', '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', '{{ $user->nim_nip ?? '' }}', '{{ $user->role }}')" style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem;">
+                                            <span class="material-symbols-outlined" style="font-size: 1rem;">edit</span> Edit
+                                        </button>
+                                        {{-- Tombol Hapus --}}
+                                        <button type="button" onclick="openDeleteModal('{{ $user->id }}', '{{ addslashes($user->name) }}')" style="background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem;">
+                                            <span class="material-symbols-outlined" style="font-size: 1rem;">delete</span> Hapus
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($users as $user)
-                                <tr>
-                                    <td class="users-table__id">
-                                        #{{ str_pad($user->id, 3, '0', STR_PAD_LEFT) }}
-                                    </td>
-                                    <td class="users-table__name">{{ $user->name }}</td>
-                                    <td class="users-table__email">{{ $user->email }}</td>
-                                    <td class="users-table__email">
-                                        {{ $user->nim_nip ?? '—' }}
-                                    </td>
-                                    <td>
-                                        <span class="role-badge role-badge--{{ $user->role }}">
-                                            {{ $user->role }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="users-table__actions">
-                                            {{-- Tombol Detail --}}
-                                            <button type="button"
-                                               class="action-btn action-btn--view"
-                                               onclick="openDetailModal(
-                                                   '{{ $user->id }}',
-                                                   '{{ addslashes($user->name) }}',
-                                                   '{{ addslashes($user->email) }}',
-                                                   '{{ $user->nim_nip ?? '-' }}',
-                                                   '{{ $user->role }}'
-                                               )">
-                                                <span class="material-symbols-outlined">visibility</span>
-                                                <span>Detail</span>
-                                            </button>
-
-                                            {{-- Tombol Edit --}}
-                                            <button type="button"
-                                               class="action-btn action-btn--edit"
-                                               onclick="openEditModal(
-                                                   '{{ $user->id }}',
-                                                   '{{ addslashes($user->name) }}',
-                                                   '{{ addslashes($user->email) }}',
-                                                   '{{ $user->nim_nip ?? '' }}',
-                                                   '{{ $user->role }}'
-                                               )">
-                                                <span class="material-symbols-outlined">edit</span>
-                                                <span>Edit</span>
-                                            </button>
-
-                                            {{-- Tombol Hapus --}}
-                                            <button type="button"
-                                                    class="action-btn action-btn--delete"
-                                                    onclick="openDeleteModal('{{ $user->id }}', '{{ addslashes($user->name) }}')">
-                                                <span class="material-symbols-outlined">delete</span>
-                                                <span>Hapus</span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="users-table__empty">
-                                        <span class="material-symbols-outlined">group_off</span>
-                                        Belum ada user yang terdaftar.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
+                        @empty
+                            <tr>
+                                <td colspan="6" style="padding: 40px; text-align: center; color: #666;">
+                                    <span class="material-symbols-outlined" style="font-size: 3rem; display: block; margin-bottom: 10px;">group_off</span>
+                                    Belum ada user yang terdaftar.
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
-
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL TAMBAH USER                          -->
-    <!-- ========================================== -->
+    {{-- ========================================== --}}
+    {{-- MODAL TAMBAH USER                          --}}
+    {{-- ========================================== --}}
     <div id="modal-create" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2><span class="material-symbols-outlined">person_add</span> Tambah User Baru</h2>
-                <button class="modal-close" onclick="closeModal('modal-create')">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
+                <button class="modal-close" onclick="closeModal('modal-create')"><span class="material-symbols-outlined">close</span></button>
             </div>
-            
             <form id="form-create" method="POST" action="{{ route('users.store') }}">
                 @csrf
                 <div class="modal-body">
@@ -441,19 +316,16 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL DETAIL USER (DIPERBARUI)             -->
-    <!-- ========================================== -->
+    {{-- ========================================== --}}
+    {{-- MODAL DETAIL USER                          --}}
+    {{-- ========================================== --}}
     <div id="modal-detail" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2><span class="material-symbols-outlined">badge</span> Detail User</h2>
-                <button class="modal-close" onclick="closeModal('modal-detail')">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
+                <button class="modal-close" onclick="closeModal('modal-detail')"><span class="material-symbols-outlined">close</span></button>
             </div>
             <div class="modal-body">
-                <!-- Menggunakan Grid Layout baru -->
                 <div class="detail-grid">
                     <div class="detail-item">
                         <span class="detail-label">ID User</span>
@@ -483,21 +355,17 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL EDIT USER                            -->
-    <!-- ========================================== -->
+    {{-- ========================================== --}}
+    {{-- MODAL EDIT USER                            --}}
+    {{-- ========================================== --}}
     <div id="modal-edit" class="modal-overlay">
         <div class="modal-content">
             <div class="modal-header">
                 <h2><span class="material-symbols-outlined">edit</span> Edit User</h2>
-                <button class="modal-close" onclick="closeModal('modal-edit')">
-                    <span class="material-symbols-outlined">close</span>
-                </button>
+                <button class="modal-close" onclick="closeModal('modal-edit')"><span class="material-symbols-outlined">close</span></button>
             </div>
-            
             <form id="form-edit" method="POST" action="">
-                @csrf
-                @method('PUT')
+                @csrf @method('PUT')
                 <div class="modal-body">
                     <div class="modal-form-grid">
                         <div class="modal-form-group">
@@ -534,9 +402,9 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- MODAL HAPUS USER                           -->
-    <!-- ========================================== -->
+    {{-- ========================================== --}}
+    {{-- MODAL HAPUS USER                           --}}
+    {{-- ========================================== --}}
     <div id="modal-delete" class="modal-overlay">
         <div class="modal-content modal-sm">
             <div class="modal-header">
@@ -544,15 +412,11 @@
             </div>
             <div class="modal-body" style="text-align: center; padding-top: 10px;">
                 <h2 style="color: #fff; margin-bottom: 10px; font-family: 'Plus Jakarta Sans', sans-serif;">Hapus User?</h2>
-                <p style="color: #aaa; font-size: 0.95rem;">
-                    Apakah Anda yakin ingin menghapus <br>
-                    <strong id="delete-name" style="color:#fff; font-size: 1.1rem; display: block; margin-top: 8px;"></strong>
-                </p>
+                <p style="color: #aaa; font-size: 0.95rem;">Apakah Anda yakin ingin menghapus <br><strong id="delete-name" style="color:#fff; font-size: 1.1rem; display: block; margin-top: 8px;"></strong></p>
                 <p style="color: #ef4444; font-size: 0.8rem; margin-top: 15px;">Tindakan ini tidak dapat dibatalkan.</p>
             </div>
             <form id="form-delete" method="POST" action="">
-                @csrf
-                @method('DELETE')
+                @csrf @method('DELETE')
                 <div class="modal-footer center">
                     <button type="button" class="btn-secondary" onclick="closeModal('modal-delete')">Batal</button>
                     <button type="submit" class="btn btn--primary btn-action-delete">Ya, Hapus</button>
@@ -561,74 +425,39 @@
         </div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- JAVASCRIPT LOGIC                           -->
-    <!-- ========================================== -->
+    {{-- JAVASCRIPT LOGIC --}}
     <script>
-        // Fungsi Buka/Tutup Modal
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // 0. Logic Modal Tambah User
-        function openCreateModal() {
-            document.getElementById('form-create').reset();
-            openModal('modal-create');
-        }
-
-        // 1. Logic Modal Detail (Diperbarui untuk Badge Role)
+        function openModal(modalId) { document.getElementById(modalId).classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); document.body.style.overflow = ''; }
+        function openCreateModal() { document.getElementById('form-create').reset(); openModal('modal-create'); }
         function openDetailModal(id, name, email, nim, role) {
             document.getElementById('detail-id').innerText = '#' + id.padStart(3, '0');
             document.getElementById('detail-name').innerText = name;
             document.getElementById('detail-email').innerText = email;
             document.getElementById('detail-nim').innerText = nim;
-            
-            // Set Role dengan Class Warna
             const roleEl = document.getElementById('detail-role');
             roleEl.innerText = role;
             roleEl.className = 'detail-value role-badge role-badge--' + role.toLowerCase();
-
             openModal('modal-detail');
         }
-
-        // 2. Logic Modal Edit
         function openEditModal(id, name, email, nim, role) {
             const form = document.getElementById('form-edit');
             form.action = `/users/${id}`; 
-
             document.getElementById('edit-name').value = name;
             document.getElementById('edit-email').value = email;
             document.getElementById('edit-nim').value = nim;
             document.getElementById('edit-role').value = role;
-            
             openModal('modal-edit');
         }
-
-        // 3. Logic Modal Hapus
         function openDeleteModal(id, name) {
             const form = document.getElementById('form-delete');
             form.action = `/users/${id}`;
-
             document.getElementById('delete-name').innerText = name;
-            
             openModal('modal-delete');
         }
-
-        // Menutup modal jika area overlay diklik
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', function(e) {
-                if (e.target === this) {
-                    closeModal(this.id);
-                }
-            });
+            overlay.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
         });
     </script>
 
-</body>
-</html>
+</x-layout>

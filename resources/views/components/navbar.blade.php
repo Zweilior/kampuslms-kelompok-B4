@@ -2,12 +2,12 @@
 
 @php
     $navItems = [
-        ['path' => 'dashboard',  'icon' => 'grid_view',      'label' => 'Dashboard',     'route' => 'dashboard'],
-        ['path' => 'courses',    'icon' => 'menu_book',      'label' => 'Mata Kuliah',   'route' => 'courses.index'],
-        ['path' => 'users',      'icon' => 'campaign',       'label' => 'Manajemen User',          'route' => 'users.index'],
-        ['path' => 'jadwal',     'icon' => 'calendar_today', 'label' => 'Materi', 'route' => null],
-        ['path' => 'tugas',      'icon' => 'assignment',     'label' => 'Tugas',  'route' => null],
-        ['path' => 'nilai',      'icon' => 'grade',          'label' => 'Monitoring Nilai',   'route' => null],
+        ['path' => 'dashboard',  'icon' => 'grid_view',      'label' => 'Dashboard',        'route' => 'dashboard'],
+        ['path' => 'courses',    'icon' => 'menu_book',      'label' => 'Mata Kuliah',      'route' => 'courses.index'],
+        ['path' => 'users',      'icon' => 'campaign',       'label' => 'Manajemen User',   'route' => 'users.index'],
+        ['path' => 'jadwal',     'icon' => 'calendar_today', 'label' => 'Materi',           'route' => null],
+        ['path' => 'tugas',      'icon' => 'assignment',     'label' => 'Tugas',            'route' => null],
+        ['path' => 'nilai',      'icon' => 'grade',          'label' => 'Monitoring Nilai', 'route' => null],
     ];
 @endphp
 
@@ -39,7 +39,6 @@
 
         {{-- Right side: Status + Avatar --}}
         <div class="navbar__right">
-
             <div class="navbar__status">
                 <span class="navbar__status-dot"></span>
                 <span class="navbar__status-text">Online</span>
@@ -48,7 +47,6 @@
             <div class="navbar__avatar" title="Sekolah">
                 M
             </div>
-
         </div>
 
     </nav>
