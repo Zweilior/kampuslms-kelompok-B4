@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
@@ -42,14 +43,16 @@ class CourseController extends Controller
      */
     public function store(Request $request)
     {
-        $course = Course::create([
-            'code' => $request->code,
-            'name' => $request->name,
-            'description' => $request->description,
-            'sks' => $request->sks,
-            'lecturer_id' => $request->lecturer_id,
-            'status' => $request->status,
+        $validated = $request->validate([
+            'code' => ['required', 'string', 'max:255', 'unique:courses,code'],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'sks' => ['required', 'integer', 'min:1'],
+            'lecturer_id' => ['required', 'exists:users,id'],
+            'status' => ['required', 'in:draft,active,archived'],
         ]);
+
+        $course = Course::create($validated);
 
         return redirect()
             ->route('courses.show', $course)
@@ -88,14 +91,21 @@ class CourseController extends Controller
      */
     public function update(Request $request, Course $course)
     {
-        $course->update([
-            'code' => $request->code,
-            'name' => $request->name,
-            'description' => $request->description,
-            'sks' => $request->sks,
-            'lecturer_id' => $request->lecturer_id,
-            'status' => $request->status,
+        $validated = $request->validate([
+            'code' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('courses', 'code')->ignore($course->id),
+            ],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'sks' => ['required', 'integer', 'min:1'],
+            'lecturer_id' => ['required', 'exists:users,id'],
+            'status' => ['required', 'in:draft,active,archived'],
         ]);
+
+        $course->update($validated);
 
         return redirect()
             ->route('courses.show', $course)
