@@ -22,31 +22,26 @@
     @vite('resources/css/app.css')
     
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
+
+    <style>
+        /* Memastikan konten utama tidak tertutup navbar */
+        .main-content {
+            padding-top: 100px; /* Jarak aman dari navbar fixed */
+            min-height: 100vh;
+            background-color: #0f0f0f; /* Warna background gelap */
+            padding-bottom: 40px;
+        }
+    </style>
 </head>
 
 <body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
 
-    {{-- SIDEBAR --}}
+    {{-- NAVBAR --}}
     @include('components.navbar')
 
     {{-- KONTEN UTAMA --}}
     <div class="main-content">
-
-        {{-- FLASH MESSAGE --}}
-        @if (session('success'))
-            <div class="mb-4 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-green-400">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="mb-4 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-400">
-                {{ session('error') }}
-            </div>
-        @endif
-
         {{ $slot }}
-
     </div>
 
 </body>

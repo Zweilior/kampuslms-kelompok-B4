@@ -37,7 +37,7 @@ class UserController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        return view('users.index', compact('users'));
+        return view('courses.user', compact('users'));
     }
 
     /**
@@ -73,7 +73,7 @@ class UserController extends Controller
         $user->save();
 
         return redirect()
-            ->route('users.show', $user)
+            ->route('users.index', $user)
             ->with('success', 'User berhasil ditambahkan.');
     }
 
