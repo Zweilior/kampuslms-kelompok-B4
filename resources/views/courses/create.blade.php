@@ -27,9 +27,11 @@
     <div class="bg-surface-container-low p-space-lg rounded-2xl shadow-md max-w-3xl">
 
         <form
+            id="createCourseForm"
             action="{{ route('courses.store') }}"
             method="POST"
             class="space-y-space-md"
+            novalidate
         >
 
             @csrf
@@ -52,6 +54,8 @@
                     placeholder="Contoh: SI251406"
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
+
+                <p id="js-error-code" class="text-red-500 text-sm mt-1 hidden"></p>
 
                 @error('code')
                     <p class="text-red-500 text-sm mt-1">
@@ -80,6 +84,8 @@
                     placeholder="Contoh: Pemrograman Web"
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
+
+                <p id="js-error-name" class="text-red-500 text-sm mt-1 hidden"></p>
 
                 @error('name')
                     <p class="text-red-500 text-sm mt-1">
@@ -131,10 +137,11 @@
                     id="sks"
                     name="sks"
                     type="number"
-                    min="1"
                     value="{{ old('sks', 3) }}"
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
+
+                <p id="js-error-sks" class="text-red-500 text-sm mt-1 hidden"></p>
 
                 @error('sks')
                     <p class="text-red-500 text-sm mt-1">
@@ -178,6 +185,8 @@
 
                 </select>
 
+                <p id="js-error-lecturer_id" class="text-red-500 text-sm mt-1 hidden"></p>
+
                 @error('lecturer_id')
                     <p class="text-red-500 text-sm mt-1">
                         {{ $message }}
@@ -201,6 +210,10 @@
                     name="status"
                     class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary"
                 >
+                    <option value="">
+                        -- Pilih Status --
+                    </option>
+
                     <option
                         value="draft"
                         @selected(old('status', 'draft') === 'draft')
@@ -222,6 +235,8 @@
                         Archived
                     </option>
                 </select>
+
+                <p id="js-error-status" class="text-red-500 text-sm mt-1 hidden"></p>
 
                 @error('status')
                     <p class="text-red-500 text-sm mt-1">
@@ -253,5 +268,75 @@
         </form>
 
     </div>
+
+    {{-- Script Client-Side JavaScript Validation --}}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const form = document.getElementById('createCourseForm');
+
+            form.addEventListener('submit', function (e) {
+                let isValid = true;
+
+                // Reset error messages
+                const errorElements = document.querySelectorAll('[id^="js-error-"]');
+                errorElements.forEach(el => {
+                    el.classList.add('hidden');
+                    el.textContent = '';
+                });
+
+                // Validasi Code (Wajib diisi)
+                const codeInput = document.getElementById('code');
+                if (!codeInput.value.trim()) {
+                    showJsError('js-error-code', '[JS Validation] Kode mata kuliah wajib diisi.');
+                    isValid = false;
+                }
+
+                // Validasi Name (Wajib diisi)
+                const nameInput = document.getElementById('name');
+                if (!nameInput.value.trim()) {
+                    showJsError('js-error-name', '[JS Validation] Nama mata kuliah wajib diisi.');
+                    isValid = false;
+                }
+
+                // Validasi SKS (Wajib diisi & 1–6)
+                const sksInput = document.getElementById('sks');
+                const sksVal = parseInt(sksInput.value, 10);
+                if (!sksInput.value.trim()) {
+                    showJsError('js-error-sks', '[JS Validation] Jumlah SKS wajib diisi.');
+                    isValid = false;
+                } else if (isNaN(sksVal) || sksVal < 1 || sksVal > 6) {
+                    showJsError('js-error-sks', '[JS Validation] Jumlah SKS harus antara 1 sampai 6.');
+                    isValid = false;
+                }
+
+                // Validasi Lecturer ID (Wajib dipilih)
+                const lecturerSelect = document.getElementById('lecturer_id');
+                if (!lecturerSelect.value) {
+                    showJsError('js-error-lecturer_id', '[JS Validation] Dosen pengampu wajib dipilih.');
+                    isValid = false;
+                }
+
+                // Validasi Status (Wajib dipilih)
+                const statusSelect = document.getElementById('status');
+                if (!statusSelect.value) {
+                    showJsError('js-error-status', '[JS Validation] Status mata kuliah wajib dipilih.');
+                    isValid = false;
+                }
+
+                // Hentikan pengiriman form jika ada input tidak valid
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+
+            function showJsError(elementId, message) {
+                const el = document.getElementById(elementId);
+                if (el) {
+                    el.textContent = message;
+                    el.classList.remove('hidden');
+                }
+            }
+        });
+    </script>
 
 </x-layout>
