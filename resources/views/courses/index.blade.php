@@ -37,7 +37,7 @@
                     </span>
                     <span class="w-1 h-1 rounded-full bg-outline"></span>
                     <span class="font-label-sm text-label-sm text-on-surface-variant">
-                        {{ $courses->count() }} Mata Kuliah Terdaftar
+                        {{ $courses->total() }} Mata Kuliah Terdaftar
                     </span>
                 </div>
 
@@ -87,7 +87,7 @@
                     <span class="font-label-lg text-label-lg text-on-surface-variant">Total Mata Kuliah</span>
                 </div>
                 <div class="mt-space-md flex items-baseline gap-space-xs">
-                    <span class="font-display-lg text-display-lg tracking-tight font-bold leading-none">{{ $courses->count() }}</span>
+                    <span class="font-display-lg text-display-lg tracking-tight font-bold leading-none">{{ $courses->total() }}</span>
                     <span class="font-headline-sm text-headline-sm text-on-surface-variant font-medium">Kelas</span>
                 </div>
             </div>
@@ -103,7 +103,7 @@
                 </div>
                 <div class="mt-space-md flex items-baseline gap-space-xs">
                     <span class="font-display-lg text-display-lg tracking-tight font-bold leading-none">{{ $courses->where('status', 'active')->count() }}</span>
-                    <span class="font-headline-sm text-headline-sm text-on-surface-variant font-medium">Aktif</span>
+                    <span class="font-headline-sm text-headline-sm text-on-surface-variant font-medium">Aktif di Halaman Ini</span>
                 </div>
             </div>
 
@@ -124,24 +124,56 @@
         </div>
 
 
-        {{-- TOOLBAR PENCARIAN --}}
-        <div class="bg-surface-container-low p-space-sm rounded-2xl flex items-center gap-space-sm shadow-sm mb-bento-gap-desktop">
-            <div class="flex items-center gap-space-xs bg-surface-container px-space-md py-2 rounded-xl flex-1 max-w-xl">
+        {{-- TOOLBAR PENCARIAN & FILTER (SERVER-SIDE) --}}
+        <form method="GET" action="{{ route('courses.index') }}" class="bg-surface-container-low p-space-sm rounded-2xl flex flex-col md:flex-row items-stretch md:items-center gap-space-sm shadow-sm mb-bento-gap-desktop">
+            
+            {{-- Input Search --}}
+            <div class="flex items-center gap-space-xs bg-surface-container px-space-md py-2 rounded-xl flex-1">
                 <span class="material-symbols-outlined text-outline text-headline-sm">search</span>
-                <input id="courseSearchInput" class="bg-transparent border-none outline-none font-body-md text-body-md text-on-surface placeholder-outline flex-1 focus:ring-0" placeholder="Cari kode atau nama mata kuliah..." type="text" />
-                <span class="font-label-sm text-label-sm text-outline-variant bg-surface-container-highest px-1.5 py-0.5 rounded">ESC</span>
+                <input 
+                    name="search" 
+                    value="{{ request('search') }}" 
+                    class="bg-transparent border-none outline-none font-body-md text-body-md text-on-surface placeholder-outline flex-1 focus:ring-0" 
+                    placeholder="Cari kode atau nama mata kuliah..." 
+                    type="text" 
+                />
             </div>
-            <div class="flex items-center gap-space-xs ml-auto">
-                <span class="font-label-sm text-label-sm text-on-surface-variant">Ditemukan:</span>
-                <span id="courseCount" class="font-label-lg text-label-lg text-primary">{{ $courses->count() }}</span>
+
+            {{-- Filter Status --}}
+            <div class="flex items-center gap-space-xs">
+                <select name="status" onchange="this.form.submit()" class="bg-surface-container border-none outline-none font-body-md text-body-md text-on-surface rounded-xl px-space-md py-2 focus:ring-0">
+                    <option value="">Semua Status</option>
+                    <option value="active" @selected(request('status') === 'active')>Active</option>
+                    <option value="draft" @selected(request('status') === 'draft')>Draft</option>
+                    <option value="archived" @selected(request('status') === 'archived')>Archived</option>
+                </select>
+
+                {{-- Tombol Submit --}}
+                <button type="submit" class="px-space-md py-2 rounded-xl bg-primary text-on-primary font-label-md hover:bg-primary-container transition-colors flex items-center gap-1">
+                    <span class="material-symbols-outlined text-sm">search</span>
+                    <span>Cari</span>
+                </button>
+
+                {{-- Tombol Reset jika ada pencarian/filter --}}
+                @if(request()->filled('search') || request()->filled('status'))
+                    <a href="{{ route('courses.index') }}" class="px-space-xs py-2 text-on-surface-variant hover:text-error font-label-md flex items-center" title="Reset Filter">
+                        <span class="material-symbols-outlined text-sm">close</span>
+                    </a>
+                @endif
             </div>
-        </div>
+
+            {{-- Total Ditemukan --}}
+            <div class="flex items-center gap-space-xs ml-auto pt-2 md:pt-0 border-t md:border-t-0 border-outline/10">
+                <span class="font-label-sm text-label-sm text-on-surface-variant">Total Ditemukan:</span>
+                <span class="font-label-lg text-label-lg text-primary">{{ $courses->total() }}</span>
+            </div>
+        </form>
 
 
         {{-- GRID MATA KULIAH --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-bento-gap-desktop" id="courseGrid">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-bento-gap-desktop">
             @forelse ($courses as $course)
-                <div class="course-card bg-surface-container-low hover:bg-surface-container p-space-lg rounded-2xl shadow-md transition-all duration-300 flex flex-col justify-between group relative overflow-hidden" data-code="{{ strtolower($course->code) }}" data-name="{{ strtolower($course->name) }}">
+                <div class="bg-surface-container-low hover:bg-surface-container p-space-lg rounded-2xl shadow-md transition-all duration-300 flex flex-col justify-between group relative overflow-hidden">
                     <div class="flex flex-col space-y-space-xs">
                         {{-- Kode & Status --}}
                         <div class="flex items-center justify-between mb-1">
@@ -213,14 +245,32 @@
                 </div>
             @empty
                 <div class="col-span-full py-space-2xl text-center">
-                    <span class="material-symbols-outlined text-headline-lg text-outline">menu_book</span>
-                    <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm">Belum ada mata kuliah.</p>
-                    <button @click="openCreateModal = true" class="inline-flex items-center gap-space-xs mt-space-md px-space-md py-2.5 rounded-xl bg-primary text-on-primary">
-                        <span class="material-symbols-outlined">add_circle</span>
-                        Tambah Mata Kuliah
-                    </button>
+                    <span class="material-symbols-outlined text-headline-lg text-outline">search_off</span>
+                    <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm">
+                        @if(request()->filled('search') || request()->filled('status'))
+                            Tidak ada mata kuliah yang cocok dengan kata kunci atau filter tersebut.
+                        @else
+                            Belum ada mata kuliah.
+                        @endif
+                    </p>
+                    @if(request()->filled('search') || request()->filled('status'))
+                        <a href="{{ route('courses.index') }}" class="inline-flex items-center gap-space-xs mt-space-md px-space-md py-2.5 rounded-xl bg-surface-container-high text-on-surface">
+                            Reset Pencarian
+                        </a>
+                    @else
+                        <button @click="openCreateModal = true" class="inline-flex items-center gap-space-xs mt-space-md px-space-md py-2.5 rounded-xl bg-primary text-on-primary">
+                            <span class="material-symbols-outlined">add_circle</span>
+                            Tambah Mata Kuliah
+                        </button>
+                    @endif
                 </div>
             @endforelse
+        </div>
+
+
+        {{-- NAVIGASI PAGINATION --}}
+        <div class="mt-space-lg flex justify-center">
+            {{ $courses->links('vendor.pagination.custom-pagination') }}
         </div>
 
 
@@ -337,7 +387,7 @@
         </div>
 
 
-        {{-- POP-UP / MODAL FORM EDIT (PERSIS SAMA DENGAN POP-UP EDIT SHOW) --}}
+        {{-- POP-UP / MODAL FORM EDIT --}}
         <div 
             x-show="openEditModal" 
             x-transition:enter="transition ease-out duration-300"
@@ -415,7 +465,8 @@
                             <label for="edit_status" class="block font-label-md text-label-md mb-1">Status</label>
                             <select id="edit_status" name="status" x-model="editCourse.status" class="w-full bg-surface-container border-none rounded-xl px-space-md py-3 focus:ring-2 focus:ring-primary">
                                 <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
+                                <option value="draft">Draft</option>
+                                <option value="archived">Archived</option>
                             </select>
                             @if($errors->has('edit_id'))
                                 @error('status') <p class="text-red-500 text-sm mt-1">{{ $message }}</p> @enderror
@@ -451,49 +502,5 @@
         </div>
 
     </div>
-
-    {{-- PESAN PENCARIAN --}}
-    <div id="noResult" class="hidden py-space-2xl text-center">
-        <span class="material-symbols-outlined text-headline-lg text-outline">search_off</span>
-        <p class="font-body-md text-body-md text-on-surface-variant mt-space-sm">
-            Tidak ada mata kuliah yang cocok dengan pencarian.
-        </p>
-    </div>
-
-    <script>
-        (function () {
-            const searchInput = document.getElementById('courseSearchInput');
-            const cards = document.querySelectorAll('.course-card');
-            const countEl = document.getElementById('courseCount');
-            const noResult = document.getElementById('noResult');
-
-            if (!searchInput) return;
-
-            function applySearch() {
-                const q = (searchInput.value || '').toLowerCase().trim();
-                let visible = 0;
-
-                cards.forEach(card => {
-                    const name = card.getAttribute('data-name') || '';
-                    const code = card.getAttribute('data-code') || '';
-                    const match = !q || name.includes(q) || code.includes(q);
-
-                    card.style.display = match ? 'flex' : 'none';
-                    if (match) visible++;
-                });
-
-                countEl.textContent = visible;
-                noResult.classList.toggle('hidden', visible > 0);
-            }
-
-            searchInput.addEventListener('input', applySearch);
-            searchInput.addEventListener('keydown', e => {
-                if (e.key === 'Escape') {
-                    searchInput.value = '';
-                    applySearch();
-                }
-            });
-        })();
-    </script>
 
 </x-layout>
