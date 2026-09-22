@@ -1,7 +1,9 @@
 <x-layout title="Dashboard - Akademia LMS" active-nav="dashboard">
 
-        {{-- HERO HEADER --}}
+    {{-- HERO HEADER --}}
     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-y-space-sm mb-space-lg">
+        
+        {{-- KIRI: Judul & Subtitle --}}
         <div class="flex flex-col">
             <div class="flex items-center gap-space-xs mb-space-2xs">
                 <span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm tracking-wide uppercase">
@@ -16,10 +18,10 @@
             </p>
         </div>
 
-        {{-- Bagian Kanan: Role Switcher & Tanggal --}}
-        <div class="flex flex-col items-end gap-2">
+        {{-- KANAN: Role Switcher & Tanggal (Sejajar Horizontal) --}}
+        <div class="flex flex-wrap items-center gap-3">
             
-            {{-- Role Switcher (Simulasi) --}}
+
             <div style="display: flex; gap: 8px; background: #222; padding: 6px; border-radius: 12px; border: 1px solid #333;">
                 <a href="{{ route('switch.role', 'admin') }}" 
                    style="display: flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 20px; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;
@@ -42,7 +44,7 @@
             </div>
 
             {{-- Tanggal --}}
-            <span class="flex items-center gap-space-2xs px-space-md py-2 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md">
+            <span class="flex items-center gap-2 px-4 py-2 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md">
                 <span class="material-symbols-outlined text-sm">event</span>
                 <span>{{ date('d F Y') }}</span>
             </span>

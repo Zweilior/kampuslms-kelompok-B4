@@ -3,16 +3,12 @@
 @php
     use Illuminate\Support\Facades\Auth;
 
-    // Logika Prioritas Role:
-    // 1. Jika user login, pakai role dari user
-    // 2. Jika tidak login, pakai role dari session (simulasi)
-    // 3. Jika tidak ada keduanya, default ke 'mahasiswa' (atau 'guest')
     if (Auth::check()) {
         $userRole = Auth::user()->role;
         $userName = Auth::user()->name;
     } else {
         $userRole = session('simulated_role', 'mahasiswa'); // Default ke mahasiswa jika belum pilih
-        $userName = ucfirst($userRole) . ' (Simulasi)';
+        $userName = ucfirst($userRole) ;
     }
 
     // Menu Dasar (Semua Role Bisa Akses)
