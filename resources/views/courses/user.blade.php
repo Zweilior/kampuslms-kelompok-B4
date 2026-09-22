@@ -168,12 +168,114 @@
             .modal-content { margin: 10px; }
         }
 
-        /* Container Utama Halaman User */
+        /* =========================================
+           CONTAINER UTAMA & TABEL (DIPERBARUI)
+           ========================================= */
         .users-container {
             max-width: 1600px;
             margin: 0 auto;
             padding: 0 32px;
         }
+        
+        /* Style untuk Filter & Search Toolbar */
+        .filter-search-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .filter-search-wrapper .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .filter-search-wrapper .input-group span {
+            position: absolute;
+            left: 10px;
+            color: #666;
+            font-size: 1rem;
+            pointer-events: none;
+        }
+        .filter-search-wrapper input,
+        .filter-search-wrapper select {
+            background: #222;
+            border: 1px solid #444;
+            color: #fff;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            outline: none;
+            transition: all 0.2s;
+            height: 38px; /* Samakan tingginya */
+        }
+        .filter-search-wrapper input {
+            padding-left: 34px; /* Ruang untuk icon search */
+            width: 220px;
+        }
+        .filter-search-wrapper input:focus,
+        .filter-search-wrapper select:focus {
+            border-color: #a3e635;
+            background: #2a2a2a;
+        }
+        .filter-search-wrapper input::placeholder {
+            color: #666;
+        }
+
+        /* Style Tabel Profesional */
+                /* Style Tabel Profesional */
+        .users-table th {
+            padding: 16px 24px;
+            color: #a3e635;;          /* Ubah warna teks menjadi putih terang */
+            font-size: 0.8rem;       /* Sedikit lebih besar dari 0.75rem */
+            font-weight: 800;        /* Bold maksimal */
+            text-transform: uppercase;
+            letter-spacing: 0.08em;  /* Spasi antar huruf lebih lebar */
+            background: linear-gradient(to right, #222, #1a1a1a);
+            border-bottom: 2px solid #444; /* Garis bawah lebih tebal */
+        }
+        .users-table td {
+            padding: 16px 24px;
+            vertical-align: middle;
+            border-bottom: 1px solid #2a2a2a;
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+        .users-table tbody tr {
+            transition: background-color 0.2s;
+        }
+        .users-table tbody tr:hover {
+            background-color: #222;
+        }
+        
+        /* Lebar Kolom Spesifik */
+        .col-id { width: 80px; }
+        .col-name { width: 20%; }
+        .col-email { width: 25%; }
+        .col-nim { width: 15%; }
+        .col-role { width: 120px; }
+        .col-action { width: 280px; text-align: right; }
+
+        /* Tombol Aksi di Tabel */
+        .table-action-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            text-decoration: none;
+        }
+        .btn-detail { background: rgba(168, 85, 247, 0.1); color: #c084fc; border-color: rgba(168, 85, 247, 0.3); }
+        .btn-detail:hover { background: rgba(168, 85, 247, 0.2); }
+        
+        .btn-edit { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+        .btn-edit:hover { background: rgba(59, 130, 246, 0.2); }
+        
+        .btn-delete { background: rgba(239, 68, 68, 0.1); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+        .btn-delete:hover { background: rgba(239, 68, 68, 0.2); }
     </style>
 
     {{-- KONTEN UTAMA --}}
@@ -203,52 +305,99 @@
 
         {{-- Card Tabel --}}
         <div class="users-index__card" style="background: #1a1a1a; border: 1px solid #333; border-radius: 16px; overflow: hidden;">
-            <div class="users-index__card-header" style="padding: 20px 24px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center;">
+            
+            {{-- Card Header dengan Search & Filter --}}
+            <div class="users-index__card-header" style="padding: 20px 24px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
+                
+                {{-- Kiri: Judul --}}
                 <h2 class="users-index__card-title" style="color: #fff; margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
                     <span class="material-symbols-outlined" style="color: #a3e635;">group</span>
                     Semua Pengguna
                 </h2>
-                <span class="users-index__count" style="background: #333; color: #ccc; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem;">
-                    {{ $users->count() }} user
-                </span>
+
+                {{-- Kanan: Search, Filter, dan Count --}}
+                <div class="filter-search-wrapper">
+                    {{-- Input Pencarian --}}
+                    <div class="input-group">
+                        <span class="material-symbols-outlined">search</span>
+                        <input type="text" id="searchInput" placeholder="Cari nama, email, NIM...">
+                    </div>
+
+                    {{-- Dropdown Filter Role --}}
+                    <select id="roleFilter">
+                        <option value="">Semua Role</option>
+                        <option value="admin">Admin</option>
+                        <option value="dosen">Dosen</option>
+                        <option value="mahasiswa">Mahasiswa</option>
+                    </select>
+
+                    {{-- Badge Count --}}
+                    <span class="users-index__count" id="userCount" style="background: #333; color: #ccc; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                        {{ $users->count() }} user
+                    </span>
+                </div>
             </div>
 
             <div class="users-table-wrapper" style="overflow-x: auto;">
-                <table class="users-table" style="width: 100%; border-collapse: collapse; text-align: left;">
+                <table class="users-table" style="width: 100%; border-collapse: collapse;" id="usersTable">
                     <thead>
-                        <tr style="background: #222; border-bottom: 1px solid #333;">
-                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">ID</th>
-                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">Nama</th>
-                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">Email</th>
-                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">NIM/NIP</th>
-                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">Role</th>
-                            <th style="padding: 16px 24px; color: #888; font-size: 0.8rem; text-transform: uppercase;">Aksi</th>
+                        <tr>
+                            {{-- Semua header di tengah --}}
+                            <th class="col-id" style="text-align: center;">ID</th>
+                            <th class="col-name" style="text-align: center;">Nama</th>
+                            <th class="col-email" style="text-align: center;">Email</th>
+                            <th class="col-nim" style="text-align: center;">NIM/NIP</th>
+                            <th class="col-role" style="text-align: center;">Role</th>
+                            <th class="col-action" style="text-align: center;">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($users as $user)
-                            <tr style="border-bottom: 1px solid #2a2a2a;">
-                                <td style="padding: 16px 24px; color: #888;">#{{ str_pad($user->id, 3, '0', STR_PAD_LEFT) }}</td>
-                                <td style="padding: 16px 24px; color: #fff; font-weight: 500;">{{ $user->name }}</td>
-                                <td style="padding: 16px 24px; color: #aaa;">{{ $user->email }}</td>
-                                <td style="padding: 16px 24px; color: #aaa;">{{ $user->nim_nip ?? '—' }}</td>
-                                <td style="padding: 16px 24px;">
-                                    <span class="role-badge role-badge--{{ $user->role }}" style="padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; text-transform: capitalize;">
+                            {{-- Tambahkan data-attribute untuk filtering --}}
+                            <tr class="user-row" 
+                                data-name="{{ strtolower($user->name) }}" 
+                                data-email="{{ strtolower($user->email) }}" 
+                                data-nim="{{ strtolower($user->nim_nip ?? '') }}"
+                                data-role="{{ strtolower($user->role) }}">
+                                
+                                {{-- Semua isi data di tengah (kecuali kolom Aksi) --}}
+                                <td class="col-id" style="color: #888; font-family: monospace; text-align: center;">
+                                    #{{ str_pad($user->id, 3, '0', STR_PAD_LEFT) }}
+                                </td>
+                                <td class="col-name" style="color: #fff; font-weight: 500; text-align: center;">
+                                    {{ $user->name }}
+                                </td>
+                                <td class="col-email" style="color: #aaa; text-align: center;">
+                                    {{ $user->email }}
+                                </td>
+                                <td class="col-nim" style="color: #aaa; font-family: monospace; text-align: center;">
+                                    {{ $user->nim_nip ?? '—' }}
+                                </td>
+                                <td class="col-role" style="text-align: center;">
+                                    <span class="role-badge role-badge--{{ $user->role }}">
                                         {{ $user->role }}
                                     </span>
                                 </td>
-                                <td style="padding: 16px 24px;">
-                                    <div style="display: flex; gap: 8px;">
+                                <td class="col-action" style="text-align: right;">
+                                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
                                         {{-- Tombol Detail --}}
-                                        <button type="button" onclick="openDetailModal('{{ $user->id }}', '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', '{{ $user->nim_nip ?? '-' }}', '{{ $user->role }}')" style="background: rgba(168, 85, 247, 0.1); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem;">
+                                        <button type="button" 
+                                            class="table-action-btn btn-detail"
+                                            onclick="openDetailModal('{{ $user->id }}', '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', '{{ $user->nim_nip ?? '-' }}', '{{ $user->role }}')">
                                             <span class="material-symbols-outlined" style="font-size: 1rem;">visibility</span> Detail
                                         </button>
+                                        
                                         {{-- Tombol Edit --}}
-                                        <button type="button" onclick="openEditModal('{{ $user->id }}', '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', '{{ $user->nim_nip ?? '' }}', '{{ $user->role }}')" style="background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem;">
+                                        <button type="button" 
+                                            class="table-action-btn btn-edit"
+                                            onclick="openEditModal('{{ $user->id }}', '{{ addslashes($user->name) }}', '{{ addslashes($user->email) }}', '{{ $user->nim_nip ?? '' }}', '{{ $user->role }}')">
                                             <span class="material-symbols-outlined" style="font-size: 1rem;">edit</span> Edit
                                         </button>
+                                        
                                         {{-- Tombol Hapus --}}
-                                        <button type="button" onclick="openDeleteModal('{{ $user->id }}', '{{ addslashes($user->name) }}')" style="background: rgba(239, 68, 68, 0.1); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); padding: 6px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 4px; font-size: 0.8rem;">
+                                        <button type="button" 
+                                            class="table-action-btn btn-delete"
+                                            onclick="openDeleteModal('{{ $user->id }}', '{{ addslashes($user->name) }}')">
                                             <span class="material-symbols-outlined" style="font-size: 1rem;">delete</span> Hapus
                                         </button>
                                     </div>
@@ -262,6 +411,13 @@
                                 </td>
                             </tr>
                         @endforelse
+                        {{-- Baris untuk pesan "Tidak ditemukan" --}}
+                        <tr id="noResultRow" style="display: none;">
+                            <td colspan="6" style="padding: 40px; text-align: center; color: #666;">
+                                <span class="material-symbols-outlined" style="font-size: 3rem; display: block; margin-bottom: 10px;">search_off</span>
+                                Tidak ada user yang cocok dengan pencarian/filter.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -425,8 +581,11 @@
         </div>
     </div>
 
-    {{-- JAVASCRIPT LOGIC --}}
+    {{-- ========================================== --}}
+    {{-- JAVASCRIPT LOGIC                           --}}
+    {{-- ========================================== --}}
     <script>
+        // --- Logic Modal ---
         function openModal(modalId) { document.getElementById(modalId).classList.add('active'); document.body.style.overflow = 'hidden'; }
         function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); document.body.style.overflow = ''; }
         function openCreateModal() { document.getElementById('form-create').reset(); openModal('modal-create'); }
@@ -457,6 +616,55 @@
         }
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', function(e) { if (e.target === this) closeModal(this.id); });
+        });
+
+        // --- Logic Filter & Search ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const roleFilter = document.getElementById('roleFilter');
+            const tableRows = document.querySelectorAll('.user-row');
+            const userCountBadge = document.getElementById('userCount');
+            const noResultRow = document.getElementById('noResultRow');
+
+            function filterTable() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const roleTerm = roleFilter.value.toLowerCase();
+                let visibleCount = 0;
+
+                tableRows.forEach(row => {
+                    const name = row.getAttribute('data-name');
+                    const email = row.getAttribute('data-email');
+                    const nim = row.getAttribute('data-nim');
+                    const role = row.getAttribute('data-role');
+
+                    // Cek kecocokan search (nama, email, atau nim)
+                    const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm) || nim.includes(searchTerm);
+                    
+                    // Cek kecocokan filter role
+                    const matchesRole = roleTerm === '' || role === roleTerm;
+
+                    if (matchesSearch && matchesRole) {
+                        row.style.display = ''; // Tampilkan
+                        visibleCount++;
+                    } else {
+                        row.style.display = 'none'; // Sembunyikan
+                    }
+                });
+
+                // Update badge count
+                userCountBadge.innerText = visibleCount + ' user';
+
+                // Tampilkan pesan "Tidak ditemukan" jika 0
+                if (visibleCount === 0 && tableRows.length > 0) {
+                    noResultRow.style.display = '';
+                } else {
+                    noResultRow.style.display = 'none';
+                }
+            }
+
+            // Event listener untuk input dan select
+            searchInput.addEventListener('input', filterTable);
+            roleFilter.addEventListener('change', filterTable);
         });
     </script>
 

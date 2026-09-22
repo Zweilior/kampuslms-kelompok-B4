@@ -1,6 +1,6 @@
 <x-layout title="Dashboard - Akademia LMS" active-nav="dashboard">
 
-    {{-- HERO HEADER --}}
+        {{-- HERO HEADER --}}
     <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-y-space-sm mb-space-lg">
         <div class="flex flex-col">
             <div class="flex items-center gap-space-xs mb-space-2xs">
@@ -16,7 +16,32 @@
             </p>
         </div>
 
-        <div class="flex items-center gap-space-sm">
+        {{-- Bagian Kanan: Role Switcher & Tanggal --}}
+        <div class="flex flex-col items-end gap-2">
+            
+            {{-- Role Switcher (Simulasi) --}}
+            <div style="display: flex; gap: 8px; background: #222; padding: 6px; border-radius: 12px; border: 1px solid #333;">
+                <a href="{{ route('switch.role', 'admin') }}" 
+                   style="display: flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 20px; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;
+                   {{ session('simulated_role', 'mahasiswa') === 'admin' ? 'background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3);' : 'color: #888; border: 1px solid transparent;' }}">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #ef4444;"></span>
+                    Admin
+                </a>
+                <a href="{{ route('switch.role', 'dosen') }}" 
+                   style="display: flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 20px; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;
+                   {{ session('simulated_role', 'mahasiswa') === 'dosen' ? 'background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3);' : 'color: #888; border: 1px solid transparent;' }}">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #3b82f6;"></span>
+                    Dosen
+                </a>
+                <a href="{{ route('switch.role', 'mahasiswa') }}" 
+                   style="display: flex; align-items: center; gap: 6px; padding: 6px 16px; border-radius: 20px; text-decoration: none; font-size: 0.8rem; font-weight: 600; transition: all 0.2s;
+                   {{ session('simulated_role', 'mahasiswa') === 'mahasiswa' ? 'background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3);' : 'color: #888; border: 1px solid transparent;' }}">
+                    <span style="width: 8px; height: 8px; border-radius: 50%; background: #a855f7;"></span>
+                    Mahasiswa
+                </a>
+            </div>
+
+            {{-- Tanggal --}}
             <span class="flex items-center gap-space-2xs px-space-md py-2 rounded-xl bg-surface-container-high text-on-surface font-label-md text-label-md">
                 <span class="material-symbols-outlined text-sm">event</span>
                 <span>{{ date('d F Y') }}</span>
