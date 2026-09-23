@@ -38,9 +38,9 @@ Route::get('/switch-role/{role}', function ($role) {
 // --- ROUTE YANG MEMBUTUHKAN LOGIN (Middleware Auth) ---
 // Untuk simulasi, kita bisa hapus middleware auth dulu agar bisa diakses tanpa login
 // Nanti jika sudah production, baru diaktifkan kembali.
-Route::get('/dashboard', function () {
-    return view('dashboard');
-})->name('dashboard');
+// Route::get('/dashboard', function () {
+//     return view('dashboard');
+// })->name('dashboard');
 
 Route::resource('courses', CourseController::class);
 Route::resource('users', UserController::class);
