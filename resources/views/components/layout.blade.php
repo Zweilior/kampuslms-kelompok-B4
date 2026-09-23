@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="dark" lang="id">
+<html lang="id">
 
 <head>
     <meta charset="utf-8" />
@@ -9,7 +9,9 @@
     {{-- Fonts --}}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Plus+Jakarta+Sans:wght@100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap" rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@100..900&family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        rel="stylesheet" />
 
     {{-- Tailwind CDN --}}
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,21 +22,23 @@
 
     {{-- Custom CSS --}}
     @vite('resources/css/app.css')
-    
+
     <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
 
     <style>
         /* Memastikan konten utama tidak tertutup navbar */
         .main-content {
-            padding-top: 100px; /* Jarak aman dari navbar fixed */
+            padding-top: 100px;
+            /* Jarak aman dari navbar fixed */
             min-height: 100vh;
-            background-color: #0f0f0f; /* Warna background gelap */
+            background-color: var(--bg-base);
             padding-bottom: 40px;
         }
     </style>
 </head>
 
-<body class="bg-surface font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
+<body
+    class="font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
 
     {{-- NAVBAR --}}
     @include('components.navbar')
