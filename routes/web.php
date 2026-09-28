@@ -6,6 +6,9 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\LoginController;
 use Illuminate\Http\Request; // <-- Tambahkan ini
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\SubmissionController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,12 +38,26 @@ Route::get('/switch-role/{role}', function ($role) {
     return redirect()->back(); // Kembali ke halaman sebelumnya
 })->name('switch.role');
 
-// --- ROUTE YANG MEMBUTUHKAN LOGIN (Middleware Auth) ---
-// Untuk simulasi, kita bisa hapus middleware auth dulu agar bisa diakses tanpa login
-// Nanti jika sudah production, baru diaktifkan kembali.
-// Route::get('/dashboard', function () {
-//     return view('dashboard');
-// })->name('dashboard');
 
 Route::resource('courses', CourseController::class);
 Route::resource('users', UserController::class);
+
+Route::scopeBindings()->group(function () {
+    Route::resource('courses.materials', MaterialController::class);
+});
+
+Route::scopeBindings()->group(function () {
+    Route::resource('courses.assignments', AssignmentController::class);
+});
+Route::scopeBindings()->group(function () {
+    Route::resource(
+        'courses.assignments.submissions',
+        SubmissionController::class
+    );
+});
+Route::scopeBindings()->group(function () {
+    Route::resource(
+        'courses.assignments.submissions',
+        SubmissionController::class
+    );
+});
