@@ -1,15 +1,17 @@
 @if ($paginator->hasPages())
     <nav role="navigation" aria-label="Pagination Navigation" class="flex justify-center my-4">
         {{-- Capsule/Pill Container Light Mode --}}
-        <div class="inline-flex items-center gap-1.5 p-1.5 rounded-full bg-surface-container-high/60 backdrop-blur-md border border-outline/10 shadow-sm">
-            
+        <div class="custom-pagination__container inline-flex items-center gap-1.5 p-1.5 rounded-full backdrop-blur-md">
+
             {{-- Tombol Previous --}}
             @if ($paginator->onFirstPage())
-                <span class="px-5 py-2 rounded-full text-body-sm font-label-md text-on-surface-variant/40 cursor-not-allowed select-none">
+                <span
+                    class="custom-pagination__previous-disabled px-5 py-2 rounded-full text-body-sm font-label-md cursor-not-allowed select-none">
                     Previous
                 </span>
             @else
-                <a href="{{ $paginator->previousPageUrl() }}" class="px-5 py-2 rounded-full bg-surface hover:bg-surface-container text-on-surface text-body-sm font-label-md transition-all shadow-sm">
+                <a href="{{ $paginator->previousPageUrl() }}"
+                    class="custom-pagination__previous px-5 py-2 rounded-full text-body-sm font-label-md transition-all shadow-sm">
                     Previous
                 </a>
             @endif
@@ -18,7 +20,7 @@
             @foreach ($elements as $element)
                 {{-- "Three Dots" Separator --}}
                 @if (is_string($element))
-                    <span class="px-3 py-2 text-on-surface-variant font-label-md text-body-sm select-none">
+                    <span class="custom-pagination__ellipsis px-3 py-2 font-label-md text-body-sm select-none">
                         {{ $element }}
                     </span>
                 @endif
@@ -28,12 +30,14 @@
                     @foreach ($element as $page => $url)
                         @if ($page == $paginator->currentPage())
                             {{-- Halaman Aktif (Lingkaran Putih/Surface dengan Shadow) --}}
-                            <span class="w-9 h-9 flex items-center justify-center rounded-full bg-surface text-primary font-bold text-body-sm shadow-md border border-outline/10 select-none">
+                            <span
+                                class="custom-pagination__page-active w-9 h-9 flex items-center justify-center rounded-full font-bold text-body-sm shadow-md select-none">
                                 {{ $page }}
                             </span>
                         @else
                             {{-- Halaman Tidak Aktif --}}
-                            <a href="{{ $url }}" class="w-9 h-9 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface/50 font-label-md text-body-sm transition-all">
+                            <a href="{{ $url }}"
+                                class="custom-pagination__page w-9 h-9 flex items-center justify-center rounded-full font-label-md text-body-sm transition-all">
                                 {{ $page }}
                             </a>
                         @endif
@@ -43,11 +47,13 @@
 
             {{-- Tombol Next (Warna Primary sama seperti tombol 'Tambah Mata Kuliah') --}}
             @if ($paginator->hasMorePages())
-                <a href="{{ $paginator->nextPageUrl() }}" class="px-5 py-2 rounded-full bg-primary hover:bg-primary-container text-on-primary font-label-md text-body-sm transition-all shadow-[0_0_15px_rgba(173,210,134,0.3)]">
+                <a href="{{ $paginator->nextPageUrl() }}"
+                    class="custom-pagination__next px-5 py-2 rounded-full font-label-md text-body-sm transition-all">
                     Next
                 </a>
             @else
-                <span class="px-5 py-2 rounded-full bg-surface-container text-on-surface-variant/40 text-body-sm font-label-md cursor-not-allowed select-none">
+                <span
+                    class="custom-pagination__next-disabled px-5 py-2 rounded-full text-body-sm font-label-md cursor-not-allowed select-none">
                     Next
                 </span>
             @endif

@@ -8,13 +8,22 @@
         $userName = Auth::user()->name;
     } else {
         $userRole = session('simulated_role', 'mahasiswa'); // Default ke mahasiswa jika belum pilih
-        $userName = ucfirst($userRole) ;
+        $userName = ucfirst($userRole);
     }
+
+    $dashboardRoute = $userRole === 'mahasiswa' ? 'mahasiswa.dashboard' : 'dashboard';
+    $coursesRoute = $userRole === 'mahasiswa' ? 'mahasiswa.courses.index' : 'courses.index';
+    $activeNav = match (true) {
+        request()->routeIs('users.*') => 'users',
+        request()->routeIs('courses.*', 'mahasiswa.courses.*') => 'courses',
+        request()->routeIs('dashboard', 'mahasiswa.dashboard') => 'dashboard',
+        default => $activeNav,
+    };
 
     // Menu Dasar (Semua Role Bisa Akses)
     $navItems = [
-        ['path' => 'dashboard',  'icon' => 'grid_view',      'label' => 'Dashboard',        'route' => 'dashboard'],
-        ['path' => 'courses',    'icon' => 'menu_book',      'label' => 'Mata Kuliah',      'route' => 'courses.index'],
+        ['path' => 'dashboard', 'icon' => 'grid_view', 'label' => 'Dashboard', 'route' => $dashboardRoute],
+        ['path' => 'courses', 'icon' => 'menu_book', 'label' => 'Mata Kuliah', 'route' => $coursesRoute],
     ];
 
     // Menu Khusus Admin
@@ -23,16 +32,16 @@
     }
 
     // Menu Lainnya (Preview - Route masih null)
-    $navItems[] = ['path' => 'jadwal', 'icon' => 'calendar_today', 'label' => 'Materi',           'route' => null];
-    $navItems[] = ['path' => 'tugas',  'icon' => 'assignment',     'label' => 'Tugas',            'route' => null];
-    $navItems[] = ['path' => 'nilai',  'icon' => 'grade',          'label' => 'Monitoring Nilai', 'route' => null];
+    $navItems[] = ['path' => 'jadwal', 'icon' => 'calendar_today', 'label' => 'Materi', 'route' => null];
+    $navItems[] = ['path' => 'tugas', 'icon' => 'assignment', 'label' => 'Tugas', 'route' => null];
+    $navItems[] = ['path' => 'nilai', 'icon' => 'grade', 'label' => 'Monitoring Nilai', 'route' => null];
 @endphp
 
 <header class="navbar">
     <nav class="navbar__inner">
 
         {{-- Logo / Brand --}}
-        <a href="{{ route('dashboard') }}" class="navbar__brand">
+        <a href="{{ route($dashboardRoute) }}" class="navbar__brand">
             <span class="material-symbols-outlined navbar__brand-icon">school</span>
             <div class="navbar__brand-text">
                 <span class="navbar__brand-name">EduSpace</span>
@@ -46,7 +55,7 @@
                 @php $isActive = $activeNav === $item['path']; @endphp
                 <li>
                     <a href="{{ $item['route'] ? route($item['route']) : '#' }}"
-                       class="navbar__link {{ $isActive ? 'is-active' : '' }}">
+                        class="navbar__link {{ $isActive ? 'is-active' : '' }}">
                         <span class="material-symbols-outlined">{{ $item['icon'] }}</span>
                         <span>{{ $item['label'] }}</span>
                     </a>
@@ -56,7 +65,7 @@
 
         {{-- Right side: Status + User Info + Logout --}}
         <div class="navbar__right">
-            
+
             {{-- Status Online --}}
             <div class="navbar__status">
                 <span class="navbar__status-dot"></span>
@@ -69,13 +78,13 @@
                 <div class="navbar__avatar" title="{{ $userName }}">
                     {{ strtoupper(substr($userName, 0, 1)) }}
                 </div>
-                
+
                 {{-- Nama & Role --}}
                 <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                    <span style="font-size: 0.85rem; font-weight: 600; color: #fff;">
+                    <span class="navbar__user-name" style="font-size: 0.85rem; font-weight: 600;">
                         {{ $userName }}
                     </span>
-                    <span style="font-size: 0.7rem; color: #aaa; text-transform: capitalize;">
+                    <span class="navbar__user-role" style="font-size: 0.7rem; text-transform: capitalize;">
                         {{ $userRole }}
                     </span>
                 </div>
@@ -85,7 +94,9 @@
             @auth
                 <form action="{{ route('logout') }}" method="POST" style="display: inline; margin-left: 10px;">
                     @csrf
-                    <button type="submit" class="navbar__link" style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 8px; display: flex; align-items: center;" title="Logout">
+                    <button type="submit" class="navbar__link"
+                        style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 8px; display: flex; align-items: center;"
+                        title="Logout">
                         <span class="material-symbols-outlined">logout</span>
                     </button>
                 </form>

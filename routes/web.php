@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\MahasiswaController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -37,6 +38,23 @@ Route::get('/switch-role/{role}', function ($role) {
     
     return redirect()->back(); // Kembali ke halaman sebelumnya
 })->name('switch.role');
+
+Route::prefix('mahasiswa')->name('mahasiswa.')->scopeBindings()->group(function () {
+    Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])
+        ->name('dashboard');
+    Route::get('/courses', [MahasiswaController::class, 'courses'])
+        ->name('courses.index');
+    Route::get('/courses/{course}', [MahasiswaController::class, 'showCourse'])
+        ->name('courses.show');
+    Route::get('/courses/{course}/assignments', [MahasiswaController::class, 'assignments'])
+        ->name('courses.assignments.index');
+    Route::get('/courses/{course}/materials', [MahasiswaController::class, 'materials'])
+        ->name('courses.materials.index');
+    Route::get('/courses/{course}/assignments/{assignment}/submissions', [MahasiswaController::class, 'submissions'])
+        ->name('courses.assignments.submissions.index');
+    Route::get('/courses/{course}/assignments/{assignment}/submissions/create', [MahasiswaController::class, 'createSubmission'])
+        ->name('courses.assignments.submissions.create');
+});
 
 
 Route::resource('courses', CourseController::class);

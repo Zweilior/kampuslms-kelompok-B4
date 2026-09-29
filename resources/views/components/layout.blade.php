@@ -45,7 +45,8 @@
 
     {{-- KONTEN UTAMA --}}
     <div class="main-content">
-        {{ $slot }}
+        {{ $slot ?? '' }}
+        @yield('content')
     </div>
 
 </body>

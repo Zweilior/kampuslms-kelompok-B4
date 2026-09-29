@@ -324,6 +324,74 @@ button {
     transform: scale(1.05);
 }
 
+.navbar__user-name {
+    color: var(--text-primary);
+}
+
+.navbar__user-role {
+    color: var(--text-secondary);
+}
+
+.custom-pagination__container {
+    background-color: color-mix(
+        in srgb,
+        var(--color-surface-container-high) 60%,
+        transparent
+    );
+    border: 1px solid var(--border-hairline);
+    box-shadow: var(--shadow-sm);
+}
+
+.custom-pagination__previous {
+    background-color: var(--bg-elevated);
+    color: var(--text-primary);
+}
+
+.custom-pagination__previous:hover {
+    background-color: var(--bg-hover);
+}
+
+.custom-pagination__previous-disabled,
+.custom-pagination__next-disabled {
+    color: var(--text-muted);
+    opacity: 0.5;
+}
+
+.custom-pagination__ellipsis {
+    color: var(--text-secondary);
+}
+
+.custom-pagination__page-active {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-hairline);
+    color: var(--primary);
+}
+
+.custom-pagination__page {
+    color: var(--text-secondary);
+}
+
+.custom-pagination__page:hover {
+    background-color: color-mix(in srgb, var(--bg-elevated) 50%, transparent);
+    color: var(--text-primary);
+}
+
+.custom-pagination__next {
+    background-color: var(--primary);
+    box-shadow: 0 0 15px var(--glow-sage);
+    color: #ffffff;
+}
+
+.custom-pagination__next:hover {
+    background-color: var(--primary-dark);
+}
+
+@media (prefers-color-scheme: dark) {
+    .custom-pagination__next {
+        color: var(--bg-base);
+    }
+}
+
 /* ============================================
    MAIN CONTENT — FIXED
    ============================================ */
