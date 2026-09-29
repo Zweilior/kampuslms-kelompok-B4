@@ -94,6 +94,16 @@ class CourseController extends Controller
         return view('courses.show', compact('course', 'lecturers'));
     }
 
+    public function dosenIndex()
+    {
+        return view('dosen.courses.index');
+    }
+
+    public function dosenShow(Course $course)
+    {
+        return view('dosen.courses.show', compact('course'));
+    }
+
     /**
      * Menampilkan form edit mata kuliah.
      */

@@ -22,7 +22,8 @@ class UserController extends Controller
 
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('nim_nip', 'like', "%{$search}%");
             });
         }
 
@@ -33,11 +34,13 @@ class UserController extends Controller
 
         // Pagination 15 data per halaman dan mempertahankan filter
         $users = $query
-            ->orderBy('name')
+            ->orderBy('id')
             ->paginate(15)
             ->withQueryString();
 
-        return view('courses.user', compact('users'));
+        $userRoutePrefix = $request->routeIs('admin.users.*') ? 'admin.users' : 'users';
+
+        return view('courses.user', compact('users', 'userRoutePrefix'));
     }
 
     /**
@@ -72,8 +75,10 @@ class UserController extends Controller
         $user->role = $validated['role'];
         $user->save();
 
+        $userRoutePrefix = $request->routeIs('admin.users.*') ? 'admin.users' : 'users';
+
         return redirect()
-            ->route('users.index', $user)
+            ->route($userRoutePrefix . '.index')
             ->with('success', 'User berhasil ditambahkan.');
     }
 
@@ -132,20 +137,23 @@ class UserController extends Controller
 
         $user->save();
 
+        $userRoutePrefix = $request->routeIs('admin.users.*') ? 'admin.users' : 'users';
+
         return redirect()
-            ->route('users.show', $user)
+            ->route($userRoutePrefix . '.show', $user)
             ->with('success', 'User berhasil diperbarui.');
     }
 
     /**
      * Menghapus user.
      */
-    public function destroy(User $user)
+    public function destroy(Request $request, User $user)
     {
         $user->delete();
+        $userRoutePrefix = $request->routeIs('admin.users.*') ? 'admin.users' : 'users';
 
         return redirect()
-            ->route('users.index')
+            ->route($userRoutePrefix . '.index')
             ->with('success', 'User berhasil dihapus.');
     }
 }

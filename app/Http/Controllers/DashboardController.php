@@ -8,6 +8,21 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    public function adminDashboard()
+    {
+        $totalUsers = User::count();
+        $totalLecturers = User::where('role', 'dosen')->count();
+        $totalStudents = User::where('role', 'mahasiswa')->count();
+        $totalCourses = Course::count();
+
+        return view('admin.dashboard', compact(
+            'totalUsers',
+            'totalLecturers',
+            'totalStudents',
+            'totalCourses'
+        ));
+    }
+
     public function index()
     {
         // Hitung total data mata kuliah
@@ -28,5 +43,12 @@ class DashboardController extends Controller
             'totalLecturers',
             'recentCourses'
         ));
+    }
+
+    public function dosenDashboard()
+    {
+        $totalStudents = User::where('role', 'mahasiswa')->count();
+
+        return view('dosen.dashboard', compact('totalStudents'));
     }
 }
