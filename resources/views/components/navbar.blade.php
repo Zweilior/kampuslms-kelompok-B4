@@ -7,34 +7,69 @@
         $userRole = Auth::user()->role;
         $userName = Auth::user()->name;
     } else {
-        $userRole = session('simulated_role', 'mahasiswa'); // Default ke mahasiswa jika belum pilih
+        $userRole = match (true) {
+            request()->routeIs('dosen.*') => 'dosen',
+            request()->routeIs('admin.*') => 'admin',
+            request()->routeIs('mahasiswa.*') => 'mahasiswa',
+            default => session('simulated_role', 'mahasiswa'),
+        };
         $userName = ucfirst($userRole);
     }
 
-    $dashboardRoute = $userRole === 'mahasiswa' ? 'mahasiswa.dashboard' : 'dashboard';
-    $coursesRoute = $userRole === 'mahasiswa' ? 'mahasiswa.courses.index' : 'courses.index';
+    // Route dinamis per role
+    $dashboardRoute = match ($userRole) {
+        'admin' => 'admin.dashboard',
+        'dosen' => 'dosen.dashboard',
+        'mahasiswa' => 'mahasiswa.dashboard',
+        default => 'dashboard',
+    };
+    $coursesRoute = match ($userRole) {
+        'admin' => 'admin.courses.index',
+        'dosen' => 'dosen.courses.index',
+        'mahasiswa' => 'mahasiswa.courses.index',
+        default => 'courses.index',
+    };
+
+    // Penanda menu aktif
     $activeNav = match (true) {
-        request()->routeIs('users.*') => 'users',
-        request()->routeIs('courses.*', 'mahasiswa.courses.*') => 'courses',
-        request()->routeIs('dashboard', 'mahasiswa.dashboard') => 'dashboard',
+        request()->routeIs('admin.users.*') => 'users',
+        request()->routeIs('admin.courses.*') => 'courses',
+        request()->routeIs('admin.materials.*') => 'materials',
+        request()->routeIs('admin.assignments.*') => 'assignments',
+        request()->routeIs('admin.grades.*') => 'grades',
+        request()->routeIs('dosen.dashboard') => 'dashboard',
+        request()->routeIs('dosen.grades.*') => 'grades',
+        request()->routeIs('dosen.courses.assignments.*') => 'assignments',
+        request()->routeIs('dosen.courses.materials.*') => 'materials',
+        request()->routeIs('dosen.courses.*') => request('focus', 'materials'),
+        request()->routeIs('mahasiswa.courses.*') => 'courses',
+        request()->routeIs('dashboard', 'admin.dashboard', 'dosen.dashboard', 'mahasiswa.dashboard') => 'dashboard',
         default => $activeNav,
     };
 
-    // Menu Dasar (Semua Role Bisa Akses)
     $navItems = [
         ['path' => 'dashboard', 'icon' => 'grid_view', 'label' => 'Dashboard', 'route' => $dashboardRoute],
-        ['path' => 'courses', 'icon' => 'menu_book', 'label' => 'Mata Kuliah', 'route' => $coursesRoute],
     ];
 
-    // Menu Khusus Admin
+    // ==================== MENU KHUSUS ADMIN ====================
     if ($userRole === 'admin') {
-        $navItems[] = ['path' => 'users', 'icon' => 'campaign', 'label' => 'Manajemen User', 'route' => 'users.index'];
+        $navItems[] = ['path' => 'courses',     'icon' => 'menu_book',      'label' => 'Mata Kuliah',      'route' => $coursesRoute];
+        $navItems[] = ['path' => 'users',       'icon' => 'group',          'label' => 'Manajemen User',   'route' => 'admin.users.index'];
+        $navItems[] = ['path' => 'materials',   'icon' => 'calendar_today', 'label' => 'Materi',           'route' => 'admin.materials.index'];
+        $navItems[] = ['path' => 'assignments', 'icon' => 'assignment',     'label' => 'Tugas',            'route' => 'admin.assignments.index'];
+        $navItems[] = ['path' => 'grades',      'icon' => 'grade',          'label' => 'Monitoring Nilai', 'route' => 'admin.grades.index'];
     }
 
-    // Menu Lainnya (Preview - Route masih null)
-    $navItems[] = ['path' => 'jadwal', 'icon' => 'calendar_today', 'label' => 'Materi', 'route' => null];
-    $navItems[] = ['path' => 'tugas', 'icon' => 'assignment', 'label' => 'Tugas', 'route' => null];
-    $navItems[] = ['path' => 'nilai', 'icon' => 'grade', 'label' => 'Monitoring Nilai', 'route' => null];
+    if ($userRole === 'dosen') {
+        $navItems[] = ['path' => 'materials', 'icon' => 'description', 'label' => 'Materi', 'route' => 'dosen.courses.index', 'query' => ['focus' => 'materials']];
+        $navItems[] = ['path' => 'assignments', 'icon' => 'assignment', 'label' => 'Tugas', 'route' => 'dosen.courses.index', 'query' => ['focus' => 'assignments']];
+        $navItems[] = ['path' => 'grades', 'icon' => 'grade', 'label' => 'Nilai', 'route' => 'dosen.grades.index'];
+    }
+
+    if ($userRole === 'mahasiswa') {
+        $navItems[] = ['path' => 'courses', 'icon' => 'menu_book', 'label' => 'Mata Kuliah', 'route' => $coursesRoute];
+    }
+
 @endphp
 
 <header class="navbar">
@@ -54,7 +89,7 @@
             @foreach ($navItems as $item)
                 @php $isActive = $activeNav === $item['path']; @endphp
                 <li>
-                    <a href="{{ $item['route'] ? route($item['route']) : '#' }}"
+                    <a href="{{ route($item['route'], $item['query'] ?? []) }}"
                         class="navbar__link {{ $isActive ? 'is-active' : '' }}">
                         <span class="material-symbols-outlined">{{ $item['icon'] }}</span>
                         <span>{{ $item['label'] }}</span>
@@ -72,14 +107,11 @@
                 <span class="navbar__status-text">Online</span>
             </div>
 
-            {{-- User Info (Nama & Role) --}}
+            {{-- User Info --}}
             <div style="display: flex; align-items: center; gap: 10px; margin-left: 10px;">
-                {{-- Avatar dengan Inisial --}}
                 <div class="navbar__avatar" title="{{ $userName }}">
                     {{ strtoupper(substr($userName, 0, 1)) }}
                 </div>
-
-                {{-- Nama & Role --}}
                 <div style="display: flex; flex-direction: column; line-height: 1.2;">
                     <span class="navbar__user-name" style="font-size: 0.85rem; font-weight: 600;">
                         {{ $userName }}
@@ -90,7 +122,6 @@
                 </div>
             </div>
 
-            {{-- Tombol Logout (Hanya jika login) --}}
             @auth
                 <form action="{{ route('logout') }}" method="POST" style="display: inline; margin-left: 10px;">
                     @csrf

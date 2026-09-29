@@ -542,27 +542,31 @@
                 </h2>
 
                 {{-- Kanan: Search, Filter, dan Count --}}
-                <div class="filter-search-wrapper">
+                <form method="GET" action="{{ route($userRoutePrefix . '.index') }}" class="filter-search-wrapper">
                     {{-- Input Pencarian --}}
                     <div class="input-group">
                         <span class="material-symbols-outlined">search</span>
-                        <input type="text" id="searchInput" placeholder="Cari nama, email, NIM...">
+                        <input type="search" id="searchInput" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM...">
                     </div>
 
                     {{-- Dropdown Filter Role --}}
-                    <select id="roleFilter">
+                    <select id="roleFilter" name="role" onchange="this.form.submit()">
                         <option value="">Semua Role</option>
-                        <option value="admin">Admin</option>
-                        <option value="dosen">Dosen</option>
-                        <option value="mahasiswa">Mahasiswa</option>
+                        <option value="admin" @selected(request('role') === 'admin')>Admin</option>
+                        <option value="dosen" @selected(request('role') === 'dosen')>Dosen</option>
+                        <option value="mahasiswa" @selected(request('role') === 'mahasiswa')>Mahasiswa</option>
                     </select>
 
+                    <button type="submit" class="table-action-btn btn-edit" title="Cari user" aria-label="Cari user">
+                        <span class="material-symbols-outlined">search</span>
+                    </button>
+
                     {{-- Badge Count --}}
-                    <span class="users-index__count" id="userCount"
+                    <span class="users-index__count"
                         style="background: #333; color: #ccc; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
-                        {{ $users->count() }} user
+                        {{ number_format($users->total()) }} user
                     </span>
-                </div>
+                </form>
             </div>
 
             <div class="users-table-wrapper" style="overflow-x: auto;">
@@ -570,7 +574,7 @@
                     <thead>
                         <tr>
                             {{-- Semua header di tengah --}}
-                            <th class="col-id" style="text-align: center;">ID</th>
+                            <th class="col-id" style="text-align: center;">No</th>
                             <th class="col-name" style="text-align: center;">Nama</th>
                             <th class="col-email" style="text-align: center;">Email</th>
                             <th class="col-nim" style="text-align: center;">NIM/NIP</th>
@@ -588,7 +592,7 @@
 
                                 {{-- Semua isi data di tengah (kecuali kolom Aksi) --}}
                                 <td class="col-id" style="color: #888; font-family: monospace; text-align: center;">
-                                    #{{ str_pad($user->id, 3, '0', STR_PAD_LEFT) }}
+                                    {{ str_pad($user->id, 3, '0', STR_PAD_LEFT) }}
                                 </td>
                                 <td class="col-name" style="color: #fff; font-weight: 500; text-align: center;">
                                     {{ $user->name }}
@@ -634,27 +638,19 @@
                                 <td colspan="6" style="padding: 40px; text-align: center; color: #666;">
                                     <span class="material-symbols-outlined"
                                         style="font-size: 3rem; display: block; margin-bottom: 10px;">group_off</span>
-                                    Belum ada user yang terdaftar.
+                                    {{ request()->filled('search') || request()->filled('role') ? 'Tidak ada user yang cocok dengan pencarian atau filter.' : 'Belum ada user yang terdaftar.' }}
                                 </td>
                             </tr>
                         @endforelse
-                        {{-- Baris untuk pesan "Tidak ditemukan" --}}
-                        <tr id="noResultRow" style="display: none;">
-                            <td colspan="6" style="padding: 40px; text-align: center; color: #666;">
-                                <span class="material-symbols-outlined"
-                                    style="font-size: 3rem; display: block; margin-bottom: 10px;">search_off</span>
-                                Tidak ada user yang cocok dengan pencarian/filter.
-                            </td>
-                        </tr>
                     </tbody>
                 </table>
+            </div>
+            <div class="users-pagination" style="display: flex; justify-content: center; padding: 12px 24px; border-top: 1px solid #333;">
+                {{ $users->links('vendor.pagination.custom-pagination') }}
             </div>
         </div>
     </div>
 
-    {{-- ========================================== --}}
-    {{-- MODAL TAMBAH USER                          --}}
-    {{-- ========================================== --}}
     <div id="modal-create" class="modal-overlay users-modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -832,6 +828,8 @@
             document.body.style.overflow = '';
         }
 
+        const userRouteBase = @json(route($userRoutePrefix . '.index'));
+
         function openCreateModal() {
             document.getElementById('form-create').reset();
             openModal('modal-create');
@@ -850,7 +848,7 @@
 
         function openEditModal(id, name, email, nim, role) {
             const form = document.getElementById('form-edit');
-            form.action = `/users/${id}`;
+            form.action = `${userRouteBase}/${id}`;
             document.getElementById('edit-name').value = name;
             document.getElementById('edit-email').value = email;
             document.getElementById('edit-nim').value = nim;
@@ -860,7 +858,7 @@
 
         function openDeleteModal(id, name) {
             const form = document.getElementById('form-delete');
-            form.action = `/users/${id}`;
+            form.action = `${userRouteBase}/${id}`;
             document.getElementById('delete-name').innerText = name;
             openModal('modal-delete');
         }
@@ -870,55 +868,6 @@
             });
         });
 
-        // --- Logic Filter & Search ---
-        document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchInput');
-            const roleFilter = document.getElementById('roleFilter');
-            const tableRows = document.querySelectorAll('.user-row');
-            const userCountBadge = document.getElementById('userCount');
-            const noResultRow = document.getElementById('noResultRow');
-
-            function filterTable() {
-                const searchTerm = searchInput.value.toLowerCase();
-                const roleTerm = roleFilter.value.toLowerCase();
-                let visibleCount = 0;
-
-                tableRows.forEach(row => {
-                    const name = row.getAttribute('data-name');
-                    const email = row.getAttribute('data-email');
-                    const nim = row.getAttribute('data-nim');
-                    const role = row.getAttribute('data-role');
-
-                    // Cek kecocokan search (nama, email, atau nim)
-                    const matchesSearch = name.includes(searchTerm) || email.includes(searchTerm) || nim
-                        .includes(searchTerm);
-
-                    // Cek kecocokan filter role
-                    const matchesRole = roleTerm === '' || role === roleTerm;
-
-                    if (matchesSearch && matchesRole) {
-                        row.style.display = ''; // Tampilkan
-                        visibleCount++;
-                    } else {
-                        row.style.display = 'none'; // Sembunyikan
-                    }
-                });
-
-                // Update badge count
-                userCountBadge.innerText = visibleCount + ' user';
-
-                // Tampilkan pesan "Tidak ditemukan" jika 0
-                if (visibleCount === 0 && tableRows.length > 0) {
-                    noResultRow.style.display = '';
-                } else {
-                    noResultRow.style.display = 'none';
-                }
-            }
-
-            // Event listener untuk input dan select
-            searchInput.addEventListener('input', filterTable);
-            roleFilter.addEventListener('change', filterTable);
-        });
     </script>
 
 </x-layout>
