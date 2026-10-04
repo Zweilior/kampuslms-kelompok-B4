@@ -112,6 +112,71 @@ class AssignmentController extends Controller
         ];
     }
 
+    public function dosenIndex(Course $course)
+    {
+        $assignments = $course->assignments()->withCount('submissions')->latest()->get();
+        return view('dosen.assignments.index', compact('course', 'assignments'));
+    }
+
+    public function dosenCreate(Course $course)
+    {
+        return view('dosen.assignments.create', compact('course'));
+    }
+
+    public function dosenStore(Request $request, Course $course)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'due_at' => ['required', 'date'],
+            'instructions' => ['nullable', 'string'],
+            'max_score' => ['required', 'integer', 'min:0', 'max:255'],
+            'allow_late' => ['required', 'boolean'],
+            'status' => ['required', 'in:draft,published'],
+        ]);
+
+        $course->assignments()->create([
+            ...$validated,
+            'created_by' => auth()->id() ?? User::where('role', 'dosen')->value('id'),
+        ]);
+
+        return redirect()->route('dosen.courses.assignments.index', $course)
+            ->with('success', 'Tugas berhasil dibuat.');
+    }
+
+    public function dosenEdit(Course $course, Assignment $assignment)
+    {
+        return view('dosen.assignments.edit', compact('course', 'assignment'));
+    }
+
+    public function dosenUpdate(Request $request, Course $course, Assignment $assignment)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'due_at' => ['required', 'date'],
+            'instructions' => ['nullable', 'string'],
+            'max_score' => ['required', 'integer', 'min:0', 'max:255'],
+            'allow_late' => ['required', 'boolean'],
+            'status' => ['required', 'in:draft,published'],
+        ]);
+
+        $assignment->update($validated);
+
+        return redirect()->route('dosen.courses.assignments.index', $course)
+            ->with('success', 'Tugas berhasil diperbarui.');
+    }
+
+    public function dosenDestroy(Course $course, Assignment $assignment)
+    {
+        if ($assignment->submissions()->exists()) {
+            return back()->with('error', 'Tugas tidak dapat dihapus karena sudah memiliki submission.');
+        }
+
+        $assignment->delete();
+
+        return redirect()->route('dosen.courses.assignments.index', $course)
+            ->with('success', 'Tugas berhasil dihapus.');
+    }
+
     /**
      * Menampilkan form tambah tugas.
      */

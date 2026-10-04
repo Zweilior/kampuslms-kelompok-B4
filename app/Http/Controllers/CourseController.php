@@ -43,7 +43,7 @@ class CourseController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('courses.index', compact('courses', 'lecturers'));
+        return view($request->routeIs('admin.courses.*') ? 'admin.courses.index' : 'courses.index', compact('courses', 'lecturers'));
     }
 
     /**
@@ -55,7 +55,7 @@ class CourseController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('courses.create', compact('lecturers'));
+        return view($this->isAdminRoute() ? 'admin.courses.create' : 'courses.create', compact('lecturers'));
     }
 
     /**
@@ -63,19 +63,10 @@ class CourseController extends Controller
      */
     public function store(StoreCourseRequest $request)
     {
-        $validated = $request->validate([
-            'code' => ['required', 'string', 'max:255', 'unique:courses,code'],
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'sks' => ['required', 'integer', 'min:1'],
-            'lecturer_id' => ['required', 'exists:users,id'],
-            'status' => ['required', 'in:draft,active,archived'],
-        ]);
-
         $course = Course::create($request->validated());
 
         return redirect()
-            ->route('courses.show', $course)
+            ->route($this->isAdminRoute() ? 'admin.courses.show' : 'courses.show', $course)
             ->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
 
@@ -91,12 +82,23 @@ class CourseController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('courses.show', compact('course', 'lecturers'));
+        return view($this->isAdminRoute() ? 'admin.courses.show' : 'courses.show', compact('course', 'lecturers'));
     }
 
-    public function dosenIndex()
+    public function dosenIndex(Request $request)
     {
-        return view('dosen.courses.index');
+        $lecturer = User::where('role', 'dosen')
+            ->orderBy('id')
+            ->first();
+
+        $courses = Course::where('lecturer_id', $lecturer?->id)
+            ->with('lecturer')
+            ->orderBy('code')
+            ->get();
+
+        $focus = $request->input('focus', 'materials');
+
+        return view('dosen.courses.index', compact('courses', 'focus'));
     }
 
     public function dosenShow(Course $course)
@@ -113,7 +115,7 @@ class CourseController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view('courses.edit', compact('course', 'lecturers'));
+        return view($this->isAdminRoute() ? 'admin.courses.edit' : 'courses.edit', compact('course', 'lecturers'));
     }
 
     /**
@@ -121,20 +123,6 @@ class CourseController extends Controller
      */
     public function update(UpdateCourseRequest $request, Course $course)
     {
-        $validated = $request->validate([
-            'code' => [
-                'required',
-                'string',
-                'max:255',
-                Rule::unique('courses', 'code')->ignore($course->id),
-            ],
-            'name' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'sks' => ['required', 'integer', 'min:1'],
-            'lecturer_id' => ['required', 'exists:users,id'],
-            'status' => ['required', 'in:draft,active,archived'],
-        ]);
-
         $course->update($request->validated());
 
         return redirect()
@@ -150,7 +138,7 @@ class CourseController extends Controller
         $course->delete();
 
         return redirect()
-            ->route('courses.index')
+            ->route($this->isAdminRoute() ? 'admin.courses.index' : 'courses.index')
             ->with('success', 'Mata kuliah berhasil dihapus.');
     }
 }

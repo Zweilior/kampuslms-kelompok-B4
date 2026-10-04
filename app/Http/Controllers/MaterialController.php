@@ -154,6 +154,93 @@ class MaterialController extends Controller
         ];
     }
 
+    public function dosenIndex(Course $course)
+    {
+        $materials = $course->materials()->latest()->get();
+        return view('dosen.materials.index', compact('course', 'materials'));
+    }
+
+    public function dosenCreate(Course $course)
+    {
+        return view('dosen.materials.create', compact('course'));
+    }
+
+    public function dosenStore(Request $request, Course $course)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'type' => ['required', 'in:file,link'],
+            'external_url' => ['nullable', 'required_if:type,link', 'url', 'max:2048'],
+            'file' => ['nullable', 'file', 'max:20480'],
+        ]);
+
+        $material = $course->materials()->make($validated);
+        $material->uploaded_by = Auth::id() ?? User::where('role', 'dosen')->value('id');
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $material->file_path = $file->store('materials', 'public');
+            $material->original_name = $file->getClientOriginalName();
+            $material->file_size = $file->getSize();
+            $material->mime_type = $file->getMimeType();
+        }
+
+        $material->save();
+
+        return redirect()->route('dosen.courses.materials.index', $course)
+            ->with('success', 'Materi berhasil ditambahkan.');
+    }
+
+    public function dosenEdit(Course $course, Material $material)
+    {
+        return view('dosen.materials.edit', compact('course', 'material'));
+    }
+
+    public function dosenUpdate(Request $request, Course $course, Material $material)
+    {
+        $validated = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'type' => ['required', 'in:file,link'],
+            'external_url' => ['nullable', 'required_if:type,link', 'url', 'max:2048'],
+            'file' => ['nullable', 'file', 'max:20480'],
+        ]);
+
+        $oldFile = $material->file_path;
+        $material->fill($validated);
+
+        if ($request->hasFile('file')) {
+            $file = $request->file('file');
+            $material->file_path = $file->store('materials', 'public');
+            $material->original_name = $file->getClientOriginalName();
+            $material->file_size = $file->getSize();
+            $material->mime_type = $file->getMimeType();
+        }
+
+        $material->save();
+
+        if ($oldFile && $oldFile !== $material->file_path) {
+            Storage::disk('public')->delete($oldFile);
+        }
+
+        return redirect()->route('dosen.courses.materials.index', $course)
+            ->with('success', 'Materi berhasil diperbarui.');
+    }
+
+    public function dosenDestroy(Course $course, Material $material)
+    {
+        $file = $material->file_path;
+        $material->delete();
+
+        if ($file) {
+            Storage::disk('public')->delete($file);
+        }
+
+        return redirect()->route('dosen.courses.materials.index', $course)
+            ->with('success', 'Materi berhasil dihapus.');
+    }
+
     /**
      * Menampilkan form tambah materi.
      */

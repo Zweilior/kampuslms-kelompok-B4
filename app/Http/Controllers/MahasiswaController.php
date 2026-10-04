@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\Submission;
+use App\Models\User;
 
 class MahasiswaController extends Controller
 {
@@ -55,7 +56,9 @@ class MahasiswaController extends Controller
 
     public function submissions(Course $course, Assignment $assignment)
     {
+        $studentId = auth()->id() ?? User::where('role', 'mahasiswa')->value('id');
         $submissions = $assignment->submissions()
+            ->where('user_id', $studentId)
             ->with('grade')
             ->latest()
             ->get()

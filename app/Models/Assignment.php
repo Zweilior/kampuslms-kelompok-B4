@@ -21,6 +21,7 @@ class Assignment extends Model
         'max_score',
         'allow_late',
         'status',
+        'created_by',
     ];
 
     protected function casts(): array
