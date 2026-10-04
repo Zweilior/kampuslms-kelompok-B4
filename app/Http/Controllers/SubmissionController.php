@@ -5,10 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\Submission;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class SubmissionController extends Controller
 {
+    public function dosenIndex(Course $course, Assignment $assignment)
+    {
+        $submissions = $assignment->submissions()->with('student', 'grade')->latest()->get();
+        return view('dosen.assignments.show', compact('course', 'assignment', 'submissions'));
+    }
+
     /**
      * Menampilkan daftar pengumpulan dari suatu tugas.
      */
@@ -53,7 +60,7 @@ class SubmissionController extends Controller
 
         $assignment->submissions()->create([
             ...$validated,
-            'user_id' => auth()->id(),
+            'user_id' => auth()->id() ?? User::where('role', 'mahasiswa')->value('id'),
             'submitted_at' => now(),
         ]);
 

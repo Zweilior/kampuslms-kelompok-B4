@@ -26,11 +26,15 @@ class LoginController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        $fieldType = filter_var($credentials['identity'], FILTER_VALIDATE_EMAIL) ? 'email' : 'nim';
+        $fieldType = filter_var($credentials['identity'], FILTER_VALIDATE_EMAIL) ? 'email' : 'nim_nip';
 
         if (Auth::attempt([$fieldType => $credentials['identity'], 'password' => $credentials['password']], $request->boolean('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended(route('courses.index'));
+            return redirect()->intended(match (Auth::user()->role) {
+                'admin' => route('admin.dashboard'),
+                'dosen' => route('dosen.dashboard'),
+                default => route('mahasiswa.dashboard'),
+            });
         }
 
         return back()->withErrors([
