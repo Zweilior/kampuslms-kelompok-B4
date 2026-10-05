@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         $admin = User::updateOrCreate(
             ['email' => 'admin@kampuslms.test'],
             [
-                'name' => 'Administrator LMS',
+                'name' => 'Administrator',
                 'password' => Hash::make('password'),
                 'role' => 'admin',
                 'nim_nip' => 'ADM001',

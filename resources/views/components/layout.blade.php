@@ -23,29 +23,16 @@
     {{-- Custom CSS --}}
     @vite('resources/css/app.css')
 
-    <link rel="stylesheet" href="{{ asset('css/layout.css') }}">
-
-    <style>
-        /* Memastikan konten utama tidak tertutup navbar */
-        .main-content {
-            padding-top: 100px;
-            /* Jarak aman dari navbar fixed */
-            min-height: 100vh;
-            background-color: var(--bg-base);
-            padding-bottom: 40px;
-        }
-    </style>
 </head>
 
-<body
-    class="font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
+<body class="font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
 
     @auth
-    @include('components.navbar')
+        @include('components.navbar')
     @endauth
-    
+
     {{-- KONTEN UTAMA --}}
-    <div class="main-content">
+    <div class="{{ auth()->check() ? 'main-content main-content--with-navbar' : 'main-content' }}">
         {{ $slot ?? '' }}
         @yield('content')
     </div>
