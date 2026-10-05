@@ -3,73 +3,75 @@
 @php
     use Illuminate\Support\Facades\Auth;
 
-    if (Auth::check()) {
-        $userRole = Auth::user()->role;
-        $userName = Auth::user()->name;
-    } else {
-        $userRole = match (true) {
-            request()->routeIs('dosen.*') => 'dosen',
-            request()->routeIs('admin.*') => 'admin',
-            request()->routeIs('mahasiswa.*') => 'mahasiswa',
-            default => session('simulated_role', 'mahasiswa'),
-        };
-        $userName = ucfirst($userRole);
-    }
+    // Navbar hanya muncul saat login, jadi aman ambil dari Auth
+    $user     = Auth::user();
+    $userRole = $user->role ?? 'mahasiswa';
+    $userName = $user->name ?? 'User';
 
     // Route dinamis per role
     $dashboardRoute = match ($userRole) {
-        'admin' => 'admin.dashboard',
-        'dosen' => 'dosen.dashboard',
+        'admin'     => 'admin.dashboard',
+        'dosen'     => 'dosen.dashboard',
         'mahasiswa' => 'mahasiswa.dashboard',
-        default => 'dashboard',
+        default     => 'dashboard',
     };
     $coursesRoute = match ($userRole) {
-        'admin' => 'admin.courses.index',
-        'dosen' => 'dosen.courses.index',
+        'admin'     => 'admin.courses.index',
+        'dosen'     => 'dosen.courses.index',
         'mahasiswa' => 'mahasiswa.courses.index',
-        default => 'courses.index',
+        default     => 'courses.index',
     };
 
     // Penanda menu aktif
     $activeNav = match (true) {
-        request()->routeIs('admin.users.*') => 'users',
-        request()->routeIs('admin.courses.*') => 'courses',
-        request()->routeIs('admin.materials.*') => 'materials',
+        request()->routeIs('admin.users.*')       => 'users',
+        request()->routeIs('admin.courses.*')     => 'courses',
+        request()->routeIs('admin.materials.*')   => 'materials',
         request()->routeIs('admin.assignments.*') => 'assignments',
-        request()->routeIs('admin.grades.*') => 'grades',
-        request()->routeIs('dosen.dashboard') => 'dashboard',
-        request()->routeIs('dosen.grades.*') => 'grades',
-        request()->routeIs('dosen.courses.assignments.*') => 'assignments',
-        request()->routeIs('dosen.courses.materials.*') => 'materials',
-        request()->routeIs('dosen.courses.*') => request('focus', 'materials'),
+        request()->routeIs('admin.grades.*')      => 'grades',
+
+        request()->routeIs('dosen.dashboard')                              => 'dashboard',
+        request()->routeIs('dosen.courses.materials.*')                    => 'materials',
+        request()->routeIs('dosen.courses.assignments.*')                  => 'assignments',
+        request()->routeIs('dosen.grades.*')                               => 'grades',
+
         request()->routeIs('mahasiswa.courses.*') => 'courses',
+
         request()->routeIs('dashboard', 'admin.dashboard', 'dosen.dashboard', 'mahasiswa.dashboard') => 'dashboard',
         default => $activeNav,
     };
 
+    // Menu dasar (semua role)
     $navItems = [
-        ['path' => 'dashboard', 'icon' => 'grid_view', 'label' => 'Dashboard', 'route' => $dashboardRoute],
+        ['path' => 'dashboard', 'icon' => 'grid_view', 'label' => 'Dashboard',   'route' => $dashboardRoute],
+        ['path' => 'courses',   'icon' => 'menu_book', 'label' => 'Mata Kuliah', 'route' => $coursesRoute],
     ];
 
     // ==================== MENU KHUSUS ADMIN ====================
     if ($userRole === 'admin') {
-        $navItems[] = ['path' => 'courses',     'icon' => 'menu_book',      'label' => 'Mata Kuliah',      'route' => $coursesRoute];
         $navItems[] = ['path' => 'users',       'icon' => 'group',          'label' => 'Manajemen User',   'route' => 'admin.users.index'];
         $navItems[] = ['path' => 'materials',   'icon' => 'calendar_today', 'label' => 'Materi',           'route' => 'admin.materials.index'];
         $navItems[] = ['path' => 'assignments', 'icon' => 'assignment',     'label' => 'Tugas',            'route' => 'admin.assignments.index'];
         $navItems[] = ['path' => 'grades',      'icon' => 'grade',          'label' => 'Monitoring Nilai', 'route' => 'admin.grades.index'];
     }
 
+    // ==================== MENU KHUSUS DOSEN ====================
     if ($userRole === 'dosen') {
-        $navItems[] = ['path' => 'materials', 'icon' => 'description', 'label' => 'Materi', 'route' => 'dosen.courses.index', 'query' => ['focus' => 'materials']];
-        $navItems[] = ['path' => 'assignments', 'icon' => 'assignment', 'label' => 'Tugas', 'route' => 'dosen.courses.index', 'query' => ['focus' => 'assignments']];
-        $navItems[] = ['path' => 'grades', 'icon' => 'grade', 'label' => 'Nilai', 'route' => 'dosen.grades.index'];
+        $navItems = [
+            ['path' => 'dashboard',   'icon' => 'grid_view',   'label' => 'Dashboard',        'route' => 'dosen.dashboard'],
+            ['path' => 'materials',   'icon' => 'description', 'label' => 'Materi',           'route' => 'dosen.courses.index'],
+            ['path' => 'assignments', 'icon' => 'assignment',  'label' => 'Tugas',            'route' => 'dosen.courses.index'],
+            ['path' => 'grades',      'icon' => 'grade',       'label' => 'Monitoring Nilai', 'route' => 'dosen.grades.index'],
+        ];
     }
 
+    // ==================== MENU KHUSUS MAHASISWA ====================
     if ($userRole === 'mahasiswa') {
-        $navItems[] = ['path' => 'courses', 'icon' => 'menu_book', 'label' => 'Mata Kuliah', 'route' => $coursesRoute];
+        $navItems = [
+            ['path' => 'dashboard', 'icon' => 'grid_view', 'label' => 'Dashboard',   'route' => 'mahasiswa.dashboard'],
+            ['path' => 'courses',   'icon' => 'menu_book', 'label' => 'Mata Kuliah', 'route' => 'mahasiswa.courses.index'],
+        ];
     }
-
 @endphp
 
 <header class="navbar">

@@ -21,23 +21,7 @@ Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
-Route::get('/switch-role/{role}', function (string $role) {
-    abort_unless(in_array($role, ['admin', 'dosen', 'mahasiswa'], true), 404);
 
-    session(['simulated_role' => $role]);
-
-    return redirect()->route(match ($role) {
-        'admin' => 'admin.dashboard',
-        'dosen' => 'dosen.dashboard',
-        default => 'mahasiswa.dashboard',
-    });
-})->name('switch.role');
-
-/*
-|--------------------------------------------------------------------------
-| Route Admin
-|--------------------------------------------------------------------------
-*/
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
