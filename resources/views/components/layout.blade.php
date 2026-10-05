@@ -40,9 +40,10 @@
 <body
     class="font-body-md text-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container">
 
-    {{-- NAVBAR --}}
+    @auth
     @include('components.navbar')
-
+    @endauth
+    
     {{-- KONTEN UTAMA --}}
     <div class="main-content">
         {{ $slot ?? '' }}
