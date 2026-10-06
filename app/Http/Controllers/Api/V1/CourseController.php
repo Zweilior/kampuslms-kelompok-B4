@@ -27,7 +27,7 @@ class CourseController extends Controller
             ->with('lecturer')
             ->withCount([
                 'materials',
-                'assignments',
+                'assignments' => $this->visibleAssignments($user),
             ]);
 
         if ($user->role === 'dosen') {
@@ -65,7 +65,7 @@ class CourseController extends Controller
         $course->load('lecturer')
             ->loadCount([
                 'materials',
-                'assignments',
+                'assignments' => $this->visibleAssignments($user),
             ]);
 
         return new CourseResource($course);
@@ -123,6 +123,20 @@ class CourseController extends Controller
             ->paginate(15);
 
         return new AssignmentCollection($assignments);
+    }
+
+    /**
+     * Mahasiswa hanya boleh menghitung tugas yang sudah published,
+     * supaya jumlah tugas draft tidak ikut terlihat.
+     * Dipakai oleh withCount() / loadCount() pada relasi 'assignments'.
+     */
+    private function visibleAssignments($user): \Closure
+    {
+        return function ($query) use ($user) {
+            if ($user->role === 'mahasiswa') {
+                $query->where('status', 'published');
+            }
+        };
     }
 
     /**

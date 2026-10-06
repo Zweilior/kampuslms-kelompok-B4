@@ -273,6 +273,8 @@ class DatabaseSeeder extends Seeder
                 ]
             );
         }
+
+        $this->call(NotificationSeeder::class);
     }
 
     private function createSubmission(
