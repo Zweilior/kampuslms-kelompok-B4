@@ -13,6 +13,8 @@ class FinalGrade extends Model
     protected $fillable = [
         'course_id',
         'user_id',
+        'total_score',
+        'letter_grade',
     ];
 
     protected function casts(): array

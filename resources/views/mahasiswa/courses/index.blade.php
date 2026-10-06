@@ -35,11 +35,13 @@
                             <span>Dosen pengampu</span>
                         </span>
                     </div>
-                    <a href="{{ route('mahasiswa.courses.show', $course->id) }}"
-                        class="mahasiswa-page__button mahasiswa-page__button--primary mahasiswa-page__button--wide">
-                        Masuk kelas
-                        <span class="material-symbols-outlined">arrow_forward</span>
-                    </a>
+                    <div class="mahasiswa-page__button-row">
+                        <a href="{{ route('mahasiswa.courses.assignments.index', $course->id) }}"
+                            class="mahasiswa-page__button mahasiswa-page__button--primary">
+                            Lihat daftar tugas
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </a>
+                    </div>
                 </article>
             @empty
                 <div class="mahasiswa-page__empty">

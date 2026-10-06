@@ -106,11 +106,11 @@ class DatabaseSeeder extends Seeder
 
             $course = Course::updateOrCreate(
                 [
-                    'code' => 'SI25140' . ($index + 1),
+                    'code' => 'SI25140'.($index + 1),
                 ],
                 [
                     'name' => $courseName,
-                    'description' => 'Mata kuliah ' . $courseName . ' pada Kampus LMS.',
+                    'description' => 'Mata kuliah '.$courseName.' pada Kampus LMS.',
                     'sks' => 3,
                     'lecturer_id' => $lecturer->id,
                     'status' => 'active',
@@ -125,9 +125,13 @@ class DatabaseSeeder extends Seeder
             |--------------------------------------------------------------------------
             */
 
-            $selectedStudents = $mahasiswa
-                ->shuffle()
-                ->take(15);
+            $selectedStudents = collect([$mahasiswaDemo])
+                ->merge(
+                    $mahasiswa
+                        ->reject(fn (User $student) => $student->id === $mahasiswaDemo->id)
+                        ->shuffle()
+                        ->take(14)
+                );
 
             foreach ($selectedStudents as $student) {
                 $course->students()->syncWithoutDetaching([
@@ -144,14 +148,14 @@ class DatabaseSeeder extends Seeder
             |
             | Tugas 1 = deadline sudah lewat
             | Tugas 2 = masih aktif
-            | Tugas 3 = draft
+            | Tugas 3 = published tanpa submission agar status Assigned terlihat.
             |
             */
 
             $pastAssignment = Assignment::updateOrCreate(
                 [
                     'course_id' => $course->id,
-                    'title' => 'Tugas 1 - ' . $courseName,
+                    'title' => 'Tugas 1 - '.$courseName,
                 ],
                 [
                     'created_by' => $lecturer->id,
@@ -166,7 +170,7 @@ class DatabaseSeeder extends Seeder
             $activeAssignment = Assignment::updateOrCreate(
                 [
                     'course_id' => $course->id,
-                    'title' => 'Tugas 2 - ' . $courseName,
+                    'title' => 'Tugas 2 - '.$courseName,
                 ],
                 [
                     'created_by' => $lecturer->id,
@@ -181,15 +185,15 @@ class DatabaseSeeder extends Seeder
             Assignment::updateOrCreate(
                 [
                     'course_id' => $course->id,
-                    'title' => 'Tugas 3 - ' . $courseName,
+                    'title' => 'Tugas 3 - '.$courseName,
                 ],
                 [
                     'created_by' => $lecturer->id,
-                    'instructions' => 'Tugas ini masih dalam tahap persiapan.',
+                    'instructions' => 'Kerjakan tugas sesuai materi dan kumpulkan sebelum batas waktu.',
                     'due_at' => now()->addDays(14),
                     'max_score' => 100,
                     'allow_late' => true,
-                    'status' => 'draft',
+                    'status' => 'published',
                 ]
             );
 
@@ -289,12 +293,12 @@ class DatabaseSeeder extends Seeder
             ],
             [
                 'file_path' => 'submissions/'
-                    . $assignment->id
-                    . '-'
-                    . $student->id
-                    . '.pdf',
+                    .$assignment->id
+                    .'-'
+                    .$student->id
+                    .'.pdf',
 
-                'original_name' => 'tugas-' . $assignment->id . '.pdf',
+                'original_name' => 'tugas-'.$assignment->id.'.pdf',
 
                 'file_size' => fake()->numberBetween(
                     100_000,

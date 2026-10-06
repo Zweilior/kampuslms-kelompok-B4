@@ -1,15 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\MaterialController;
-use App\Http\Controllers\AssignmentController;
-use App\Http\Controllers\SubmissionController;
-use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\AdminGradeController;
+use App\Http\Controllers\AssignmentController;
+use App\Http\Controllers\CourseController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\MahasiswaController;
+use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\SubmissionController;
+use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('welcome'));
 
@@ -22,7 +22,6 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
-
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
@@ -84,7 +83,9 @@ Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scop
 Route::prefix('mahasiswa')->name('mahasiswa.')->middleware(['auth', 'role:mahasiswa'])->scopeBindings()->group(function () {
     Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
     Route::get('/courses', [MahasiswaController::class, 'courses'])->name('courses.index');
+    Route::get('/monitoring-nilai', [MahasiswaController::class, 'monitoringGrades'])->name('grades.index');
     Route::get('/courses/{course}', [MahasiswaController::class, 'showCourse'])->name('courses.show');
+    Route::get('/courses/{course}/grades', [MahasiswaController::class, 'grades'])->name('courses.grades.show');
     Route::get('/courses/{course}/assignments', [MahasiswaController::class, 'assignments'])->name('courses.assignments.index');
     Route::get('/courses/{course}/materials', [MahasiswaController::class, 'materials'])->name('courses.materials.index');
     Route::get('/courses/{course}/assignments/{assignment}/submissions', [MahasiswaController::class, 'submissions'])->name('courses.assignments.submissions.index');
