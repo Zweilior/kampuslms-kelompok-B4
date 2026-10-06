@@ -128,6 +128,43 @@
         box-shadow 180ms ease;
 }
 
+.mahasiswa-page__summary-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.mahasiswa-page__dashboard-links {
+    margin-bottom: 1.5rem;
+}
+
+.mahasiswa-page__text-link {
+    color: var(--primary);
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.mahasiswa-page__text-link:hover {
+    text-decoration: underline;
+}
+
+.mahasiswa-page__dashboard-assignment {
+    color: inherit;
+    text-decoration: none;
+}
+
+.mahasiswa-page__dashboard-assignment:hover .mahasiswa-page__list-copy strong {
+    color: var(--primary);
+}
+
+.mahasiswa-page__grade-summary th,
+.mahasiswa-page__grade-summary td {
+    border-top: 1px solid var(--border-hover);
+    border-bottom: 0;
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
 .mahasiswa-page__stat-card:hover,
 .mahasiswa-page__course-card:hover,
 .mahasiswa-page__assignment-card:hover,
@@ -467,10 +504,55 @@
     font-size: 0.98rem;
 }
 
-.mahasiswa-page__quick-card > span:last-child {
+.mahasiswa-page__quick-card > span:last-child:not(.material-symbols-outlined) {
     color: var(--text-secondary);
     font-size: 0.78rem;
     line-height: 1.55;
+}
+
+.mahasiswa-page__course-meta {
+    margin-top: 0.65rem;
+}
+
+.mahasiswa-page__grid--course-actions {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+}
+
+.mahasiswa-page__grid--course-actions .mahasiswa-page__quick-card {
+    min-height: 0;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem 1.2rem;
+}
+
+.mahasiswa-page__grid--course-actions .mahasiswa-page__quick-card .mahasiswa-page__icon-box {
+    margin: 0;
+}
+
+.mahasiswa-page__quick-card-copy {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.mahasiswa-page__quick-card-copy > span {
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.55;
+}
+
+.mahasiswa-page__quick-card-arrow {
+    flex: 0 0 auto;
+    color: var(--text-muted);
+}
+
+.mahasiswa-page__grid--course-actions .mahasiswa-page__quick-card:hover .mahasiswa-page__quick-card-arrow {
+    color: var(--primary);
+    transform: translateX(2px);
 }
 
 .mahasiswa-page__list {
@@ -542,15 +624,298 @@
     background: var(--bg-hover);
 }
 
+.mahasiswa-page__grade-panel {
+    overflow: hidden;
+}
+
+.mahasiswa-page__assignment-list {
+    overflow: hidden;
+}
+
+.mahasiswa-page__assignment-row {
+    display: flex;
+    min-height: 3.5rem;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    border-bottom: 1px solid var(--border-hairline);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: background-color 160ms ease;
+}
+
+.mahasiswa-page__assignment-row:last-child {
+    border-bottom: 0;
+}
+
+.mahasiswa-page__assignment-row:hover {
+    background: var(--bg-hover);
+}
+
+.mahasiswa-page__assignment-row-copy {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.mahasiswa-page__assignment-row-copy strong {
+    overflow: hidden;
+    font-size: 0.84rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.mahasiswa-page__assignment-row-copy > span {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+}
+
+.mahasiswa-page__assignment-row-status {
+    flex: 0 0 auto;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: lowercase;
+}
+
+.mahasiswa-page__assignment-row-status.is-submitted {
+    color: var(--primary);
+}
+
+.mahasiswa-page__assignment-row-arrow {
+    flex: 0 0 auto;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+}
+
+.mahasiswa-page__grade-tabs {
+    display: flex;
+    gap: 1.25rem;
+    padding: 0.75rem 1.2rem 0;
+    border-bottom: 1px solid var(--border-hairline);
+}
+
+.mahasiswa-page__grade-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0 0.8rem;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.mahasiswa-page__grade-tab span {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+}
+
+.mahasiswa-page__grade-tab.is-active {
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.mahasiswa-page__grade-course {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    color: inherit;
+    text-decoration: none;
+}
+
+.mahasiswa-page__grade-course:hover strong {
+    color: var(--primary);
+}
+
+.mahasiswa-page__grade-course span,
+.mahasiswa-page__table-subtext {
+    color: var(--text-muted);
+    font-size: 0.7rem;
+    font-weight: 400;
+}
+
+.mahasiswa-page__table-subtext {
+    display: block;
+    margin-top: 0.2rem;
+}
+
+.mahasiswa-page__grade-table td:nth-child(2),
+.mahasiswa-page__grade-table td:nth-child(3),
+.mahasiswa-page__grade-table td:nth-child(4),
+.mahasiswa-page__grade-table td:last-child {
+    white-space: nowrap;
+}
+
+.mahasiswa-page__icon-link {
+    display: inline-grid;
+    width: 2rem;
+    height: 2rem;
+    place-items: center;
+    border-radius: 50%;
+    color: var(--text-secondary);
+}
+
+.mahasiswa-page__icon-link:hover {
+    background: var(--bg-hover);
+    color: var(--primary);
+}
+
+.mahasiswa-page__final-grade {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    padding: 1.25rem 1.5rem;
+}
+
+.mahasiswa-page__final-grade h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.mahasiswa-page__final-grade .mahasiswa-page__eyebrow {
+    margin-bottom: 0.25rem;
+}
+
+.mahasiswa-page__final-grade-values {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+}
+
+.mahasiswa-page__final-grade-values div {
+    display: grid;
+    justify-items: end;
+    gap: 0.25rem;
+}
+
+.mahasiswa-page__final-grade-values span {
+    color: var(--text-muted);
+    font-size: 0.72rem;
+}
+
+.mahasiswa-page__final-grade-values strong {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+}
+
+.mahasiswa-page__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+}
+
 .mahasiswa-page__table td:first-child {
     color: var(--text-primary);
     font-weight: 600;
 }
 
 .mahasiswa-page__form-card {
-    width: min(100%, 760px);
+    width: min(100%, 880px);
     margin: 0 auto;
-    padding: 1.5rem;
+    padding: 1.6rem;
+}
+
+.mahasiswa-page--submission-create .mahasiswa-page__header {
+    align-items: flex-start;
+}
+
+.mahasiswa-page--submission-create .mahasiswa-page__header-copy {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.mahasiswa-page--submission-create .mahasiswa-page__eyebrow {
+    margin-top: 1rem;
+}
+
+.mahasiswa-page__submission-context {
+    display: grid;
+    width: min(100%, 880px);
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+    margin: 0 auto 1rem;
+    padding: 1.2rem 1.4rem;
+    background:
+        linear-gradient(120deg, color-mix(in srgb, var(--primary) 8%, transparent), transparent 60%),
+        var(--color-surface-container-low);
+}
+
+.mahasiswa-page__submission-context > .mahasiswa-page__icon-box {
+    width: 2.8rem;
+    height: 2.8rem;
+}
+
+.mahasiswa-page__submission-context-copy {
+    min-width: 0;
+}
+
+.mahasiswa-page__submission-context-label {
+    color: var(--text-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.mahasiswa-page__submission-context-copy h2 {
+    margin: 0.3rem 0 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.mahasiswa-page__submission-context-copy > p {
+    margin: 0.35rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    line-height: 1.6;
+}
+
+.mahasiswa-page__submission-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.55rem 1rem;
+    margin-top: 0.85rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--border-hairline);
+}
+
+.mahasiswa-page__submission-meta > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--text-secondary);
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.mahasiswa-page__submission-meta .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 1rem;
+}
+
+.mahasiswa-page__form-card-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.35rem;
+}
+
+.mahasiswa-page__form-card-heading .mahasiswa-page__form-intro {
+    margin-bottom: 0;
 }
 
 .mahasiswa-page__form-heading {
@@ -580,6 +945,10 @@
     color: var(--text-primary);
     font-size: 0.78rem;
     font-weight: 600;
+}
+
+.mahasiswa-page__field label > span {
+    color: var(--primary);
 }
 
 .mahasiswa-page__field input,
@@ -613,6 +982,22 @@
 .mahasiswa-page__field textarea:focus {
     border-color: var(--primary);
     box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.mahasiswa-page__field input.is-invalid,
+.mahasiswa-page__field textarea.is-invalid {
+    border-color: #dc6b6b;
+}
+
+.mahasiswa-page__field-hint {
+    color: var(--text-muted);
+    font-size: 0.69rem;
+}
+
+.mahasiswa-page__field-error {
+    color: #e58b8b;
+    font-size: 0.72rem;
+    font-weight: 600;
 }
 
 .mahasiswa-page__form-actions {
@@ -709,10 +1094,28 @@
         padding: 1rem;
     }
 
+    .mahasiswa-page__submission-context {
+        padding: 1rem;
+    }
+
+    .mahasiswa-page__form-card-heading {
+        flex-direction: column;
+    }
+
     .mahasiswa-page__deadline,
     .mahasiswa-page__list-item {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .mahasiswa-page__final-grade {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .mahasiswa-page__final-grade-values {
+        width: 100%;
+        justify-content: space-between;
     }
 
     .mahasiswa-page__button-row {

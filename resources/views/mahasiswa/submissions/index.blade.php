@@ -8,7 +8,6 @@
                     <span class="material-symbols-outlined">arrow_back</span>
                     Kembali ke daftar tugas
                 </a>
-                <span class="mahasiswa-page__eyebrow">Riwayat tugas</span>
                 <h1 class="mahasiswa-page__title">Status pengumpulan & nilai</h1>
                 <p class="mahasiswa-page__description">{{ $assignment->title }} · {{ $course->name }}</p>
             </div>

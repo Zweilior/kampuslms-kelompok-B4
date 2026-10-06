@@ -35,6 +35,8 @@
         request()->routeIs('dosen.courses.assignments.*')                  => 'assignments',
         request()->routeIs('dosen.grades.*')                               => 'grades',
 
+        request()->routeIs('mahasiswa.grades.*') => 'grades',
+        request()->routeIs('mahasiswa.courses.grades.*') => 'courses',
         request()->routeIs('mahasiswa.courses.*') => 'courses',
 
         request()->routeIs('dashboard', 'admin.dashboard', 'dosen.dashboard', 'mahasiswa.dashboard') => 'dashboard',
@@ -68,8 +70,9 @@
     // ==================== MENU KHUSUS MAHASISWA ====================
     if ($userRole === 'mahasiswa') {
         $navItems = [
-            ['path' => 'dashboard', 'icon' => 'grid_view', 'label' => 'Dashboard',   'route' => 'mahasiswa.dashboard'],
-            ['path' => 'courses',   'icon' => 'menu_book', 'label' => 'Mata Kuliah', 'route' => 'mahasiswa.courses.index'],
+            ['path' => 'dashboard', 'icon' => 'grid_view', 'label' => 'Dashboard',        'route' => 'mahasiswa.dashboard'],
+            ['path' => 'courses',   'icon' => 'menu_book', 'label' => 'Mata Kuliah',      'route' => 'mahasiswa.courses.index'],
+            ['path' => 'grades',    'icon' => 'grade',     'label' => 'Monitoring Nilai', 'route' => 'mahasiswa.grades.index'],
         ];
     }
 @endphp

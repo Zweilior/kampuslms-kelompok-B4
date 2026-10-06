@@ -144,7 +144,7 @@
                                 id="identity"
                                 name="identity"
                                 value="{{ old('identity') }}"
-                                placeholder="cth: 10241042 nama@kampuslms.test"
+                                placeholder="10241000 atau nama@kampuslms.test"
                                 required autofocus autocomplete="username"
                                 class="w-full rounded-xl border border-outline-variant bg-surface-container-lowest py-3 pl-12 pr-4 text-sm text-on-surface outline-none transition-all placeholder:text-outline focus:border-primary focus:ring-2 focus:ring-primary/20" />
                         </div>
