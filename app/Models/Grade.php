@@ -15,6 +15,7 @@ class Grade extends Model
         'graded_by',
         'score',
         'feedback',
+        'graded_at',
     ];
 
     protected function casts(): array
