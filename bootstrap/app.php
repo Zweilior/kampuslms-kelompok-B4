@@ -1,12 +1,11 @@
 <?php
 
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 
 return Application::configure(basePath: dirname(__DIR__))
 
@@ -39,12 +38,24 @@ return Application::configure(basePath: dirname(__DIR__))
             }
         });
 
-        // Kontrak Bagian 5: format 403 (termasuk dari middleware role / abort(403)).
-        $exceptions->render(function (AuthorizationException|AccessDeniedHttpException $e, Request $request) {
-            if ($request->is('api/*')) {
-                return response()->json([
-                    'message' => 'Anda tidak memiliki akses ke sumber daya ini.',
-                ], 403);
+        // Kontrak Bagian 5: format 403, plus 404 yang tidak membocorkan nama model.
+        // Satu handler untuk semua HttpException, karena Laravel mengubah
+        // AuthorizationException -> AccessDeniedHttpException (403) dan
+        // ModelNotFoundException -> NotFoundHttpException (404) sebelum
+        // sampai ke sini, sedangkan abort(403) melempar HttpException biasa.
+        $exceptions->render(function (HttpExceptionInterface $e, Request $request) {
+            if (! $request->is('api/*')) {
+                return null;
             }
+
+            return match ($e->getStatusCode()) {
+                403 => response()->json([
+                    'message' => 'Anda tidak memiliki akses ke sumber daya ini.',
+                ], 403),
+                404 => response()->json([
+                    'message' => 'Sumber daya tidak ditemukan.',
+                ], 404),
+                default => null, // 429 dst. tetap memakai bawaan Laravel
+            };
         });
     })->create();
