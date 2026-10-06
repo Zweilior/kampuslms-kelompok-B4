@@ -30,6 +30,7 @@ Route::prefix('v1')
 
         // Submissions & Grades
         Route::get('/assignments/{assignment}/submissions', [SubmissionController::class, 'index']);
+        Route::post('/assignments/{assignment}/submissions', [SubmissionController::class, 'store']);
         Route::put('/submissions/{submission}/grade', [SubmissionController::class, 'grade']);
 
         // Notifications
