@@ -125,14 +125,47 @@
             </div>
 
             @auth
-                <form action="{{ route('logout') }}" method="POST" style="display: inline; margin-left: 10px;">
-                    @csrf
-                    <button type="submit" class="navbar__link"
-                        style="background: none; border: none; cursor: pointer; color: #ef4444; padding: 8px; display: flex; align-items: center;"
-                        title="Logout">
+                <div x-data="{ logoutOpen: false }" @keydown.escape.window="logoutOpen = false">
+                    <button type="button" class="navbar__link navbar__logout-button"
+                        style="background: none; border: none; cursor: pointer; padding: 8px; display: flex; align-items: center;"
+                        title="Keluar" aria-label="Keluar dari akun"
+                        @click="logoutOpen = true">
                         <span class="material-symbols-outlined">logout</span>
                     </button>
-                </form>
+
+                    <template x-teleport="body">
+                        <div class="logout-dialog-backdrop" x-cloak x-show="logoutOpen"
+                            x-transition.opacity @click.self="logoutOpen = false"
+                            role="presentation">
+                            <section class="logout-dialog" role="dialog" aria-modal="true"
+                                aria-labelledby="logout-dialog-title"
+                                @click.stop>
+                                <div class="logout-dialog__icon" aria-hidden="true">
+                                    <span class="material-symbols-outlined">logout</span>
+                                </div>
+                                <h2 class="logout-dialog__title" id="logout-dialog-title">
+                                    Yakin ingin keluar?
+                                </h2>
+                                <p class="logout-dialog__message">
+                                    Anda akan keluar dari akun {{ $userName }}. Pastikan perubahan Anda sudah tersimpan.
+                                </p>
+                                <div class="logout-dialog__actions">
+                                    <button type="button" class="logout-dialog__button"
+                                        @click="logoutOpen = false">
+                                        Batal
+                                    </button>
+                                    <form action="{{ route('logout') }}" method="POST">
+                                        @csrf
+                                        <button type="submit"
+                                            class="logout-dialog__button logout-dialog__button--confirm">
+                                            Ya, keluar
+                                        </button>
+                                    </form>
+                                </div>
+                            </section>
+                        </div>
+                    </template>
+                </div>
             @endauth
 
         </div>

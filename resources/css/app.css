@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./layout.css";
+@import "./auth/logout.css";
 @import "./dashboard.css";
 @import "./mahasiswa/index.css";
 @import "./users/index.css";
@@ -7,9 +8,6 @@
 @import "./users/edit.css";
 @import "./users/show.css";
 @import "./users/modal.css";
-
-/* login.css HAPUS, karena sudah tidak dipakai */
-/* @import "./login.css"; */
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

@@ -1,0 +1,120 @@
+[x-cloak] {
+    display: none !important;
+}
+
+.logout-dialog-backdrop {
+    position: fixed;
+    z-index: 1000;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    background: rgba(10, 15, 9, 0.58);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+}
+
+.logout-dialog {
+    width: min(100%, 27rem);
+    padding: 1.75rem;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-hairline);
+    border-radius: 1.25rem;
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.3);
+    animation: logout-dialog-in 180ms ease-out both;
+}
+
+.logout-dialog__icon {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    place-items: center;
+    color: #c2413b;
+    background: rgba(194, 65, 59, 0.1);
+    border-radius: 1rem;
+}
+
+.logout-dialog__title {
+    margin: 0 0 0.5rem;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.logout-dialog__message {
+    margin: 0;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.logout-dialog__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.logout-dialog__button {
+    min-height: 2.75rem;
+    padding: 0.65rem 1rem;
+    border: 1px solid var(--border-hairline);
+    border-radius: 0.7rem;
+    color: var(--text-primary);
+    background: var(--bg-hover);
+    font: inherit;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 150ms ease, transform 150ms ease;
+}
+
+.logout-dialog__button:hover {
+    transform: translateY(-1px);
+}
+
+.logout-dialog__button:focus-visible,
+.navbar__logout-button:focus-visible {
+    outline: 3px solid var(--primary-light);
+    outline-offset: 2px;
+}
+
+.logout-dialog__button--confirm {
+    color: #fff;
+    background: #b93832;
+    border-color: #b93832;
+}
+
+.logout-dialog__button--confirm:hover {
+    background: #982f2a;
+}
+
+.navbar__logout-button {
+    color: #c2413b !important;
+}
+
+@keyframes logout-dialog-in {
+    from { opacity: 0; transform: translateY(8px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (max-width: 480px) {
+    .logout-dialog {
+        padding: 1.4rem;
+    }
+
+    .logout-dialog__actions {
+        flex-direction: column-reverse;
+    }
+
+    .logout-dialog__button {
+        width: 100%;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .logout-dialog {
+        animation-duration: 0.01ms;
+    }
+}

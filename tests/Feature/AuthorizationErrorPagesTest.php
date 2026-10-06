@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class AuthorizationErrorPagesTest extends TestCase
@@ -34,5 +36,40 @@ class AuthorizationErrorPagesTest extends TestCase
         $this->getJson('/api/v1/me')
             ->assertUnauthorized()
             ->assertJsonStructure(['message']);
+    }
+
+    public function test_invalid_login_message_is_shown_below_the_password_field(): void
+    {
+        Auth::shouldReceive('attempt')->once()->andReturnFalse();
+
+        $this->from('/login')
+            ->followingRedirects()
+            ->post('/login', [
+                'identity' => 'nim-tidak-valid',
+                'password' => 'kata-sandi-salah',
+            ])
+            ->assertOk()
+            ->assertSeeInOrder([
+                'Kata Sandi',
+                'NIM/Email atau kata sandi salah. Silakan periksa kembali.',
+            ]);
+    }
+
+    public function test_authenticated_navbar_has_a_logout_confirmation_dialog(): void
+    {
+        Route::get('/test-navbar', fn () => view('components.navbar'))
+            ->middleware('auth');
+
+        $user = new User();
+        $user->name = 'Pengguna Tes';
+        $user->role = 'mahasiswa';
+
+        $this->actingAs($user)
+            ->get('/test-navbar')
+            ->assertOk()
+            ->assertSee('Yakin ingin keluar?')
+            ->assertSee('Ya, keluar')
+            ->assertSee('Batal')
+            ->assertSee('x-teleport="body"', false);
     }
 }
