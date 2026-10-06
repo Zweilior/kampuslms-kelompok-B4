@@ -19,204 +19,8 @@
 
     {{-- Vite --}}
     @vite('resources/css/app.css')
+    @vite('resources/css/auth/login.css')
 
-    <style>
-        .auth-shell {
-            display: grid;
-            min-height: 100vh;
-            min-height: 100svh;
-            grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-            overflow: hidden;
-            background: #10150f;
-        }
-
-        .auth-pattern {
-            background-image:
-                radial-gradient(rgba(255, 255, 255, 0.12) 0.7px, transparent 0.7px),
-                linear-gradient(135deg, #233e19 0%, #3d6827 52%, #759c54 100%);
-            background-size: 22px 22px, 180% 180%;
-            background-position: 0 0, 0% 50%;
-            animation: auth-gradient-shift 18s ease-in-out infinite;
-        }
-
-        .auth-brand-panel {
-            isolation: isolate;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-            animation: auth-brand-in 900ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
-        }
-
-        .auth-form-panel {
-            min-width: 0;
-            padding: clamp(1.25rem, 3vh, 2.5rem) clamp(1.5rem, 4vw, 4rem);
-            animation: auth-form-in 800ms 100ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
-        }
-
-        .auth-form-content {
-            padding: clamp(1.25rem, 2.2vw, 1.8rem);
-            border: 1px solid rgba(210, 224, 197, 0.12);
-            border-radius: 1.25rem;
-            background: linear-gradient(145deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.015));
-            box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(14px);
-        }
-
-        .auth-form-content h2,
-        .auth-brand-panel h1 {
-            font-family: 'Poppins', 'Inter', sans-serif;
-        }
-
-        .auth-form-content input {
-            min-height: 3.25rem;
-            transition: border-color 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
-        }
-
-        .auth-field-icon,
-        .auth-field-action {
-            position: absolute;
-            top: 50%;
-            display: inline-flex;
-            width: 1.5rem;
-            height: 1.5rem;
-            align-items: center;
-            justify-content: center;
-            line-height: 1;
-            transform: translateY(-50%);
-        }
-
-        .auth-field-icon {
-            left: 1rem;
-            pointer-events: none;
-        }
-
-        .auth-field-action {
-            right: 0.75rem;
-        }
-
-        .auth-form-content input:focus {
-            background-color: rgba(255, 255, 255, 0.06);
-        }
-
-        .auth-form-content button[type='submit'] {
-            min-height: 3.5rem;
-            transition: transform 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
-        }
-
-        .auth-mobile-brand {
-            animation: auth-form-in 700ms 80ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
-        }
-
-        @keyframes auth-gradient-shift {
-            0%, 100% { background-position: 0 0, 0% 50%; }
-            50% { background-position: 0 0, 100% 50%; }
-        }
-
-        @keyframes auth-brand-in {
-            from { opacity: 0; transform: translateX(-18px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes auth-form-in {
-            from { opacity: 0; transform: translateY(14px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 1023px) {
-            .auth-shell {
-                grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
-            }
-
-            .auth-brand-panel {
-                padding: 1.5rem;
-            }
-
-            .auth-brand-panel h1 {
-                font-size: 2.25rem;
-            }
-
-            .auth-form-panel {
-                padding: 1.5rem;
-            }
-        }
-
-        @media (max-width: 767px) {
-            .auth-shell {
-                display: flex;
-                flex-direction: column;
-                overflow: visible;
-                background: radial-gradient(ellipse at top, rgba(89, 132, 57, 0.14), transparent 55%), #10150f;
-            }
-
-            .auth-form-panel {
-                flex: 1;
-                justify-content: flex-start;
-                padding: max(1.25rem, env(safe-area-inset-top)) 1rem max(1.5rem, env(safe-area-inset-bottom));
-                transition: padding 320ms cubic-bezier(0.2, 0.75, 0.25, 1);
-            }
-
-            .auth-mobile-brand {
-                width: 100%;
-                max-width: 28rem;
-                margin: 0 auto 1.5rem;
-                transition: margin 320ms cubic-bezier(0.2, 0.75, 0.25, 1);
-            }
-
-            .auth-mobile-brand > div:first-child {
-                width: 3.5rem;
-                height: 3.5rem;
-                border: 1px solid rgba(255, 255, 255, 0.2);
-                background: rgba(255, 255, 255, 0.12);
-                backdrop-filter: blur(10px);
-            }
-
-            .auth-form-content {
-                width: 100%;
-                max-width: 28rem;
-                margin-inline: auto;
-                padding: 1.4rem;
-                border-radius: 1rem;
-                animation: auth-form-in 700ms 140ms cubic-bezier(0.2, 0.75, 0.25, 1) both;
-                transition: width 320ms cubic-bezier(0.2, 0.75, 0.25, 1), padding 320ms cubic-bezier(0.2, 0.75, 0.25, 1), border-radius 320ms ease;
-            }
-
-            .auth-form-content h2 {
-                font-size: 1.75rem;
-            }
-
-            .auth-form-content input {
-                font-size: 16px;
-            }
-
-            .auth-form-content .auth-bottom-links {
-                flex-wrap: wrap;
-                row-gap: 0.75rem;
-            }
-        }
-
-        @media (max-width: 380px) {
-            .auth-form-panel {
-                padding-inline: 0.75rem;
-            }
-
-            .auth-form-content {
-                padding: 1.15rem;
-            }
-
-            .auth-mobile-brand {
-                margin-bottom: 1.1rem;
-            }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            *,
-            *::before,
-            *::after {
-                scroll-behavior: auto !important;
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-    </style>
 </head>
 <body class="font-sans antialiased bg-surface text-on-surface">
 
@@ -317,7 +121,7 @@
                 </div>
 
                 {{-- Error umum --}}
-                @if ($errors->any() && !$errors->has('identity') && !$errors->has('password'))
+                @if ($errors->any() && !$errors->has('identity') && !$errors->has('password') && !$errors->has('auth'))
                     <div class="mb-5 px-4 py-3 rounded-xl bg-error/10 border border-error/30 text-error text-sm">
                         {{ $errors->first() }}
                     </div>
@@ -387,6 +191,12 @@
                         @error('password')
                             <p class="mt-2 text-xs text-error flex items-center gap-1">
                                 <span class="material-symbols-outlined text-[14px]">error</span>
+                                {{ $message }}
+                            </p>
+                        @enderror
+                        @error('auth')
+                            <p class="mt-2 text-sm font-medium text-error flex items-center gap-1" role="alert">
+                                <span class="material-symbols-outlined text-base">error</span>
                                 {{ $message }}
                             </p>
                         @enderror

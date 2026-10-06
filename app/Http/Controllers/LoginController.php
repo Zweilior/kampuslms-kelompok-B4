@@ -38,7 +38,7 @@ class LoginController extends Controller
         }
 
         return back()->withErrors([
-            'identity' => 'Kredensial yang Anda masukkan tidak cocok.',
+            'auth' => 'NIM/Email atau kata sandi salah. Silakan periksa kembali.',
         ])->onlyInput('identity');
     }
 
