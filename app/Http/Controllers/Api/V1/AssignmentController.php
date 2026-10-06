@@ -74,6 +74,7 @@ class AssignmentController extends Controller
             'max_score' => $validated['max_score'],
             'allow_late' => $validated['allow_late'],
             'status' => $validated['status'],
+            'created_by' => $user->id,
         ]);
 
         return (new AssignmentResource($assignment))
