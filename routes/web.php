@@ -15,14 +15,16 @@ Route::get('/', fn () => view('welcome'));
 
 Route::get('/tentang', fn () => view('tentang'))->name('tentang');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])
+    ->middleware('auth')
+    ->name('dashboard');
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
-Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
     Route::resource('users', UserController::class);
@@ -50,7 +52,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
 | Route Dosen
 |--------------------------------------------------------------------------
 */
-Route::prefix('dosen')->name('dosen.')->scopeBindings()->group(function () {
+Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scopeBindings()->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dosenDashboard'])->name('dashboard');
 
     Route::get('/grades', fn () => view('dosen.grades.index'))->name('grades.index');
@@ -79,7 +81,7 @@ Route::prefix('dosen')->name('dosen.')->scopeBindings()->group(function () {
 | Route Mahasiswa
 |--------------------------------------------------------------------------
 */
-Route::prefix('mahasiswa')->name('mahasiswa.')->scopeBindings()->group(function () {
+Route::prefix('mahasiswa')->name('mahasiswa.')->middleware(['auth', 'role:mahasiswa'])->scopeBindings()->group(function () {
     Route::get('/dashboard', [MahasiswaController::class, 'dashboard'])->name('dashboard');
     Route::get('/courses', [MahasiswaController::class, 'courses'])->name('courses.index');
     Route::get('/courses/{course}', [MahasiswaController::class, 'showCourse'])->name('courses.show');
@@ -94,11 +96,13 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->scopeBindings()->group(function 
 | Route umum yang masih dipakai halaman simulasi/dashboard lama
 |--------------------------------------------------------------------------
 */
-Route::resource('courses', CourseController::class);
-Route::resource('users', UserController::class);
+Route::middleware('auth')->group(function () {
+    Route::resource('courses', CourseController::class);
+    Route::resource('users', UserController::class);
 
-Route::scopeBindings()->group(function () {
-    Route::resource('courses.materials', MaterialController::class);
-    Route::resource('courses.assignments', AssignmentController::class);
-    Route::resource('courses.assignments.submissions', SubmissionController::class);
+    Route::scopeBindings()->group(function () {
+        Route::resource('courses.materials', MaterialController::class);
+        Route::resource('courses.assignments', AssignmentController::class);
+        Route::resource('courses.assignments.submissions', SubmissionController::class);
+    });
 });

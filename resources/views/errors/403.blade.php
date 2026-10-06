@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>403 - Akses Ditolak</title>
-</head>
-<body>
-    <h1>403</h1>
-    <h2>Akses Ditolak</h2>
-    <p>Anda tidak memiliki izin untuk mengakses halaman ini.</p>
-
-    <a href="{{ route('dashboard') }}">Kembali ke Dashboard</a>
-</body>
-</html>
+@include('errors.layout', [
+    'statusCode' => '403',
+    'pageTitle' => 'Akses Ditolak',
+    'heading' => 'Akses ke Halaman Ini Ditolak',
+    'message' => 'Maaf, akun Anda tidak memiliki izin untuk mengakses halaman ini. Silakan kembali ke dashboard atau hubungi administrator jika Anda merasa ini keliru.',
+    'primaryUrl' => route('dashboard'),
+    'primaryLabel' => 'Ke Dashboard',
+])
