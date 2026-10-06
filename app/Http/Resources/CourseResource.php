@@ -16,6 +16,7 @@ class CourseResource extends JsonResource
             'description' => $this->description,
             'sks' => $this->sks,
             'status' => $this->status,
+            'lecturer' => new UserResource($this->whenLoaded('lecturer')),
             'materials_count' => $this->when(
                 isset($this->materials_count),
                 fn () => (int) $this->materials_count
