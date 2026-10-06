@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AssignmentController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\NotificationController;
+use App\Http\Controllers\Api\V1\SubmissionController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/v1/auth/login', [AuthController::class, 'login'])
@@ -26,6 +27,10 @@ Route::prefix('v1')
         Route::post('/assignments', [AssignmentController::class, 'store']);
         Route::match(['put', 'patch'], '/assignments/{assignment}', [AssignmentController::class, 'update']);
         Route::delete('/assignments/{assignment}', [AssignmentController::class, 'destroy']);
+
+        // Submissions & Grades
+        Route::get('/assignments/{assignment}/submissions', [SubmissionController::class, 'index']);
+        Route::put('/submissions/{submission}/grade', [SubmissionController::class, 'grade']);
 
         // Notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
