@@ -106,6 +106,11 @@ class CourseController extends Controller
 
         $query = $course->assignments();
 
+        // Mahasiswa tidak boleh melihat tugas yang masih draft.
+        if ($user->role === 'mahasiswa') {
+            $query->where('status', 'published');
+        }
+
         if ($request->filled('status')) {
             $query->where(
                 'status',
