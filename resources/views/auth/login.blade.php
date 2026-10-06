@@ -232,9 +232,7 @@
                 <div class="auth-bottom-links mt-6 flex items-center justify-center gap-4 text-xs text-outline">
                     <a href="#" class="hover:text-primary transition-colors">Kebijakan Privasi</a>
                     <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-                    <a href="#" class="hover:text-primary transition-colors">Bantuan</a>
-                    <span class="w-1 h-1 rounded-full bg-outline-variant"></span>
-                    <a href="#" class="hover:text-primary transition-colors">Kontak</a>
+                    <a href="{{ route('tentang') }}" class="hover:text-primary transition-colors">Tentang Kami</a>
                 </div>
 
             </div>
