@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\NotificationController;
 use App\Http\Controllers\Api\V1\SubmissionController;
+use App\Http\Controllers\Api\V1\GradeComponentController;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/v1/auth/login', [AuthController::class, 'login'])
@@ -36,4 +37,11 @@ Route::prefix('v1')
         // Notifications
         Route::get('/notifications', [NotificationController::class, 'index']);
         Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
+
+        // Grade Components
+        Route::get('/courses/{course}/grade-components', [GradeComponentController::class, 'index']);
+        Route::post('/grade-components', [GradeComponentController::class, 'store']);
+        Route::get('/grade-components/{gradeComponent}', [GradeComponentController::class, 'show']);
+        Route::match(['put', 'patch'], '/grade-components/{gradeComponent}', [GradeComponentController::class, 'update']);
+        Route::delete('/grade-components/{gradeComponent}', [GradeComponentController::class, 'destroy']);
     });

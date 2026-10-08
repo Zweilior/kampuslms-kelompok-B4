@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class DosenMaterialsTest extends TestCase
 {
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
     public function test_material_index_renders_styled_list_and_confirmation_dialog(): void
     {

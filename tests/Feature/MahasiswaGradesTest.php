@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class MahasiswaGradesTest extends TestCase
 {
-    use RefreshDatabase;
+    // use RefreshDatabase;
 
     public function test_monitoring_page_shows_enrolled_courses_and_final_grade_for_selected_status(): void
     {

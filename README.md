@@ -28,7 +28,7 @@
 ### Jobdesk
 |Anggota | Tugasnya |
 |--------|--------- |
-|Arif | Full Stack Katanya |
+|Arif | Full Stack |
 |Marchelino | Backend |
 |Irsyad | Frontend 1 |
 |Laudya | Frontend 2 |
