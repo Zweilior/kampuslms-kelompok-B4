@@ -5,12 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CourseController extends Controller
 {
+    /**
+     * Cek apakah request datang dari route area admin (admin.courses.*).
+     */
+    private function isAdminRoute(): bool
+    {
+        return request()->routeIs('admin.*');
+    }
+
+    /**
+     * Prefix nama route sesuai area (admin.courses atau courses).
+     */
+    private function routePrefix(): string
+    {
+        return $this->isAdminRoute() ? 'admin.courses' : 'courses';
+    }
+
     /**
      * Menampilkan daftar semua mata kuliah.
      */
@@ -43,7 +59,7 @@ class CourseController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view($request->routeIs('admin.courses.*') ? 'admin.courses.index' : 'courses.index', compact('courses', 'lecturers'));
+        return view($this->routePrefix() . '.index', compact('courses', 'lecturers'));
     }
 
     /**
@@ -63,10 +79,13 @@ class CourseController extends Controller
      */
     public function store(StoreCourseRequest $request)
     {
-        $course = Course::create($request->validated());
+        $data = $request->validated();
+        $data['description'] = $data['description'] ?? '';
+
+        $course = Course::create($data);
 
         return redirect()
-            ->route($this->isAdminRoute() ? 'admin.courses.show' : 'courses.show', $course)
+            ->route($this->routePrefix() . '.show', $course)
             ->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
 
@@ -87,11 +106,7 @@ class CourseController extends Controller
 
     public function dosenIndex(Request $request)
     {
-        $lecturer = User::where('role', 'dosen')
-            ->orderBy('id')
-            ->first();
-
-        $courses = Course::where('lecturer_id', $lecturer?->id)
+        $courses = Course::where('lecturer_id', $request->user()->id)
             ->with('lecturer')
             ->orderBy('code')
             ->get();
@@ -103,6 +118,8 @@ class CourseController extends Controller
 
     public function dosenShow(Course $course)
     {
+        abort_unless($course->lecturer_id === Auth::id(), 403);
+
         return view('dosen.courses.show', compact('course'));
     }
 
@@ -123,10 +140,13 @@ class CourseController extends Controller
      */
     public function update(UpdateCourseRequest $request, Course $course)
     {
-        $course->update($request->validated());
+        $data = $request->validated();
+        $data['description'] = $data['description'] ?? '';
+
+        $course->update($data);
 
         return redirect()
-            ->route('courses.show', $course)
+            ->route($this->routePrefix() . '.show', $course)
             ->with('success', 'Mata kuliah berhasil diperbarui.');
     }
 
@@ -138,7 +158,7 @@ class CourseController extends Controller
         $course->delete();
 
         return redirect()
-            ->route($this->isAdminRoute() ? 'admin.courses.index' : 'courses.index')
+            ->route($this->routePrefix() . '.index')
             ->with('success', 'Mata kuliah berhasil dihapus.');
     }
 }
