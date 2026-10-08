@@ -1,0 +1,790 @@
+.dosen-assignment__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.dosen-assignment__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.3rem 0.625rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md, 0.5rem);
+    background: transparent;
+    font-family: inherit;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.dosen-assignment__btn .material-symbols-outlined {
+    font-size: 0.875rem;
+}
+
+.dosen-assignment__btn--grade {
+    color: #c4a1ff;
+    border-color: rgba(196, 161, 255, 0.38);
+    background: rgba(196, 161, 255, 0.09);
+}
+
+.dosen-assignment__btn--grade:hover {
+    background: rgba(196, 161, 255, 0.18);
+    border-color: rgba(196, 161, 255, 0.58);
+}
+
+.dosen-assignment__btn--edit {
+    color: #9ec5fe;
+    border-color: rgba(158, 197, 254, 0.35);
+    background: rgba(158, 197, 254, 0.08);
+}
+
+.dosen-assignment__btn--edit:hover {
+    background: rgba(158, 197, 254, 0.16);
+    border-color: rgba(158, 197, 254, 0.55);
+}
+
+.dosen-assignment__btn--danger {
+    color: #ff8a8a;
+    border-color: rgba(255, 138, 138, 0.35);
+    background: rgba(255, 138, 138, 0.08);
+}
+
+.dosen-assignment__btn--danger:hover {
+    background: rgba(255, 138, 138, 0.16);
+    border-color: rgba(255, 138, 138, 0.55);
+}
+
+.dosen-assignment__create {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    background: var(--primary);
+    color: var(--text-on-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: var(--shadow-sm);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.dosen-assignment__create:hover {
+    background: var(--primary-dark);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+}
+
+.dosen-assignment__create .material-symbols-outlined {
+    font-size: 1.125rem;
+}
+
+@media (prefers-color-scheme: light) {
+    .dosen-assignment__btn--grade {
+        color: #7e22ce;
+        border-color: rgba(126, 34, 206, 0.3);
+        background: rgba(126, 34, 206, 0.06);
+    }
+
+    .dosen-assignment__btn--grade:hover {
+        background: rgba(126, 34, 206, 0.12);
+        border-color: rgba(126, 34, 206, 0.5);
+    }
+
+    .dosen-assignment__btn--edit {
+        color: #3b82f6;
+        border-color: rgba(59, 130, 246, 0.3);
+        background: rgba(59, 130, 246, 0.06);
+    }
+
+    .dosen-assignment__btn--edit:hover {
+        background: rgba(59, 130, 246, 0.12);
+        border-color: rgba(59, 130, 246, 0.5);
+    }
+
+    .dosen-assignment__btn--danger {
+        color: #dc2626;
+        border-color: rgba(220, 38, 38, 0.3);
+        background: rgba(220, 38, 38, 0.06);
+    }
+
+    .dosen-assignment__btn--danger:hover {
+        background: rgba(220, 38, 38, 0.12);
+        border-color: rgba(220, 38, 38, 0.5);
+    }
+}
+
+@media (max-width: 768px) {
+    .dosen-assignment__actions {
+        flex-wrap: wrap;
+    }
+}
+
+.dosen-assignment-form {
+    width: min(100% - 2rem, 48rem);
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+}
+
+.dosen-assignment-form__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.dosen-assignment-form__back:hover {
+    color: var(--primary);
+}
+
+.dosen-assignment-form__back .material-symbols-outlined {
+    font-size: 1.125rem;
+}
+
+.dosen-assignment-form__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.dosen-assignment-form__icon {
+    display: grid;
+    width: 3rem;
+    height: 3rem;
+    flex: 0 0 3rem;
+    place-items: center;
+    border-radius: 1rem;
+    background: var(--color-surface-container-high);
+    color: var(--primary);
+    font-size: 1.5rem;
+}
+
+.dosen-assignment-form__eyebrow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.375rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.dosen-assignment-form__eyebrow > span:first-child {
+    color: var(--primary);
+}
+
+.dosen-assignment-form__dot {
+    width: 0.25rem;
+    height: 0.25rem;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.dosen-assignment-form__title {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.2;
+}
+
+.dosen-assignment-form__description {
+    margin: 0.375rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.dosen-assignment-form__card {
+    padding: 1.75rem;
+    border: 1px solid var(--border-hairline);
+    border-radius: 1.25rem;
+    background: var(--color-surface-container-low);
+    box-shadow: var(--shadow-md);
+}
+
+.dosen-assignment-form__fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.25rem 1rem;
+}
+
+.dosen-assignment-form__field {
+    min-width: 0;
+}
+
+.dosen-assignment-form__field--full {
+    grid-column: 1 / -1;
+}
+
+.dosen-assignment-form__field > label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.dosen-assignment-form__field > label > span {
+    color: #c2413b;
+}
+
+.dosen-assignment-form__field input,
+.dosen-assignment-form__field textarea,
+.dosen-assignment-form__field select {
+    display: block;
+    width: 100%;
+    min-height: 2.875rem;
+    padding: 0.75rem 0.875rem;
+    border: 1px solid var(--border-hairline);
+    border-radius: 0.75rem;
+    outline: none;
+    background-color: var(--bg-base);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    transition:
+        border-color 0.2s ease,
+        box-shadow 0.2s ease,
+        background-color 0.2s ease;
+}
+
+.dosen-assignment-form__field input:hover,
+.dosen-assignment-form__field textarea:hover,
+.dosen-assignment-form__field select:hover {
+    border-color: var(--border-hover);
+}
+
+.dosen-assignment-form__field input:focus,
+.dosen-assignment-form__field textarea:focus,
+.dosen-assignment-form__field select:focus {
+    border-color: var(--primary-light);
+    background-color: var(--color-surface-container-low);
+    box-shadow: 0 0 0 3px var(--glow-sage);
+}
+
+.dosen-assignment-form__field textarea {
+    min-height: 8rem;
+    resize: vertical;
+}
+
+.dosen-assignment-form__field input[type="datetime-local"] {
+    color-scheme: light;
+}
+
+.dosen-assignment-form__field input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    padding: 0.25rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+    opacity: 0.7;
+}
+
+.dosen-assignment-form__select-wrap,
+.dosen-assignment-form__number-wrap {
+    position: relative;
+}
+
+.dosen-assignment-form__select-wrap select {
+    appearance: none;
+    padding-right: 2.75rem;
+    cursor: pointer;
+}
+
+.dosen-assignment-form__select-wrap > span {
+    position: absolute;
+    top: 50%;
+    right: 0.875rem;
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.dosen-assignment-form__number-wrap input {
+    padding-right: 4rem;
+}
+
+.dosen-assignment-form__number-wrap > span {
+    position: absolute;
+    top: 50%;
+    right: 0.875rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    pointer-events: none;
+    transform: translateY(-50%);
+}
+
+.dosen-assignment-form__hint {
+    margin: 0.375rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.dosen-assignment-form__field-error {
+    margin: 0.375rem 0 0;
+    color: #c2413b;
+    font-size: 0.75rem;
+}
+
+.dosen-assignment-form__errors {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid rgba(194, 65, 59, 0.2);
+    border-radius: 0.875rem;
+    background: rgba(194, 65, 59, 0.07);
+    color: #a8322d;
+    font-size: 0.8125rem;
+}
+
+.dosen-assignment-form__errors > .material-symbols-outlined {
+    font-size: 1.25rem;
+}
+
+.dosen-assignment-form__errors-title {
+    margin: 0;
+    font-weight: 600;
+}
+
+.dosen-assignment-form__errors ul {
+    margin: 0.375rem 0 0;
+    padding-left: 1.125rem;
+}
+
+.dosen-assignment-form__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--border-hairline);
+}
+
+.dosen-assignment-form__button {
+    display: inline-flex;
+    min-height: 2.75rem;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border: 1px solid transparent;
+    border-radius: 0.75rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.dosen-assignment-form__button:active {
+    transform: translateY(1px);
+}
+
+.dosen-assignment-form__button .material-symbols-outlined {
+    font-size: 1.125rem;
+}
+
+.dosen-assignment-form__button--primary {
+    background: var(--primary);
+    color: var(--text-on-primary);
+}
+
+.dosen-assignment-form__button--primary:hover {
+    background: var(--primary-dark);
+}
+
+.dosen-assignment-form__button--secondary {
+    border-color: var(--border-hairline);
+    background: var(--color-surface-container);
+    color: var(--text-secondary);
+}
+
+.dosen-assignment-form__button--secondary:hover {
+    border-color: var(--border-hover);
+    background: var(--color-surface-container-high);
+    color: var(--text-primary);
+}
+
+@media (max-width: 640px) {
+    .dosen-assignment-form {
+        width: min(100% - 1.5rem, 48rem);
+        padding-top: 1.25rem;
+    }
+
+    .dosen-assignment-form__card {
+        padding: 1.125rem;
+    }
+
+    .dosen-assignment-form__fields {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .dosen-assignment-form__field--full {
+        grid-column: auto;
+    }
+
+    .dosen-assignment-form__title {
+        font-size: 1.5rem;
+    }
+
+    .dosen-assignment-form__footer {
+        flex-direction: column-reverse;
+    }
+
+    .dosen-assignment-form__button {
+        width: 100%;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .dosen-assignment-form__field input[type="datetime-local"] {
+        color-scheme: dark;
+    }
+}
+
+.dosen-grades {
+    width: min(100% - 2rem, 70rem);
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+}
+
+.dosen-grades__header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.dosen-grades__count {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--border-hairline);
+    border-radius: 9999px;
+    background: var(--color-surface-container-low);
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+}
+
+.dosen-grades__count .material-symbols-outlined {
+    color: var(--primary);
+    font-size: 1.125rem;
+}
+
+.dosen-grades__notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.625rem;
+    margin-bottom: 1rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border-hairline);
+    border-radius: 0.875rem;
+    font-size: 0.8125rem;
+}
+
+.dosen-grades__notice > .material-symbols-outlined {
+    flex: 0 0 auto;
+    font-size: 1.125rem;
+}
+
+.dosen-grades__notice--success {
+    background: rgba(61, 107, 31, 0.08);
+    color: var(--primary-dark);
+}
+
+.dosen-grades__notice--info {
+    background: var(--color-surface-container);
+    color: var(--text-secondary);
+}
+
+.dosen-grades__list {
+    display: grid;
+    gap: 1rem;
+}
+
+.dosen-grade-card {
+    overflow: hidden;
+    border: 1px solid var(--border-hairline);
+    border-radius: 1.125rem;
+    background: var(--color-surface-container-low);
+    box-shadow: var(--shadow-sm);
+}
+
+.dosen-grade-card__student {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-hairline);
+    background: var(--color-surface-container);
+}
+
+.dosen-grade-card__avatar {
+    display: grid;
+    width: 2.625rem;
+    height: 2.625rem;
+    flex: 0 0 2.625rem;
+    place-items: center;
+    border-radius: 0.875rem;
+    background: var(--color-surface-container-high);
+    color: var(--primary);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.dosen-grade-card__student-info {
+    min-width: 0;
+}
+
+.dosen-grade-card__student-info h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    font-weight: 650;
+}
+
+.dosen-grade-card__student-info p {
+    margin: 0.125rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+}
+
+.dosen-grade-card__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin-left: auto;
+    padding: 0.35rem 0.625rem;
+    border-radius: 9999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.dosen-grade-card__status .material-symbols-outlined {
+    font-size: 0.9375rem;
+}
+
+.dosen-grade-card__status--graded {
+    background: rgba(61, 107, 31, 0.1);
+    color: var(--primary-dark);
+}
+
+.dosen-grade-card__status--pending {
+    background: rgba(126, 34, 206, 0.08);
+    color: #7e22ce;
+}
+
+.dosen-grade-card__body {
+    display: grid;
+    grid-template-columns: minmax(12rem, 0.85fr) minmax(0, 1.5fr);
+    gap: 1.5rem;
+    padding: 1.25rem;
+}
+
+.dosen-grade-card__submission {
+    min-width: 0;
+}
+
+.dosen-grade-card__label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.dosen-grade-card__file {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: fit-content;
+    max-width: 100%;
+    color: var(--primary);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.dosen-grade-card__file:hover {
+    text-decoration: underline;
+}
+
+.dosen-grade-card__file > span:nth-child(2) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dosen-grade-card__file .material-symbols-outlined {
+    flex: 0 0 auto;
+    font-size: 1.125rem;
+}
+
+.dosen-grade-card__file .dosen-grade-card__open {
+    color: var(--text-muted);
+    font-size: 0.9375rem;
+}
+
+.dosen-grade-card__meta {
+    margin: 0.5rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
+
+.dosen-grade-card__late {
+    display: inline-block;
+    margin-left: 0.25rem;
+    padding: 0.125rem 0.4rem;
+    border-radius: 9999px;
+    background: rgba(194, 65, 59, 0.09);
+    color: #a8322d;
+    font-size: 0.6875rem;
+    font-weight: 600;
+}
+
+.dosen-grade-card__note {
+    margin: 0.75rem 0 0;
+    padding: 0.625rem 0.75rem;
+    border-left: 2px solid var(--primary-light);
+    border-radius: 0 0.5rem 0.5rem 0;
+    background: var(--bg-base);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    line-height: 1.6;
+    overflow-wrap: anywhere;
+}
+
+.dosen-grade-card__form {
+    display: grid;
+    gap: 0.875rem;
+    align-content: start;
+}
+
+.dosen-grade-card__form-fields {
+    display: grid;
+    grid-template-columns: minmax(7rem, 0.35fr) minmax(0, 1fr);
+    gap: 0.875rem;
+}
+
+.dosen-grade-card__form .dosen-assignment-form__field > label span {
+    color: var(--text-muted);
+    font-size: 0.6875rem;
+    font-weight: 400;
+}
+
+.dosen-grade-card__form .dosen-assignment-form__field textarea {
+    min-height: 5.25rem;
+}
+
+.dosen-grade-card__form > button {
+    justify-self: start;
+}
+
+.dosen-grades__empty {
+    display: grid;
+    justify-items: center;
+    padding: 3rem 1.5rem;
+    border: 1px dashed var(--border-hover);
+    border-radius: 1rem;
+    background: var(--color-surface-container-low);
+    text-align: center;
+}
+
+.dosen-grades__empty > .material-symbols-outlined {
+    color: var(--text-muted);
+    font-size: 2.25rem;
+}
+
+.dosen-grades__empty h2 {
+    margin: 0.625rem 0 0;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 650;
+}
+
+.dosen-grades__empty p {
+    margin: 0.25rem 0 0;
+    color: var(--text-secondary);
+    font-size: 0.8125rem;
+}
+
+@media (max-width: 768px) {
+    .dosen-grades {
+        width: min(100% - 1.5rem, 70rem);
+        padding-top: 1.25rem;
+    }
+
+    .dosen-grades__header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .dosen-grade-card__body {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .dosen-grade-card__form-fields {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .dosen-grade-card__student {
+        flex-wrap: wrap;
+        padding: 0.875rem;
+    }
+
+    .dosen-grade-card__status {
+        margin-left: 3.375rem;
+    }
+
+    .dosen-grade-card__body {
+        padding: 0.875rem;
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .dosen-grades__notice--success,
+    .dosen-grade-card__status--graded {
+        color: #b4d99a;
+    }
+
+    .dosen-grade-card__status--pending {
+        color: #d8b4fe;
+    }
+
+    .dosen-grade-card__late {
+        color: #ffaaa4;
+    }
+}

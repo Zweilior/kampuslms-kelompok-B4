@@ -54,7 +54,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scopeBindings()->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'dosenDashboard'])->name('dashboard');
 
-    Route::get('/grades', fn () => view('dosen.grades.index'))->name('grades.index');
+    Route::get('/grades', [CourseController::class, 'dosenGradesIndex'])->name('grades.index');
 
     Route::get('/courses', [CourseController::class, 'dosenIndex'])->name('courses.index');
     Route::get('/courses/{course}', [CourseController::class, 'dosenShow'])->name('courses.show');
@@ -73,6 +73,7 @@ Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scop
     Route::put('/courses/{course}/assignments/{assignment}', [AssignmentController::class, 'dosenUpdate'])->name('courses.assignments.update');
     Route::delete('/courses/{course}/assignments/{assignment}', [AssignmentController::class, 'dosenDestroy'])->name('courses.assignments.destroy');
     Route::get('/courses/{course}/assignments/{assignment}/submissions', [SubmissionController::class, 'dosenIndex'])->name('courses.assignments.submissions.index');
+    Route::put('/courses/{course}/assignments/{assignment}/submissions/{submission}/grade', [SubmissionController::class, 'dosenGrade'])->name('courses.assignments.submissions.grade');
 });
 
 /*

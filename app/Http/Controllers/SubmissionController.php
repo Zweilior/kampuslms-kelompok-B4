@@ -4,16 +4,56 @@ namespace App\Http\Controllers;
 
 use App\Models\Assignment;
 use App\Models\Course;
+use App\Models\Grade;
 use App\Models\Submission;
 use App\Models\User;
+use App\Notifications\NilaiDiberikan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SubmissionController extends Controller
 {
     public function dosenIndex(Course $course, Assignment $assignment)
     {
-        $submissions = $assignment->submissions()->with('student', 'grade')->latest()->get();
+        abort_unless($course->lecturer_id === Auth::id(), 403);
+
+        $submissions = $assignment->submissions()
+            ->with('student', 'grade')
+            ->latest()
+            ->get();
+
         return view('dosen.assignments.show', compact('course', 'assignment', 'submissions'));
+    }
+
+    public function dosenGrade(Request $request, Course $course, Assignment $assignment, Submission $submission)
+    {
+        abort_unless($course->lecturer_id === Auth::id(), 403);
+        abort_unless($submission->assignment_id === $assignment->id, 404);
+        abort_unless($assignment->due_at->lte(now()), 403, 'Nilai hanya dapat diubah setelah tenggat tugas selesai.');
+
+        $validated = $request->validate([
+            'score' => ['required', 'numeric', 'min:0', 'max:' . $assignment->max_score],
+            'feedback' => ['nullable', 'string', 'max:2000'],
+        ]);
+
+        $grade = Grade::updateOrCreate(
+            ['submission_id' => $submission->id],
+            [
+                'graded_by' => $request->user()->id,
+                'score' => $validated['score'],
+                'feedback' => $validated['feedback'] ?? null,
+                'graded_at' => now(),
+            ]
+        );
+
+        $submission->loadMissing('student');
+        $submission->student?->notify(
+            new NilaiDiberikan($submission, $grade, updated: ! $grade->wasRecentlyCreated)
+        );
+
+        return redirect()
+            ->route('dosen.courses.assignments.submissions.index', [$course, $assignment])
+            ->with('success', 'Nilai berhasil disimpan.');
     }
 
     /**
