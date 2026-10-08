@@ -1,0 +1,48 @@
+/* ============================================
+   COURSES / ADMIN-FORM.CSS — Tambah & Edit Mata Kuliah (admin)
+   Memakai class global .form-group, .form-label, .form-input,
+   .form-select, .form-error dan .btn dari users/*.css
+   ============================================ */
+
+.admin-course-form {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.admin-course-form__card {
+    background-color: var(--bg-elevated);
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-md);
+    padding: 1.75rem;
+}
+
+.admin-course-form__title {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+}
+
+.admin-course-form textarea.form-input {
+    resize: vertical;
+    min-height: 6rem;
+}
+
+.admin-course-form__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 1.75rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-hairline);
+}
+
+@media (max-width: 640px) {
+    .admin-course-form__card { padding: 1.25rem; }
+    .admin-course-form__actions { flex-direction: column-reverse; }
+    .admin-course-form__actions .btn { width: 100%; justify-content: center; }
+}
