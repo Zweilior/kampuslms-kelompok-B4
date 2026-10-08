@@ -116,6 +116,23 @@ class CourseController extends Controller
         return view('dosen.courses.index', compact('courses', 'focus'));
     }
 
+    public function dosenGradesIndex(Request $request)
+    {
+        $courses = Course::where('lecturer_id', $request->user()->id)
+            ->withCount('students')
+            ->withAvg('finalGrades', 'total_score')
+            ->orderBy('code')
+            ->get();
+
+        $activeCourses = $courses->where('status', 'active')->values();
+        $archivedCourses = $courses->where('status', 'archived')->values();
+
+        return view('dosen.grades.index', compact(
+            'activeCourses',
+            'archivedCourses'
+        ));
+    }
+
     public function dosenShow(Course $course)
     {
         abort_unless($course->lecturer_id === Auth::id(), 403);

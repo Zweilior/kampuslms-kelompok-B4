@@ -1,75 +1,94 @@
-<x-layout title="Tambah Materi - Dosen">
-    <div class="max-w-3xl mx-auto px-4">
-        <h1 class="text-2xl font-bold mb-6">Tambah Materi</h1>
+<x-layout title="Upload Materi - Dosen" active-nav="courses">
+    <main class="dosen-material-form">
+        <a href="{{ route('dosen.courses.materials.index', $course) }}" class="dosen-assignment-form__back">
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+            Kembali ke daftar materi
+        </a>
 
-        <form action="{{ route('dosen.courses.materials.store', $course) }}"
-              method="POST"
-              enctype="multipart/form-data"
-              class="bg-white rounded-lg shadow p-6">
+        <header class="dosen-assignment-form__header">
+            <span class="dosen-assignment-form__icon material-symbols-outlined" aria-hidden="true">upload_file</span>
+            <div>
+                <div class="dosen-assignment-form__eyebrow">
+                    <span>{{ $course->code }}</span>
+                    <span class="dosen-assignment-form__dot" aria-hidden="true"></span>
+                    <span>{{ $course->name }}</span>
+                </div>
+                <h1 class="dosen-assignment-form__title">Tambah Materi</h1>
+                <p class="dosen-assignment-form__description">Bagikan file atau tautan sumber belajar kepada mahasiswa.</p>
+            </div>
+        </header>
 
+        @if ($errors->any())
+            <div class="dosen-assignment-form__errors" role="alert">
+                <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                <div>
+                    <p class="dosen-assignment-form__errors-title">Materi belum berhasil disimpan.</p>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
+
+        <form action="{{ route('dosen.courses.materials.store', $course) }}" method="POST" enctype="multipart/form-data" class="dosen-assignment-form__card">
             @csrf
+            <div class="dosen-assignment-form__fields">
+                <div class="dosen-assignment-form__field dosen-assignment-form__field--full">
+                    <label for="material-title">Judul Materi <span aria-hidden="true">*</span></label>
+                    <input id="material-title" type="text" name="title" value="{{ old('title') }}" maxlength="255" autocomplete="off" required>
+                    @error('title')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+                </div>
 
-            <div class="mb-4">
-                <label class="block font-medium mb-2">Judul Materi</label>
-                <input type="text"
-                       name="title"
-                       value="{{ old('title') }}"
-                       class="w-full border rounded-lg px-3 py-2"
-                       required>
+                <div class="dosen-assignment-form__field dosen-assignment-form__field--full">
+                    <label for="description">Deskripsi</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Jelaskan isi atau kegunaan materi ini...">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="dosen-assignment-form__field dosen-assignment-form__field--full" x-data="{ type: @js(old('type', 'file')) }">
+                    <label for="type">Tipe Materi <span aria-hidden="true">*</span></label>
+                    <div class="dosen-assignment-form__select-wrap">
+                        <select id="type" name="type" x-model="type" required>
+                            <option value="file">File</option>
+                            <option value="link">Tautan eksternal</option>
+                        </select>
+                        <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+                    </div>
+                    @error('type')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+
+                    <div class="dosen-material-form__conditional" x-cloak x-show="type === 'link'" x-transition.opacity>
+                        <label for="external_url">URL Eksternal <span aria-hidden="true">*</span></label>
+                        <input id="external_url" type="url" name="external_url" value="{{ old('external_url') }}" placeholder="https://..." :required="type === 'link'">
+                        @error('external_url')
+                            <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div class="dosen-material-form__conditional" x-cloak x-show="type === 'file'" x-transition.opacity>
+                        <label for="material-file">File Materi</label>
+                        <input id="material-file" class="dosen-material-form__file-input" type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.png,.jpg,.jpeg">
+                        <p class="dosen-assignment-form__hint">Ukuran file maksimal 20 MB.</p>
+                        @error('file')
+                            <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
             </div>
 
-            <div class="mb-4">
-                <label class="block font-medium mb-2">Deskripsi</label>
-                <textarea name="description"
-                          rows="5"
-                          class="w-full border rounded-lg px-3 py-2">{{ old('description') }}</textarea>
-            </div>
-
-            <div class="mb-4">
-                <label class="block font-medium mb-2">Tipe Materi</label>
-
-                <select name="type"
-                        class="w-full border rounded-lg px-3 py-2"
-                        required>
-                    <option value="file" {{ old('type') === 'file' ? 'selected' : '' }}>
-                        File
-                    </option>
-                    <option value="link" {{ old('type') === 'link' ? 'selected' : '' }}>
-                        Link
-                    </option>
-                </select>
-            </div>
-
-            <div class="mb-4">
-                <label class="block font-medium mb-2">URL Eksternal</label>
-                <input type="url"
-                       name="external_url"
-                       value="{{ old('external_url') }}"
-                       class="w-full border rounded-lg px-3 py-2"
-                       placeholder="https://...">
-            </div>
-
-            <div class="mb-6">
-                <label class="block font-medium mb-2">File Materi</label>
-                <input type="file"
-                       name="file"
-                       class="w-full border rounded-lg px-3 py-2">
-                <p class="text-sm text-gray-500 mt-1">
-                    Maksimal ukuran file 20 MB.
-                </p>
-            </div>
-
-            <div class="flex gap-3">
-                <button type="submit"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg">
-                    Simpan Materi
+            <footer class="dosen-assignment-form__footer">
+                <a href="{{ route('dosen.courses.materials.index', $course) }}" class="dosen-assignment-form__button dosen-assignment-form__button--secondary">Batal</a>
+                <button type="submit" class="dosen-assignment-form__button dosen-assignment-form__button--primary">
+                    <span class="material-symbols-outlined" aria-hidden="true">save</span>Simpan Materi
                 </button>
-
-                <a href="{{ route('dosen.courses.materials.index', $course) }}"
-                   class="px-4 py-2 rounded-lg border">
-                    Batal
-                </a>
-            </div>
+            </footer>
         </form>
-    </div>
+    </main>
 </x-layout>

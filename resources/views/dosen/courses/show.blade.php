@@ -19,7 +19,7 @@
             </div>
         </header>
 
-        <section aria-label="Pengelolaan mata kuliah" class="grid grid-cols-1 md:grid-cols-3 gap-bento-gap-desktop">
+        <section aria-label="Pengelolaan mata kuliah" class="grid grid-cols-1 md:grid-cols-2 gap-bento-gap-desktop">
             <a href="{{ route('dosen.courses.materials.index', ['course' => $course, 'focus' => 'materials']) }}" class="group rounded-2xl border border-outline/10 bg-surface-container-low p-space-lg shadow-sm transition-colors hover:bg-surface-container">
                 <span class="mb-space-md flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary"><span class="material-symbols-outlined">description</span></span>
                 <h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary">Materi</h2>
@@ -29,17 +29,10 @@
 
             <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}" class="group rounded-2xl border border-outline/10 bg-surface-container-low p-space-lg shadow-sm transition-colors hover:bg-surface-container">
                 <span class="mb-space-md flex h-11 w-11 items-center justify-center rounded-xl bg-secondary-container text-on-secondary-container"><span class="material-symbols-outlined">assignment</span></span>
-                <h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary">Tugas &amp; Submission</h2>
-                <p class="mt-space-xs font-body-sm text-body-sm text-on-surface-variant">Kelola tugas dan tinjau pengumpulan kelas ini.</p>
-                <span class="mt-space-md inline-flex items-center gap-1 font-label-md text-label-md text-primary">Kelola tugas <span class="material-symbols-outlined text-base">arrow_forward</span></span>
+                <h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary">Tugas dan Nilai</h2>
+                <p class="mt-space-xs font-body-sm text-body-sm text-on-surface-variant">Kelola tugas, pantau pengumpulan, dan beri nilai setelah tenggat.</p>
+                <span class="mt-space-md inline-flex items-center gap-1 font-label-md text-label-md text-primary">Kelola tugas dan nilai <span class="material-symbols-outlined text-base">arrow_forward</span></span>
             </a>
-
-            <a href="{{ route('dosen.grades.index', ['course_id' => $course->id]) }}" class="group rounded-2xl border border-outline/10 bg-surface-container-low p-space-lg shadow-sm transition-colors hover:bg-surface-container">
-                <span class="mb-space-md flex h-11 w-11 items-center justify-center rounded-xl bg-tertiary-container/30 text-tertiary"><span class="material-symbols-outlined">grading</span></span>
-                <h2 class="font-headline-sm text-headline-sm text-on-surface group-hover:text-primary">Penilaian</h2>
-                <p class="mt-space-xs font-body-sm text-body-sm text-on-surface-variant">Beri dan tinjau nilai mahasiswa di kelas ini.</p>
-                <span class="mt-space-md inline-flex items-center gap-1 font-label-md text-label-md text-primary">Buka nilai <span class="material-symbols-outlined text-base">arrow_forward</span></span>
-            </a>
-        </div>
+        </section>
     </div>
 </x-layout>

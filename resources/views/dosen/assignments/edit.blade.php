@@ -1,78 +1,125 @@
-<x-layout title="Edit Tugas - Dosen">
-    <div class="max-w-3xl mx-auto px-4">
-        <h1 class="text-2xl font-bold mb-6">Edit Tugas</h1>
+<x-layout title="Edit Tugas - Dosen" active-nav="courses">
+    <div class="dosen-assignment-form">
+        <a href="{{ route('dosen.courses.assignments.index', $course) }}" class="dosen-assignment-form__back">
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+            Kembali ke daftar tugas
+        </a>
+
+        <header class="dosen-assignment-form__header">
+            <span class="dosen-assignment-form__icon material-symbols-outlined" aria-hidden="true">edit_document</span>
+            <div>
+                <div class="dosen-assignment-form__eyebrow">
+                    <span>{{ $course->code }}</span>
+                    <span class="dosen-assignment-form__dot" aria-hidden="true"></span>
+                    <span>{{ $course->name }}</span>
+                </div>
+                <h1 class="dosen-assignment-form__title">Edit Tugas</h1>
+                <p class="dosen-assignment-form__description">Perbarui informasi dan pengaturan tugas untuk kelas ini.</p>
+            </div>
+        </header>
+
+        @if ($errors->any())
+            <div class="dosen-assignment-form__errors" role="alert">
+                <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                <div>
+                    <p class="dosen-assignment-form__errors-title">Tugas belum berhasil diperbarui.</p>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        @endif
 
         <form action="{{ route('dosen.courses.assignments.update', [$course, $assignment]) }}"
               method="POST"
-              class="bg-white rounded-lg shadow p-6">
-
+              class="dosen-assignment-form__card">
             @csrf
             @method('PUT')
 
-            <div class="mb-4">
-                <label class="block font-medium mb-2">Judul Tugas</label>
-                <input type="text"
-                       name="title"
-                       value="{{ old('title', $assignment->title) }}"
-                       class="w-full border rounded-lg px-3 py-2"
-                       required>
-            </div>
+            <div class="dosen-assignment-form__fields">
+                <div class="dosen-assignment-form__field dosen-assignment-form__field--full">
+                    <label for="title">Judul Tugas <span aria-hidden="true">*</span></label>
+                    <input id="title"
+                           type="text"
+                           name="title"
+                           value="{{ old('title', $assignment->title) }}"
+                           maxlength="255"
+                           autocomplete="off"
+                           required>
+                    @error('title')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+                </div>
 
-            <div class="mb-4">
-                <label class="block font-medium mb-2">Deadline</label>
-                <input type="datetime-local"
-                       name="due_at"
-                       value="{{ old('due_at', $assignment->due_at?->format('Y-m-d\TH:i')) }}"
-                       class="w-full border rounded-lg px-3 py-2"
-                       required>
-            </div>
+                <div class="dosen-assignment-form__field">
+                    <label for="due_at">Tenggat Pengumpulan <span aria-hidden="true">*</span></label>
+                    <input id="due_at"
+                           type="datetime-local"
+                           name="due_at"
+                           value="{{ old('due_at', $assignment->due_at?->format('Y-m-d\TH:i')) }}"
+                           required>
+                    <p class="dosen-assignment-form__hint">Waktu berakhirnya masa pengumpulan tugas.</p>
+                    @error('due_at')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+                </div>
 
-            <div class="mb-4">
-                <label class="block font-medium mb-2">Instruksi</label>
-                <textarea name="instructions"
-                          rows="5"
-                          class="w-full border rounded-lg px-3 py-2">{{ old('instructions', $assignment->instructions) }}</textarea>
-            </div>
+                <div class="dosen-assignment-form__field">
+                    <label for="max_score">Nilai Maksimal <span aria-hidden="true">*</span></label>
+                    <div class="dosen-assignment-form__number-wrap">
+                        <input id="max_score"
+                               type="number"
+                               name="max_score"
+                               value="{{ old('max_score', $assignment->max_score) }}"
+                               min="0"
+                               max="255"
+                               required>
+                        <span>poin</span>
+                    </div>
+                    @error('max_score')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+                </div>
 
-            <div class="mb-4">
-                <label class="block font-medium mb-2">Nilai Maksimal</label>
-                <input type="number"
-                       name="max_score"
-                       value="{{ old('max_score', $assignment->max_score) }}"
-                       min="0"
-                       max="255"
-                       class="w-full border rounded-lg px-3 py-2"
-                       required>
-            </div>
+                <div class="dosen-assignment-form__field dosen-assignment-form__field--full">
+                    <label for="instructions">Instruksi</label>
+                    <textarea id="instructions"
+                              name="instructions"
+                              rows="5"
+                              placeholder="Tuliskan petunjuk pengerjaan tugas...">{{ old('instructions', $assignment->instructions) }}</textarea>
+                    @error('instructions')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+                </div>
 
-            <div class="mb-4">
-                <label class="block font-medium mb-2">Boleh Terlambat?</label>
-
-                <select name="allow_late"
-                        class="w-full border rounded-lg px-3 py-2"
-                        required>
-                    <option value="1" {{ old('allow_late', $assignment->allow_late) == 1 ? 'selected' : '' }}>
-                        Ya
-                    </option>
-                    <option value="0" {{ old('allow_late', $assignment->allow_late) == 0 ? 'selected' : '' }}>
-                        Tidak
-                    </option>
-                </select>
+                <div class="dosen-assignment-form__field dosen-assignment-form__field--full">
+                    <label for="allow_late">Pengumpulan Terlambat</label>
+                    <div class="dosen-assignment-form__select-wrap">
+                        <select id="allow_late" name="allow_late" required>
+                            <option value="1" {{ old('allow_late', $assignment->allow_late) == 1 ? 'selected' : '' }}>Diizinkan</option>
+                            <option value="0" {{ old('allow_late', $assignment->allow_late) == 0 ? 'selected' : '' }}>Tidak diizinkan</option>
+                        </select>
+                        <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+                    </div>
+                    @error('allow_late')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
 
             <input type="hidden" name="status" value="{{ $assignment->status }}">
 
-            <div class="flex gap-3">
-                <button type="submit"
-                        class="bg-blue-600 text-white px-4 py-2 rounded-lg">
-                    Simpan Perubahan
-                </button>
-
-                <a href="{{ route('dosen.courses.assignments.index', $course) }}"
-                   class="px-4 py-2 rounded-lg border">
+            <footer class="dosen-assignment-form__footer">
+                <a href="{{ route('dosen.courses.assignments.index', $course) }}" class="dosen-assignment-form__button dosen-assignment-form__button--secondary">
                     Batal
                 </a>
-            </div>
+                <button type="submit" class="dosen-assignment-form__button dosen-assignment-form__button--primary">
+                    <span class="material-symbols-outlined" aria-hidden="true">save</span>
+                    Simpan Perubahan
+                </button>
+            </footer>
         </form>
     </div>
 </x-layout>

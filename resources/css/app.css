@@ -9,6 +9,9 @@
 @import "./users/show.css";
 @import "./users/modal.css";
 @import "./courses/admin-form.css";
+@import "./dosen/materials.css";
+@import "./dosen/assignments.css";
+@import "./dosen/grades.css";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

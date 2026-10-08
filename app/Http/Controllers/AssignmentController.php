@@ -114,17 +114,28 @@ class AssignmentController extends Controller
 
     public function dosenIndex(Course $course)
     {
-        $assignments = $course->assignments()->withCount('submissions')->latest()->get();
-        return view('dosen.assignments.index', compact('course', 'assignments'));
+        $this->ensureLecturerOwnsCourse($course);
+
+        $assignments = $course->assignments()
+            ->withCount('submissions')
+            ->orderByDesc('created_at')
+            ->get();
+        $studentCount = $course->students()->count();
+
+        return view('dosen.assignments.index', compact('course', 'assignments', 'studentCount'));
     }
 
     public function dosenCreate(Course $course)
     {
+        $this->ensureLecturerOwnsCourse($course);
+
         return view('dosen.assignments.create', compact('course'));
     }
 
     public function dosenStore(Request $request, Course $course)
     {
+        $this->ensureLecturerOwnsCourse($course);
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'due_at' => ['required', 'date'],
@@ -145,11 +156,15 @@ class AssignmentController extends Controller
 
     public function dosenEdit(Course $course, Assignment $assignment)
     {
+        $this->ensureLecturerOwnsCourse($course);
+
         return view('dosen.assignments.edit', compact('course', 'assignment'));
     }
 
     public function dosenUpdate(Request $request, Course $course, Assignment $assignment)
     {
+        $this->ensureLecturerOwnsCourse($course);
+
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'due_at' => ['required', 'date'],
@@ -167,6 +182,8 @@ class AssignmentController extends Controller
 
     public function dosenDestroy(Course $course, Assignment $assignment)
     {
+        $this->ensureLecturerOwnsCourse($course);
+
         if ($assignment->submissions()->exists()) {
             return back()->with('error', 'Tugas tidak dapat dihapus karena sudah memiliki submission.');
         }
@@ -175,6 +192,11 @@ class AssignmentController extends Controller
 
         return redirect()->route('dosen.courses.assignments.index', $course)
             ->with('success', 'Tugas berhasil dihapus.');
+    }
+
+    private function ensureLecturerOwnsCourse(Course $course): void
+    {
+        abort_unless($course->lecturer_id === Auth::id(), 403);
     }
 
     /**

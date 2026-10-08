@@ -31,8 +31,7 @@
         request()->routeIs('admin.grades.*')      => 'grades',
 
         request()->routeIs('dosen.dashboard')                              => 'dashboard',
-        request()->routeIs('dosen.courses.materials.*')                    => 'materials',
-        request()->routeIs('dosen.courses.assignments.*')                  => 'assignments',
+        request()->routeIs('dosen.courses.*')                              => 'courses',
         request()->routeIs('dosen.grades.*')                               => 'grades',
 
         request()->routeIs('mahasiswa.grades.*') => 'grades',
@@ -60,10 +59,9 @@
     // ==================== MENU KHUSUS DOSEN ====================
     if ($userRole === 'dosen') {
         $navItems = [
-            ['path' => 'dashboard',   'icon' => 'grid_view',   'label' => 'Dashboard',        'route' => 'dosen.dashboard'],
-            ['path' => 'materials',   'icon' => 'description', 'label' => 'Materi',           'route' => 'dosen.courses.index'],
-            ['path' => 'assignments', 'icon' => 'assignment',  'label' => 'Tugas',            'route' => 'dosen.courses.index'],
-            ['path' => 'grades',      'icon' => 'grade',       'label' => 'Monitoring Nilai', 'route' => 'dosen.grades.index'],
+            ['path' => 'dashboard', 'icon' => 'grid_view',   'label' => 'Dashboard', 'route' => 'dosen.dashboard'],
+            ['path' => 'courses',   'icon' => 'menu_book',   'label' => 'Mata Kuliah', 'route' => 'dosen.courses.index'],
+            ['path' => 'grades',    'icon' => 'grade',       'label' => 'Nilai', 'route' => 'dosen.grades.index'],
         ];
     }
 
