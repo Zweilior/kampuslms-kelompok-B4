@@ -4,7 +4,7 @@
             'name' => 'Muhammad Arif Saputra',
             'nim' => '10241044',
             'program_studi' => 'Sistem Informasi',
-            'role' => 'Back-end Developer',
+            'role' => 'Full-stack Developer',
             'description' => 'Memimpin koordinasi tim pengembang sekaligus berkontribusi membangun layanan termasuk dengan migrasi dan logika sistem back-end EduSpace.',
             'email' => '10241044@student.itk.ac.id',
             'github' => 'https://github.com/Zweilior',

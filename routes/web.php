@@ -9,6 +9,7 @@ use App\Http\Controllers\MahasiswaController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\GradeComponentController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('welcome'));
@@ -74,6 +75,12 @@ Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scop
     Route::delete('/courses/{course}/assignments/{assignment}', [AssignmentController::class, 'dosenDestroy'])->name('courses.assignments.destroy');
     Route::get('/courses/{course}/assignments/{assignment}/submissions', [SubmissionController::class, 'dosenIndex'])->name('courses.assignments.submissions.index');
     Route::put('/courses/{course}/assignments/{assignment}/submissions/{submission}/grade', [SubmissionController::class, 'dosenGrade'])->name('courses.assignments.submissions.grade');
+
+    // Tambahkan route ini di dalam group dosen, setelah route assignments/submissions
+    Route::get('/courses/{course}/grade-components', [GradeComponentController::class, 'dosenIndex'])->name('courses.grade-components.index');
+    Route::post('/courses/{course}/grade-components', [GradeComponentController::class, 'dosenStore'])->name('courses.grade-components.store');
+    Route::put('/courses/{course}/grade-components/{gradeComponent}', [GradeComponentController::class, 'dosenUpdate'])->name('courses.grade-components.update');
+    Route::delete('/courses/{course}/grade-components/{gradeComponent}', [GradeComponentController::class, 'dosenDestroy'])->name('courses.grade-components.destroy');
 });
 
 /*
