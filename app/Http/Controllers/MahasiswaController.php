@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Assignment;
 use App\Models\Course;
+use App\Models\GradeComponent;
 use App\Models\Submission;
 use Illuminate\Http\Request;
 
@@ -62,45 +63,22 @@ class MahasiswaController extends Controller
             'status' => ['sometimes', 'in:active,archived'],
         ]);
         $studentId = auth()->id();
-        $status = $validated['status'] ?? 'active';
-        $studentCourses = auth()->user()->courses();
-        $courses = (clone $studentCourses)
-            ->where('courses.status', $status)
+        $status = $validated['status'] ?? null;
+        $courses = auth()->user()->courses()
             ->with(['finalGrades' => fn ($query) => $query->where('user_id', $studentId)])
             ->orderBy('courses.code')
             ->get();
-        $activeCourseCount = (clone $studentCourses)->where('courses.status', 'active')->count();
-        $archivedCourseCount = (clone $studentCourses)->where('courses.status', 'archived')->count();
-
-        $gradePoints = [
-            'A' => 4,
-            'A-' => 3.75,
-            'AB' => 3.5,
-            'B+' => 3.25,
-            'B' => 3,
-            'B-' => 2.75,
-            'BC' => 2.5,
-            'C+' => 2.25,
-            'C' => 2,
-            'D' => 1,
-            'E' => 0,
-        ];
-        $gradedCourses = $courses->filter(fn ($course) => $course->finalGrades->isNotEmpty());
-        $gradedCredits = $gradedCourses->sum(fn ($course) => $course->sks);
-        $weightedGradePoints = $gradedCourses->sum(function ($course) use ($gradePoints) {
-            $finalGrade = $course->finalGrades->first();
-            $gradePoint = $gradePoints[strtoupper($finalGrade->letter_grade)] ?? null;
-
-            return $gradePoint === null ? 0 : $gradePoint * $course->sks;
-        });
-        $ips = $gradedCredits > 0 ? $weightedGradePoints / $gradedCredits : null;
+        $activeCourses = $courses->where('status', 'active')->values();
+        $archivedCourses = $courses->where('status', 'archived')->values();
+        $activeCourseCount = $activeCourses->count();
+        $archivedCourseCount = $archivedCourses->count();
 
         return view('mahasiswa.grades.index', compact(
-            'courses',
+            'activeCourses',
+            'archivedCourses',
             'status',
             'activeCourseCount',
-            'archivedCourseCount',
-            'ips'
+            'archivedCourseCount'
         ));
     }
 
@@ -109,6 +87,40 @@ class MahasiswaController extends Controller
         $course->load('lecturer');
 
         return view('mahasiswa.courses.show', compact('course'));
+    }
+
+    public function gradeComponents(Course $course)
+    {
+        abort_unless(
+            auth()->user()->courses()->whereKey($course->id)->exists(),
+            403,
+            'Anda tidak terdaftar pada mata kuliah ini.'
+        );
+
+        $studentId = auth()->id();
+        $gradeComponents = $course->gradeComponents()
+            ->with([
+                'assignments' => fn ($query) => $query
+                    ->where('status', 'published')
+                    ->with([
+                        'submissions' => fn ($submissionQuery) => $submissionQuery
+                            ->where('user_id', $studentId)
+                            ->with('grade')
+                            ->latest(),
+                    ])
+                    ->orderBy('due_at'),
+            ])
+            ->orderBy('id')
+            ->get();
+        $totalWeight = $gradeComponents->sum('weight');
+        $assignmentCount = $gradeComponents->sum(fn (GradeComponent $component) => $component->assignments->count());
+
+        return view('mahasiswa.grades.rubric', compact(
+            'course',
+            'gradeComponents',
+            'totalWeight',
+            'assignmentCount'
+        ));
     }
 
     public function assignments(Course $course)
@@ -160,6 +172,13 @@ class MahasiswaController extends Controller
     public function grades(Course $course)
     {
         $studentId = auth()->id();
+        $gradeCategories = [
+            'tugas' => ['label' => 'Tugas', 'weight' => 15],
+            'kehadiran' => ['label' => 'Kehadiran', 'weight' => 5],
+            'kuis' => ['label' => 'Kuis', 'weight' => 10],
+            'uts' => ['label' => 'UTS', 'weight' => 25],
+            'uas' => ['label' => 'UAS', 'weight' => 45],
+        ];
         $assignments = $course->assignments()
             ->where('status', 'published')
             ->with([
@@ -171,17 +190,74 @@ class MahasiswaController extends Controller
             ])
             ->orderBy('due_at')
             ->get();
-        $finalGrade = $course->finalGrades()
-            ->where('user_id', $studentId)
-            ->first();
-        $totalWeight = $course->gradeComponents()->sum('weight');
+        $assignments->each(function (Assignment $assignment) use ($gradeCategories) {
+            $category = $this->gradeCategoryForAssignment($assignment);
+            $assignment->setAttribute('grade_category', $category);
+            $assignment->setAttribute('grade_category_label', $gradeCategories[$category]['label']);
+            $assignment->setAttribute('grade_category_weight', $gradeCategories[$category]['weight']);
+        });
+        $gradedAssignments = $assignments->filter(
+            fn (Assignment $assignment) => $assignment->submissions->first()?->grade
+        );
+        $gradedCategoryGroups = $gradedAssignments->groupBy('grade_category');
+        $gradedWeight = $gradedCategoryGroups->sum(
+            fn ($group) => (float) $group->first()->grade_category_weight
+        );
+        $totalWeightedScore = $gradedCategoryGroups->sum(function ($group) {
+            $weight = (float) $group->first()->grade_category_weight;
+            $componentAverage = $group->avg(function (Assignment $assignment) {
+                $submission = $assignment->submissions->first();
+
+                return ((float) $submission->grade->score / max($assignment->max_score, 1)) * 100;
+            });
+
+            return ($componentAverage * $weight) / 100;
+        });
+        $finalScore = $gradedWeight > 0
+            ? ($totalWeightedScore / $gradedWeight) * 100
+            : null;
+        $finalScore = $finalScore !== null
+            ? round($finalScore + 1e-9, 2, PHP_ROUND_HALF_UP)
+            : null;
+        $finalLetterGrade = match (true) {
+            $finalScore === null => null,
+            $finalScore >= 86 => 'A',
+            $finalScore >= 76 => 'AB',
+            $finalScore >= 66 => 'B',
+            $finalScore >= 56 => 'BC',
+            $finalScore >= 46 => 'C',
+            $finalScore >= 36 => 'D',
+            default => 'E',
+        };
 
         return view('mahasiswa.grades.show', compact(
             'course',
             'assignments',
-            'finalGrade',
-            'totalWeight'
+            'gradeCategories',
+            'finalScore',
+            'finalLetterGrade'
         ));
+    }
+
+    private function gradeCategoryForAssignment(Assignment $assignment): string
+    {
+        $name = mb_strtolower(implode(' ', array_filter([
+            $assignment->title,
+            $assignment->gradeComponent?->name,
+        ])));
+
+        return match (true) {
+            str_contains($name, 'kehadiran'),
+            str_contains($name, 'presensi'),
+            str_contains($name, 'attendance') => 'kehadiran',
+            str_contains($name, 'kuis'),
+            str_contains($name, 'quiz') => 'kuis',
+            str_contains($name, 'uts'),
+            str_contains($name, 'ujian tengah') => 'uts',
+            str_contains($name, 'uas'),
+            str_contains($name, 'ujian akhir') => 'uas',
+            default => 'tugas',
+        };
     }
 
     public function createSubmission(Course $course, Assignment $assignment)

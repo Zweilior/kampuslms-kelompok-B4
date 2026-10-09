@@ -8,7 +8,6 @@
                     <span class="material-symbols-outlined">arrow_back</span>
                     Kembali ke kelas
                 </a>
-                <span class="mahasiswa-page__eyebrow">Perpustakaan kelas</span>
                 <h1 class="mahasiswa-page__title">Materi perkuliahan</h1>
                 <p class="mahasiswa-page__description">{{ $course->name }} · {{ $materials->count() }} materi tersedia</p>
             </div>

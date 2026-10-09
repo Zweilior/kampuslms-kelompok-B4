@@ -14,13 +14,21 @@
             <span class="mahasiswa-page__pill mahasiswa-page__pill--code">{{ $course->code }}</span>
         </header>
 
+        <div class="mahasiswa-page__grade-weights" aria-label="Komposisi bobot penilaian">
+            @foreach ($gradeCategories as $category)
+                <span class="mahasiswa-page__grade-weight">
+                    <span>{{ $category['label'] }}</span>
+                    <strong>{{ $category['weight'] }}%</strong>
+                </span>
+            @endforeach
+        </div>
+
         <section class="mahasiswa-page__card mahasiswa-page__table-wrap">
             <table class="mahasiswa-page__table mahasiswa-page__grade-detail-table">
                 <thead>
                     <tr>
                         <th>Item penilaian</th>
                         <th>Bobot</th>
-                        <th>Terhitung</th>
                         <th>Nilai</th>
                     </tr>
                 </thead>
@@ -33,28 +41,20 @@
                                     <a href="{{ route('mahasiswa.courses.assignments.submissions.index', [$course->id, $assignment->id]) }}"
                                         class="mahasiswa-page__grade-course">
                                         <strong>{{ $assignment->title }}</strong>
-                                        <span>{{ $assignment->gradeComponent?->name ?? 'Lihat detail nilai' }}</span>
+                                        <span>{{ $assignment->grade_category_label }}</span>
                                     </a>
                                 @else
                                     <a href="{{ route('mahasiswa.courses.assignments.submissions.create', [$course->id, $assignment->id]) }}"
                                         class="mahasiswa-page__grade-course">
                                         <strong>{{ $assignment->title }}</strong>
-                                        <span>{{ $assignment->gradeComponent?->name ?? 'Belum dikumpulkan · Kumpulkan tugas' }}</span>
+                                        <span>{{ $assignment->grade_category_label }} · Belum dikumpulkan</span>
                                     </a>
                                 @endif
                             </td>
                             <td>
-                                {{ $assignment->gradeComponent ? number_format((float) $assignment->gradeComponent->weight, 2) . '%' : '—' }}
-                            </td>
-                            <td>
-                                @if ($submission?->grade && $assignment->gradeComponent)
-                                    @php($weightedScore = ((float) $submission->grade->score / max($assignment->max_score, 1)) * (float) $assignment->gradeComponent->weight)
-                                    {{ number_format($weightedScore, 2) }}
-                                @elseif ($submission)
-                                    <span class="mahasiswa-page__pill">Menunggu nilai</span>
-                                @else
-                                    —
-                                @endif
+                                <span class="mahasiswa-page__grade-weight-value">
+                                    {{ $assignment->grade_category_weight }}%
+                                </span>
                             </td>
                             <td>
                                 @if ($submission?->grade)
@@ -69,18 +69,23 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="4" class="mahasiswa-page__empty">Belum ada tugas yang dipublikasikan.</td>
+                            <td colspan="3" class="mahasiswa-page__empty">Belum ada tugas yang dipublikasikan.</td>
                         </tr>
                     @endforelse
                     <tr class="mahasiswa-page__grade-summary">
                         <th>Total</th>
-                        <td>{{ number_format((float) $totalWeight, 2) }}%</td>
-                        <td>—</td>
-                        <td>{{ $finalGrade ? number_format((float) $finalGrade->total_score, 2) : '—' }}</td>
-                    </tr>
-                    <tr class="mahasiswa-page__grade-summary">
-                        <th colspan="3">Predikat</th>
-                        <td>{{ $finalGrade?->letter_grade ?? '—' }}</td>
+                        <td>100%</td>
+                        <td>
+                            @if ($finalScore !== null)
+                                {{ number_format($finalScore, 2) }}
+                                <span class="mahasiswa-page__pill mahasiswa-page__pill--success"
+                                    aria-label="Predikat {{ $finalLetterGrade }}">
+                                    {{ $finalLetterGrade }}
+                                </span>
+                            @else
+                                —
+                            @endif
+                        </td>
                     </tr>
                 </tbody>
             </table>

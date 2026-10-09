@@ -50,9 +50,15 @@ class MahasiswaGradesTest extends TestCase
             ->assertOk()
             ->assertSee('Monitoring Nilai')
             ->assertSee($activeCourse->name)
+            ->assertSee($archivedCourse->name)
+            ->assertSee('Mata Kuliah Aktif')
+            ->assertSee('Mata Kuliah Arsip')
             ->assertSee('86.50')
             ->assertSee('A')
-            ->assertDontSee('52.25');
+            ->assertSee('52.25')
+            ->assertSee('selected: null', false)
+            ->assertSee('x-cloak', false)
+            ->assertSee('x-show="selected !== null"', false);
         $this->assertMatchesRegularExpression(
             '/href="'.preg_quote(route('mahasiswa.grades.index'), '/').'"\s+class="navbar__link is-active"/',
             $monitoringResponse->getContent()
@@ -62,7 +68,8 @@ class MahasiswaGradesTest extends TestCase
             ->assertOk()
             ->assertSee($archivedCourse->name)
             ->assertSee('52.25')
-            ->assertDontSee('86.50');
+            ->assertSee('86.50')
+            ->assertSee("selected: 'archived'", false);
     }
 
     public function test_dashboard_summarizes_courses_assignments_and_links_to_monitoring(): void
@@ -124,12 +131,66 @@ class MahasiswaGradesTest extends TestCase
             ->assertSee('mahasiswa-page__grid--course-actions', false)
             ->assertSee('Materi perkuliahan')
             ->assertSee('Tugas dan pengumpulan')
+            ->assertSee('Rubrik penilaian')
             ->assertSee('Rincian nilai')
             ->assertDontSee('Tentang mata kuliah')
             ->assertDontSee('Dosen pengampu');
     }
 
-    public function test_course_grade_detail_shows_assignment_score_and_final_predicate(): void
+    public function test_student_rubric_page_shows_database_components_published_assignments_and_own_grade(): void
+    {
+        $student = User::factory()->mahasiswa()->create();
+        $otherStudent = User::factory()->mahasiswa()->create();
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->create(['lecturer_id' => $lecturer->id]);
+        $student->courses()->attach($course->id, ['enrolled_at' => now()]);
+        $component = GradeComponent::create([
+            'course_id' => $course->id,
+            'name' => 'Proyek Akhir',
+            'weight' => 65.5,
+        ]);
+        $assignment = Assignment::factory()->create([
+            'course_id' => $course->id,
+            'grade_component_id' => $component->id,
+            'created_by' => $lecturer->id,
+            'title' => 'Aplikasi Final',
+        ]);
+        Assignment::factory()->draft()->create([
+            'course_id' => $course->id,
+            'grade_component_id' => $component->id,
+            'created_by' => $lecturer->id,
+            'title' => 'Tugas Draft',
+        ]);
+        $submission = Submission::factory()->create([
+            'assignment_id' => $assignment->id,
+            'user_id' => $student->id,
+        ]);
+        Grade::create([
+            'submission_id' => $submission->id,
+            'graded_by' => $lecturer->id,
+            'score' => 87,
+            'graded_at' => now(),
+        ]);
+
+        $response = $this->actingAs($student)
+            ->get(route('mahasiswa.courses.grade-components.index', $course->id));
+
+        $response
+            ->assertOk()
+            ->assertSee('Rubrik penilaian')
+            ->assertSee('Proyek Akhir')
+            ->assertSee('65.50')
+            ->assertSee('Aplikasi Final')
+            ->assertSee('Nilai 87.00 / 100')
+            ->assertDontSee('Tugas Draft')
+            ->assertSee(route('mahasiswa.courses.assignments.submissions.index', [$course->id, $assignment->id]));
+
+        $this->actingAs($otherStudent)
+            ->get(route('mahasiswa.courses.grade-components.index', $course->id))
+            ->assertForbidden();
+    }
+
+    public function test_course_grade_detail_shows_assignment_scores_and_category_weights(): void
     {
         $student = User::factory()->mahasiswa()->create();
         $lecturer = User::factory()->dosen()->create();
@@ -144,9 +205,32 @@ class MahasiswaGradesTest extends TestCase
             'name' => 'Proyek',
             'weight' => 40,
         ]);
+        $quizComponent = GradeComponent::create([
+            'course_id' => $course->id,
+            'name' => 'Kuis',
+            'weight' => 20,
+        ]);
         $assignment->update(['grade_component_id' => $component->id]);
+        $quiz = Assignment::factory()->create([
+            'course_id' => $course->id,
+            'grade_component_id' => $quizComponent->id,
+            'created_by' => $lecturer->id,
+            'title' => 'Kuis Basis Data',
+            'max_score' => 50,
+        ]);
+        foreach (['Kehadiran Basis Data', 'Ujian Tengah Basis Data', 'Ujian Akhir Basis Data'] as $title) {
+            Assignment::factory()->create([
+                'course_id' => $course->id,
+                'created_by' => $lecturer->id,
+                'title' => $title,
+            ]);
+        }
         $submission = Submission::factory()->create([
             'assignment_id' => $assignment->id,
+            'user_id' => $student->id,
+        ]);
+        $quizSubmission = Submission::factory()->create([
+            'assignment_id' => $quiz->id,
             'user_id' => $student->id,
         ]);
         Grade::create([
@@ -154,6 +238,12 @@ class MahasiswaGradesTest extends TestCase
             'graded_by' => $lecturer->id,
             'score' => 88,
             'feedback' => 'Analisis sudah baik.',
+            'graded_at' => now(),
+        ]);
+        Grade::create([
+            'submission_id' => $quizSubmission->id,
+            'graded_by' => $lecturer->id,
+            'score' => 40,
             'graded_at' => now(),
         ]);
         FinalGrade::create([
@@ -164,32 +254,95 @@ class MahasiswaGradesTest extends TestCase
         ]);
 
         $gradeResponse = $this->actingAs($student)
-            ->get(route('mahasiswa.courses.grades.show', $course->id));
+            ->get(route('mahasiswa.grades.courses.show', $course->id));
 
         $gradeResponse
             ->assertOk()
             ->assertSee('Tugas Analisis')
-            ->assertSee('Proyek')
-            ->assertSee('40.00%')
+            ->assertSee('Kuis Basis Data')
+            ->assertSee('Tugas')
+            ->assertSee('15%')
+            ->assertSee('Kehadiran')
+            ->assertSee('5%')
+            ->assertSee('Kuis')
+            ->assertSee('10%')
+            ->assertSee('UTS')
+            ->assertSee('25%')
+            ->assertSee('UAS')
+            ->assertSee('45%')
+            ->assertSeeInOrder(['Kehadiran · Belum dikumpulkan', '5%'])
+            ->assertSeeInOrder(['Ujian Tengah Basis Data', 'UTS · Belum dikumpulkan', '25%'])
+            ->assertSeeInOrder(['Ujian Akhir Basis Data', 'UAS · Belum dikumpulkan', '45%'])
             ->assertSee('88.00')
-            ->assertSee('91.50')
-            ->assertSee('Terhitung')
+            ->assertSee('40.00')
+            ->assertSee('84.80')
+            ->assertSee('AB')
+            ->assertDontSee('Terhitung')
             ->assertSee('Total')
-            ->assertSee('Predikat')
-            ->assertSee('A');
+            ->assertDontSee('91.50');
+        $gradeResponse->assertSee('<td>100%</td>', false);
+        $gradeResponse->assertDontSee('51.20')
+            ->assertSee('84.80')
+            ->assertDontSee('Bobot belum diatur')
+            ->assertSee('aria-label="Predikat AB"', false);
 
         $this->assertMatchesRegularExpression(
-            '/href="'.preg_quote(route('mahasiswa.courses.index'), '/').'"\s+class="navbar__link is-active"/',
+            '/href="'.preg_quote(route('mahasiswa.grades.index'), '/').'"\s+class="navbar__link is-active"/',
             $gradeResponse->getContent()
         );
         $gradeResponse->assertSee(
             route('mahasiswa.courses.assignments.submissions.index', [$course->id, $assignment->id])
         );
 
+        $quizSubmission->grade()->update(['score' => 41]);
+        $this->get(route('mahasiswa.grades.courses.show', $course->id))
+            ->assertOk()
+            ->assertSee('85.60')
+            ->assertSee('aria-label="Predikat AB"', false);
+
+        $this->get('/mahasiswa/courses/'.$course->id.'/grades')
+            ->assertRedirect(route('mahasiswa.grades.courses.show', $course->id));
+
         $this->get(route('mahasiswa.courses.assignments.submissions.index', [$course->id, $assignment->id]))
             ->assertOk()
             ->assertSee('Kembali ke daftar tugas')
             ->assertSee(route('mahasiswa.courses.assignments.index', $course->id));
+    }
+
+    public function test_grade_detail_uses_task_category_for_unlinked_assignments(): void
+    {
+        $student = User::factory()->mahasiswa()->create();
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->create(['lecturer_id' => $lecturer->id]);
+
+        foreach ([91.30, 74.53] as $index => $score) {
+            $assignment = Assignment::factory()->create([
+                'course_id' => $course->id,
+                'created_by' => $lecturer->id,
+                'title' => 'Tugas Basis Data '.($index + 1),
+            ]);
+            $submission = Submission::factory()->create([
+                'assignment_id' => $assignment->id,
+                'user_id' => $student->id,
+            ]);
+            Grade::create([
+                'submission_id' => $submission->id,
+                'graded_by' => $lecturer->id,
+                'score' => $score,
+                'graded_at' => now(),
+            ]);
+        }
+
+        $this->actingAs($student)
+            ->get(route('mahasiswa.grades.courses.show', $course->id))
+            ->assertOk()
+            ->assertSee('91.30')
+            ->assertSee('74.53')
+            ->assertSee('82.92')
+            ->assertSee('aria-label="Predikat AB"', false)
+            ->assertSee('100%')
+            ->assertDontSee('rata-rata tugas yang sudah dinilai')
+            ->assertDontSee('Bobot belum diatur');
     }
 
     public function test_assignment_list_shows_assigned_or_submitted_status(): void

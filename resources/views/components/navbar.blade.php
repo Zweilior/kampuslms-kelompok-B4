@@ -35,7 +35,6 @@
         request()->routeIs('dosen.grades.*')                               => 'grades',
 
         request()->routeIs('mahasiswa.grades.*') => 'grades',
-        request()->routeIs('mahasiswa.courses.grades.*') => 'courses',
         request()->routeIs('mahasiswa.courses.*') => 'courses',
 
         request()->routeIs('dashboard', 'admin.dashboard', 'dosen.dashboard', 'mahasiswa.dashboard') => 'dashboard',
@@ -138,12 +137,9 @@
                         <div class="logout-dialog-backdrop" x-cloak x-show="logoutOpen"
                             x-transition.opacity @click.self="logoutOpen = false"
                             role="presentation">
-                            <section class="logout-dialog" role="dialog" aria-modal="true"
+                            <section class="logout-dialog logout-dialog--confirmation" role="dialog" aria-modal="true"
                                 aria-labelledby="logout-dialog-title"
                                 @click.stop>
-                                <div class="logout-dialog__icon" aria-hidden="true">
-                                    <span class="material-symbols-outlined">logout</span>
-                                </div>
                                 <h2 class="logout-dialog__title" id="logout-dialog-title">
                                     Yakin ingin keluar?
                                 </h2>

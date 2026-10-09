@@ -60,16 +60,20 @@ class AuthorizationErrorPagesTest extends TestCase
         Route::get('/test-navbar', fn () => view('components.navbar'))
             ->middleware('auth');
 
-        $user = new User();
-        $user->name = 'Pengguna Tes';
-        $user->role = 'mahasiswa';
+        foreach (['admin', 'dosen', 'mahasiswa'] as $role) {
+            $user = new User();
+            $user->name = 'Pengguna Tes';
+            $user->role = $role;
 
-        $this->actingAs($user)
-            ->get('/test-navbar')
-            ->assertOk()
-            ->assertSee('Yakin ingin keluar?')
-            ->assertSee('Ya, keluar')
-            ->assertSee('Batal')
-            ->assertSee('x-teleport="body"', false);
+            $this->actingAs($user)
+                ->get('/test-navbar')
+                ->assertOk()
+                ->assertSee('Yakin ingin keluar?')
+                ->assertSee('Ya, keluar')
+                ->assertSee('Batal')
+                ->assertSee('logout-dialog--confirmation', false)
+                ->assertDontSee('logout-dialog__icon', false)
+                ->assertSee('x-teleport="body"', false);
+        }
     }
 }

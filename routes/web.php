@@ -93,7 +93,11 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->middleware(['auth', 'role:mahasi
     Route::get('/courses', [MahasiswaController::class, 'courses'])->name('courses.index');
     Route::get('/monitoring-nilai', [MahasiswaController::class, 'monitoringGrades'])->name('grades.index');
     Route::get('/courses/{course}', [MahasiswaController::class, 'showCourse'])->name('courses.show');
-    Route::get('/courses/{course}/grades', [MahasiswaController::class, 'grades'])->name('courses.grades.show');
+    Route::get('/courses/{course}/grade-components', [MahasiswaController::class, 'gradeComponents'])->name('courses.grade-components.index');
+    Route::get('/monitoring-nilai/{course}/grades', [MahasiswaController::class, 'grades'])->name('grades.courses.show');
+    Route::get('/courses/{course}/grades', fn (string $course) => redirect()
+        ->route('mahasiswa.grades.courses.show', ['course' => $course]))
+        ->name('courses.grades.legacy');
     Route::get('/courses/{course}/assignments', [MahasiswaController::class, 'assignments'])->name('courses.assignments.index');
     Route::get('/courses/{course}/materials', [MahasiswaController::class, 'materials'])->name('courses.materials.index');
     Route::get('/courses/{course}/assignments/{assignment}/submissions', [MahasiswaController::class, 'submissions'])->name('courses.assignments.submissions.index');
