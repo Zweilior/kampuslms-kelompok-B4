@@ -662,7 +662,9 @@ curl -s -X PUT http://localhost:8000/api/v1/submissions/1/grade \
     "errors": { "score": ["The score field must not be greater than 100."] }
   }
   ```
-
+#### 14. Submission
+- Mahasiswa TIDAK dapat mengubah atau menghapus submission sendiri. 
+  Untuk submit ulang, hubungi dosen atau admin.
 ---
 
 ### 4.5 Notifications
