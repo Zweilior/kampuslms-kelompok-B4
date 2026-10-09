@@ -409,13 +409,51 @@ button {
     min-height: 100vh;
     background-color: transparent;
     position: relative;
+    isolation: isolate;
     width: 100%;
     padding: 2rem;
+}
+
+.main-content::before,
+.main-content::after {
+    position: absolute;
+    z-index: 0;
+    content: "";
+    pointer-events: none;
+}
+
+.main-content::before {
+    inset: 0;
+    min-height: 100%;
+    background:
+        radial-gradient(ellipse 36rem 30rem at 8% 18%, rgba(139, 174, 102, 0.24), transparent 72%),
+        radial-gradient(ellipse 32rem 28rem at 92% 52%, rgba(201, 151, 63, 0.17), transparent 74%),
+        radial-gradient(ellipse 38rem 32rem at 48% 94%, rgba(139, 174, 102, 0.14), transparent 72%);
+}
+
+.main-content::after {
+    top: 18%;
+    right: 8%;
+    width: clamp(10rem, 22vw, 21rem);
+    aspect-ratio: 1;
+    border: 1px solid rgba(61, 107, 31, 0.1);
+    border-radius: 38% 62% 54% 46% / 44% 40% 60% 56%;
+    box-shadow:
+        0 0 2.5rem rgba(139, 174, 102, 0.1),
+        0 0 0 1.2rem rgba(61, 107, 31, 0.025),
+        0 0 0 2.4rem rgba(61, 107, 31, 0.018);
+    background: radial-gradient(circle at 35% 30%, rgba(139, 174, 102, 0.08), transparent 68%);
+    transform: rotate(24deg);
 }
 
 /* Varian dengan navbar: tambahkan padding-top agar tidak tertutup */
 .main-content--with-navbar {
     padding-top: calc(var(--navbar-height) + 2rem);
+}
+
+.main-content > * {
+    position: relative;
+    z-index: 1;
 }
 
 /* ============================================
@@ -467,6 +505,21 @@ button {
 
     .main-content--with-navbar {
         padding-top: calc(var(--navbar-height) + 1rem);
+    }
+
+    .main-content::after {
+        top: 24%;
+        right: -3rem;
+        width: 10rem;
+        opacity: 0.75;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .main-content::before,
+    .main-content::after {
+        animation: none !important;
+        transition: none !important;
     }
 }
 

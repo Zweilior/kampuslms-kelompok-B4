@@ -36,7 +36,16 @@
                 </span>
                 <span class="material-symbols-outlined mahasiswa-page__quick-card-arrow" aria-hidden="true">chevron_right</span>
             </a>
-            <a href="{{ route('mahasiswa.courses.grades.show', $course->id) }}"
+            <a href="{{ route('mahasiswa.courses.grade-components.index', $course->id) }}"
+                class="mahasiswa-page__card mahasiswa-page__quick-card">
+                <span class="mahasiswa-page__icon-box"><span class="material-symbols-outlined">rule</span></span>
+                <span class="mahasiswa-page__quick-card-copy">
+                    <strong>Rubrik penilaian</strong>
+                    <span>Lihat komponen, bobot, dan tugas pada setiap rubrik.</span>
+                </span>
+                <span class="material-symbols-outlined mahasiswa-page__quick-card-arrow" aria-hidden="true">chevron_right</span>
+            </a>
+            <a href="{{ route('mahasiswa.grades.courses.show', $course->id) }}"
                 class="mahasiswa-page__card mahasiswa-page__quick-card">
                 <span class="mahasiswa-page__icon-box"><span class="material-symbols-outlined">grading</span></span>
                 <span class="mahasiswa-page__quick-card-copy">
