@@ -92,12 +92,9 @@ class AssignmentController extends Controller
         $user = $request->user();
 
         // Pastikan hanya dosen pemilik course yang boleh mengubah.
-        if (
-            $user->role !== 'dosen' ||
-            (int) $assignment->course->lecturer_id !== (int) $user->id
-        ) {
-            return $this->forbidden();
-        }
+        if ($assignment->course->lecturer_id !== auth()->id()) {
+        return response()->json(['message' => 'Forbidden. Anda bukan pemilik tugas ini.'], 403);
+    }
 
         $validated = $request->validate([
             'title' => [
