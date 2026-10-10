@@ -10,6 +10,7 @@ use App\Models\User;
 use App\Notifications\NilaiDiberikan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 
 class SubmissionController extends Controller
 {

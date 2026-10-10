@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate; 
 
 class CourseController extends Controller
 {
@@ -28,19 +29,35 @@ class CourseController extends Controller
     }
 
     /**
-     * Menampilkan daftar semua mata kuliah.
+     * Menampilkan daftar mata kuliah.
+     * [POIN 4] Disaring di level query sesuai peran:
+     * - Admin: Melihat semua MK.
+     * - Dosen: Hanya MK yang diajar.
+     * - Mahasiswa: Hanya MK yang diikuti.
      */
     public function index(Request $request)
     {
+        Gate::authorize('viewAny', Course::class);
+
+        $user = $request->user(); // Ambil user yang sedang login
         $query = Course::with('lecturer');
+
+        // --- FILTER BERDASARKAN PERAN (POIN 4) ---
+        if ($user->role === 'dosen') {
+            $query->where('lecturer_id', $user->id);
+        } elseif ($user->role === 'mahasiswa') {
+            $query->whereHas('students', function ($q) use ($user) {
+                $q->where('users.id', $user->id);
+            });
+        }
+        // Jika admin, tidak difilter (boleh lihat semua)
 
         // Pencarian berdasarkan kode atau nama mata kuliah
         if ($request->filled('search')) {
             $search = $request->input('search');
-
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
-                ->orWhere('name', 'like', "%{$search}%");
+                  ->orWhere('name', 'like', "%{$search}%");
             });
         }
 
@@ -54,7 +71,7 @@ class CourseController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        // Data dosen untuk form tambah/edit
+        // Data dosen untuk form tambah/edit (hanya admin yang butuh ini, tapi aman dibiarkan)
         $lecturers = User::where('role', 'dosen')
             ->orderBy('name')
             ->get();
@@ -67,6 +84,8 @@ class CourseController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create', Course::class);
+
         $lecturers = User::where('role', 'dosen')
             ->orderBy('name')
             ->get();
@@ -79,9 +98,10 @@ class CourseController extends Controller
      */
     public function store(StoreCourseRequest $request)
     {
+        Gate::authorize('create', Course::class);
+
         $data = $request->validated();
         $data['description'] = $data['description'] ?? '';
-
         $course = Course::create($data);
 
         return redirect()
@@ -94,9 +114,10 @@ class CourseController extends Controller
      */
     public function show(Course $course)
     {
+        Gate::authorize('view', $course);
+
         $course->load('lecturer');
 
-        // Ambil data dosen agar dropdown dosen di modal edit terisi
         $lecturers = User::where('role', 'dosen')
             ->orderBy('name')
             ->get();
@@ -104,8 +125,13 @@ class CourseController extends Controller
         return view($this->isAdminRoute() ? 'admin.courses.show' : 'courses.show', compact('course', 'lecturers'));
     }
 
+    /**
+     * Daftar MK milik dosen yang sedang login.
+     */
     public function dosenIndex(Request $request)
     {
+        Gate::authorize('viewAny', Course::class);
+
         $courses = Course::where('lecturer_id', $request->user()->id)
             ->with('lecturer')
             ->orderBy('code')
@@ -116,8 +142,13 @@ class CourseController extends Controller
         return view('dosen.courses.index', compact('courses', 'focus'));
     }
 
+    /**
+     * Daftar nilai MK milik dosen yang sedang login.
+     */
     public function dosenGradesIndex(Request $request)
     {
+        Gate::authorize('viewAny', Course::class);
+
         $courses = Course::where('lecturer_id', $request->user()->id)
             ->withCount('students')
             ->withAvg('finalGrades', 'total_score')
@@ -133,9 +164,12 @@ class CourseController extends Controller
         ));
     }
 
+    /**
+     * Detail MK untuk dosen pemilik.
+     */
     public function dosenShow(Course $course)
     {
-        abort_unless($course->lecturer_id === Auth::id(), 403);
+        Gate::authorize('view', $course);
 
         return view('dosen.courses.show', compact('course'));
     }
@@ -145,6 +179,8 @@ class CourseController extends Controller
      */
     public function edit(Course $course)
     {
+        Gate::authorize('update', $course);
+
         $lecturers = User::where('role', 'dosen')
             ->orderBy('name')
             ->get();
@@ -157,9 +193,10 @@ class CourseController extends Controller
      */
     public function update(UpdateCourseRequest $request, Course $course)
     {
+        Gate::authorize('update', $course);
+
         $data = $request->validated();
         $data['description'] = $data['description'] ?? '';
-
         $course->update($data);
 
         return redirect()
@@ -172,6 +209,8 @@ class CourseController extends Controller
      */
     public function destroy(Course $course)
     {
+        Gate::authorize('delete', $course);
+
         $course->delete();
 
         return redirect()
