@@ -22,6 +22,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
+Route::get('forgot-password', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('forgot-password', [LoginController::class, 'sendResetLinkEmail'])->name('password.email');
+Route::get('reset-password/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
+Route::post('reset-password', [LoginController::class, 'resetPassword'])->name('password.update');
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
