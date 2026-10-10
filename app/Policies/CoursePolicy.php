@@ -39,10 +39,10 @@ class CoursePolicy
         return $this->isAdmin($user);
     }
 
-    /** Hanya admin. Dosen tidak boleh mengubah data MK, termasuk MK miliknya. */
+    /** Admin boleh mengubah semua data; dosen hanya data mata kuliah yang diampu. */
     public function update(User $user, Course $course): bool
     {
-        return $this->isAdmin($user);
+        return $this->canManageCourseContent($user, $course);
     }
 
     /** Hanya admin. */

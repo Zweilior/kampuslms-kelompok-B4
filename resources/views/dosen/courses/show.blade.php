@@ -3,19 +3,32 @@
         @php
             $focus = request('focus') === 'assignments' ? 'assignments' : 'materials';
         @endphp
-        <header class="mb-space-lg">
+        <header class="dosen-course-detail__header mb-space-lg">
             <a href="{{ route('dosen.courses.index', ['focus' => $focus]) }}" class="mb-space-md inline-flex items-center gap-space-xs font-label-md text-on-surface-variant hover:text-primary">
                 <span class="material-symbols-outlined text-base">arrow_back</span>Mata Kuliah Diampu
             </a>
-            <div class="rounded-2xl border border-outline/10 bg-surface-container-low p-space-lg shadow-sm">
-                <div class="flex flex-wrap items-start justify-between gap-space-md">
-                    <div>
-                        <span class="inline-flex rounded-md bg-tertiary-container/30 px-2.5 py-1 font-label-md text-label-md font-bold text-tertiary">{{ $course->code }}</span>
-                        <h1 class="mt-space-sm font-headline-lg text-headline-lg text-on-surface">{{ $course->name }}</h1>
-                        <p class="mt-space-xs font-body-md text-body-md text-on-surface-variant">{{ $course->sks }} SKS · Kelas yang Anda ampu</p>
+            <div class="dosen-course-hero">
+                <span class="dosen-course-hero__icon material-symbols-outlined" aria-hidden="true">menu_book</span>
+                <div class="dosen-course-hero__content">
+                    <span class="dosen-course-hero__eyebrow">SEMESTER BERJALAN · {{ $course->code }}</span>
+                    <h1 class="dosen-course-hero__title">{{ $course->name }}</h1>
+                    <p class="dosen-course-hero__description">{{ $course->sks }} SKS · Kelas yang Anda ampu</p>
+                    <div class="dosen-course-hero__actions">
+                        <a href="{{ route('dosen.courses.edit', $course) }}" class="dosen-course-hero__action">
+                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                            Edit Mata Kuliah
+                        </a>
+                        <a href="{{ route('dosen.courses.enrollments.index', $course) }}" class="dosen-course-hero__action">
+                            <span class="material-symbols-outlined" aria-hidden="true">group_add</span>
+                            Enrollment
+                        </a>
+                        <a href="{{ route('dosen.courses.grade-components.index', $course) }}" class="dosen-course-hero__action">
+                            <span class="material-symbols-outlined" aria-hidden="true">edit_note</span>
+                            Edit Rubrik
+                        </a>
                     </div>
-                    <span class="rounded-full bg-primary/10 px-3 py-1 font-label-sm text-label-sm text-primary">Ruang lingkup: kelas ini</span>
                 </div>
+                <span class="dosen-course-hero__badge">Aktif</span>
             </div>
         </header>
 

@@ -84,6 +84,32 @@
                 </div>
 
                 <div class="dosen-assignment-form__field dosen-assignment-form__field--full">
+                    <label for="grade_component_id">Rubrik Penilaian</label>
+                    <div class="dosen-assignment-form__select-wrap">
+                        <select id="grade_component_id" name="grade_component_id">
+                            <option value="">Tanpa rubrik</option>
+                            @foreach ($gradeComponents as $component)
+                                <option value="{{ $component->id }}" {{ (string) old('grade_component_id', $assignment->grade_component_id) === (string) $component->id ? 'selected' : '' }}>
+                                    {{ $component->name }} ({{ number_format((float) $component->weight, 2) }}%)
+                                </option>
+                            @endforeach
+                        </select>
+                        <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+                    </div>
+                    @if ($gradeComponents->isEmpty())
+                        <p class="dosen-assignment-form__hint">
+                            Belum ada rubrik untuk mata kuliah ini.
+                            <a href="{{ route('dosen.courses.grade-components.index', $course) }}">Buat rubrik terlebih dahulu</a>.
+                        </p>
+                    @else
+                        <p class="dosen-assignment-form__hint">Pilih komponen rubrik untuk mengelompokkan nilai tugas ini.</p>
+                    @endif
+                    @error('grade_component_id')
+                        <p class="dosen-assignment-form__field-error">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="dosen-assignment-form__field dosen-assignment-form__field--full">
                     <label for="instructions">Instruksi</label>
                     <textarea id="instructions"
                               name="instructions"

@@ -265,29 +265,22 @@ class MahasiswaGradesTest extends TestCase
             ->assertOk()
             ->assertSee('Tugas Analisis')
             ->assertSee('Kuis Basis Data')
-            ->assertSee('Tugas')
-            ->assertSee('15%')
-            ->assertSee('Kehadiran')
-            ->assertSee('5%')
+            ->assertSee('Proyek')
+            ->assertSee('40.00%')
             ->assertSee('Kuis')
-            ->assertSee('10%')
-            ->assertSee('UTS')
-            ->assertSee('25%')
-            ->assertSee('UAS')
-            ->assertSee('45%')
-            ->assertSeeInOrder(['Kehadiran · Belum dikumpulkan', '5%'])
-            ->assertSeeInOrder(['Ujian Tengah Basis Data', 'UTS · Belum dikumpulkan', '25%'])
-            ->assertSeeInOrder(['Ujian Akhir Basis Data', 'UAS · Belum dikumpulkan', '45%'])
+            ->assertSee('20.00%')
+            ->assertSeeInOrder(['Kehadiran Basis Data', 'Belum masuk rubrik · Belum dikumpulkan', '—'])
+            ->assertSeeInOrder(['Ujian Tengah Basis Data', 'Belum masuk rubrik · Belum dikumpulkan', '—'])
+            ->assertSeeInOrder(['Ujian Akhir Basis Data', 'Belum masuk rubrik · Belum dikumpulkan', '—'])
             ->assertSee('88.00')
             ->assertSee('40.00')
-            ->assertSee('84.80')
+            ->assertSee('85.33')
             ->assertSee('AB')
             ->assertDontSee('Terhitung')
-            ->assertSee('Total')
+            ->assertSee('Total bobot rubrik')
             ->assertDontSee('91.50');
-        $gradeResponse->assertSee('<td>100%</td>', false);
+        $gradeResponse->assertSee('<td>60.00%</td>', false);
         $gradeResponse->assertDontSee('51.20')
-            ->assertSee('84.80')
             ->assertDontSee('Bobot belum diatur')
             ->assertSee('aria-label="Predikat AB"', false);
 
@@ -302,8 +295,8 @@ class MahasiswaGradesTest extends TestCase
         $quizSubmission->grade()->update(['score' => 41]);
         $this->get(route('mahasiswa.grades.courses.show', $course->id))
             ->assertOk()
-            ->assertSee('85.60')
-            ->assertSee('aria-label="Predikat AB"', false);
+            ->assertSee('86.00')
+            ->assertSee('aria-label="Predikat A"', false);
 
         $this->get('/mahasiswa/courses/'.$course->id.'/grades')
             ->assertRedirect(route('mahasiswa.grades.courses.show', $course->id));
@@ -314,7 +307,7 @@ class MahasiswaGradesTest extends TestCase
             ->assertSee(route('mahasiswa.courses.assignments.index', $course->id));
     }
 
-    public function test_grade_detail_uses_task_category_for_unlinked_assignments(): void
+    public function test_grade_detail_does_not_infer_rubric_for_unlinked_assignments(): void
     {
         $student = User::factory()->mahasiswa()->create();
         $lecturer = User::factory()->dosen()->create();
@@ -340,16 +333,21 @@ class MahasiswaGradesTest extends TestCase
             ]);
         }
 
-        $this->actingAs($student)
-            ->get(route('mahasiswa.grades.courses.show', $course->id))
+        $response = $this->actingAs($student)
+            ->get(route('mahasiswa.grades.courses.show', $course->id));
+
+        $response
             ->assertOk()
             ->assertSee('91.30')
             ->assertSee('74.53')
-            ->assertSee('82.92')
-            ->assertSee('aria-label="Predikat AB"', false)
-            ->assertSee('100%')
+            ->assertSee('Belum masuk rubrik')
+            ->assertDontSee('82.92')
+            ->assertDontSee('aria-label="Predikat', false)
+            ->assertDontSee('100%')
             ->assertDontSee('rata-rata tugas yang sudah dinilai')
-            ->assertDontSee('Bobot belum diatur');
+            ->assertDontSee('Bobot belum diatur')
+            ->assertViewHas('finalScore', null)
+            ->assertViewHas('totalRubricWeight', 0.0);
     }
 
     public function test_assignment_list_shows_assigned_or_submitted_status(): void

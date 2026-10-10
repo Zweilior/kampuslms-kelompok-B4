@@ -1,0 +1,101 @@
+.dosen-dashboard__header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    min-height: 9.6rem;
+    margin-bottom: 1.1rem;
+    padding: 2rem 1.75rem;
+    overflow: hidden;
+    border-radius: 1.15rem;
+    background: linear-gradient(110deg, #244c16 0%, #638f3d 100%);
+    color: #fff;
+    isolation: isolate;
+}
+
+.dosen-dashboard__header::after {
+    position: absolute;
+    z-index: -1;
+    top: 50%;
+    right: 12%;
+    width: 13rem;
+    height: 13rem;
+    transform: translateY(-50%);
+    border: 1rem solid rgba(255, 255, 255, 0.07);
+    border-radius: 50%;
+    box-shadow: 0 0 0 1.8rem rgba(255, 255, 255, 0.045);
+    content: "";
+}
+
+.dosen-dashboard__header-copy {
+    min-width: 0;
+}
+
+.dosen-dashboard__title {
+    margin: 0;
+    color: #fff;
+    font-size: 1.8rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+.dosen-dashboard__description {
+    max-width: 42rem;
+    margin: 0.5rem 0 0;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.9rem;
+    line-height: 1.65;
+}
+
+.dosen-dashboard__action {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    min-height: 2.75rem;
+    padding: 0.65rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.92);
+    border-radius: 0.75rem;
+    background: #fff;
+    color: #315c20;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition:
+        background-color 180ms ease,
+        border-color 180ms ease,
+        color 180ms ease,
+        transform 180ms ease;
+}
+
+.dosen-dashboard__action:hover {
+    transform: translateY(-1px);
+    border-color: #edf5e8;
+    background: #edf5e8;
+    color: #244c16;
+}
+
+.dosen-dashboard__action:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+    .dosen-dashboard__header {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 1.5rem;
+    }
+
+    .dosen-dashboard__header::after {
+        right: -3rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dosen-dashboard__action {
+        transition: none;
+    }
+}

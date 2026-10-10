@@ -130,15 +130,18 @@ class PolicyAccessTest extends TestCase
 
     // ---------- Course ----------
 
-    public function test_only_admin_can_create_update_delete_course(): void
+    public function test_only_admin_can_create_or_delete_course_but_owner_can_update_it(): void
     {
         $this->assertTrue($this->admin->can('create', Course::class));
         $this->assertTrue($this->admin->can('update', $this->courseA));
         $this->assertTrue($this->admin->can('delete', $this->courseA));
 
-        foreach ([$this->dosenA, $this->mhsA1] as $user) {
+        $this->assertTrue($this->dosenA->can('update', $this->courseA));
+        $this->assertFalse($this->dosenB->can('update', $this->courseA));
+        $this->assertFalse($this->mhsA1->can('update', $this->courseA));
+
+        foreach ([$this->dosenA, $this->dosenB, $this->mhsA1] as $user) {
             $this->assertFalse($user->can('create', Course::class));
-            $this->assertFalse($user->can('update', $this->courseA));
             $this->assertFalse($user->can('delete', $this->courseA));
         }
     }

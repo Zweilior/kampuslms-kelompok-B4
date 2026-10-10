@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminGradeController;
 use App\Http\Controllers\AssignmentController;
 use App\Http\Controllers\CourseController;
+use App\Http\Controllers\CourseEnrollmentController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\MahasiswaController;
@@ -87,6 +88,11 @@ Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scop
 
     Route::get('/courses', [CourseController::class, 'dosenIndex'])->name('courses.index');
     Route::get('/courses/{course}', [CourseController::class, 'dosenShow'])->name('courses.show');
+    Route::get('/courses/{course}/edit', [CourseController::class, 'dosenEdit'])->name('courses.edit');
+    Route::put('/courses/{course}', [CourseController::class, 'dosenUpdate'])->name('courses.update');
+    Route::get('/courses/{course}/enrollments', [CourseEnrollmentController::class, 'dosenIndex'])->name('courses.enrollments.index');
+    Route::post('/courses/{course}/enrollments', [CourseEnrollmentController::class, 'dosenStore'])->name('courses.enrollments.store');
+    Route::delete('/courses/{course}/enrollments/{student}', [CourseEnrollmentController::class, 'dosenDestroy'])->name('courses.enrollments.destroy');
 
     Route::get('/courses/{course}/materials', [MaterialController::class, 'dosenIndex'])->name('courses.materials.index');
     Route::get('/courses/{course}/materials/create', [MaterialController::class, 'dosenCreate'])->name('courses.materials.create');
