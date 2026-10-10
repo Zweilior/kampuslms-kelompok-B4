@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class DashboardController extends Controller
 {

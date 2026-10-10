@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Models\Grade;
+use Illuminate\Support\Facades\Gate; // BARU
 
 class AdminGradeController extends Controller
 {
     public function index()
     {
+        Gate::authorize('viewAny', Grade::class); // BARU
+
         $grades = Grade::with([
             'submission.student',
             'submission.assignment.course',

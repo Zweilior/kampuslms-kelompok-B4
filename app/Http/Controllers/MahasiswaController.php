@@ -7,6 +7,7 @@ use App\Models\Course;
 use App\Models\GradeComponent;
 use App\Models\Submission;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class MahasiswaController extends Controller
 {

@@ -5,21 +5,18 @@ namespace App\Http\Controllers;
 use App\Models\Course;
 use App\Models\GradeComponent;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate; // BARU
 
 class GradeComponentController extends Controller
 {
-    private function ensureLecturerOwnsCourse(Course $course): void
-    {
-        abort_unless($course->lecturer_id === Auth::id(), 403, 'Anda tidak memiliki akses ke mata kuliah ini.');
-    }
+    // ❌ HAPUS method ensureLecturerOwnsCourse yang lama karena sudah digantikan oleh Policy
 
     /**
      * Menampilkan daftar rubrik/komponen penilaian mata kuliah.
      */
     public function dosenIndex(Course $course)
     {
-        $this->ensureLecturerOwnsCourse($course);
+        Gate::authorize('viewAny', [GradeComponent::class, $course]); // BARU (Menggantikan ensureLecturerOwnsCourse)
 
         $gradeComponents = $course->gradeComponents()
             ->withCount('assignments')
@@ -34,7 +31,7 @@ class GradeComponentController extends Controller
      */
     public function dosenStore(Request $request, Course $course)
     {
-        $this->ensureLecturerOwnsCourse($course);
+        Gate::authorize('create', [GradeComponent::class, $course]); // BARU
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -52,7 +49,7 @@ class GradeComponentController extends Controller
      */
     public function dosenUpdate(Request $request, Course $course, GradeComponent $gradeComponent)
     {
-        $this->ensureLecturerOwnsCourse($course);
+        Gate::authorize('update', $gradeComponent); // BARU
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
@@ -70,7 +67,7 @@ class GradeComponentController extends Controller
      */
     public function dosenDestroy(Course $course, GradeComponent $gradeComponent)
     {
-        $this->ensureLecturerOwnsCourse($course);
+        Gate::authorize('delete', $gradeComponent); // BARU
 
         // Cegah hapus jika masih ada tugas yang menggunakan komponen ini
         if ($gradeComponent->assignments()->count() > 0) {
