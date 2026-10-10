@@ -1,17 +1,14 @@
 <x-layout title="Dashboard Admin - KampusLMS" active-nav="dashboard">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header class="mb-space-lg">
-            <div class="flex items-center gap-space-xs mb-space-2xs">
-                <span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm uppercase">
-                    Administrasi
-                </span>
-                <span class="w-1 h-1 rounded-full bg-outline"></span>
-                <span class="font-label-sm text-label-sm text-on-surface-variant">Ringkasan sistem</span>
+        <header class="admin-dashboard__header">
+            <div class="admin-dashboard__header-copy">
+                <h1 class="admin-dashboard__title">Halo, {{ auth()->user()->name }}</h1>
+                <p class="admin-dashboard__description">Pantau pengguna dan mata kuliah yang tersimpan di KampusLMS.</p>
             </div>
-            <h1 class="font-headline-lg text-headline-lg text-on-surface">Dashboard Admin</h1>
-            <p class="font-body-md text-body-md text-on-surface-variant mt-0.5">
-                Pantau pengguna dan mata kuliah yang tersimpan di KampusLMS.
-            </p>
+            <a href="{{ route('admin.users.index') }}" class="admin-dashboard__action">
+                <span class="material-symbols-outlined" aria-hidden="true">group</span>
+                Kelola pengguna
+            </a>
         </header>
 
         <section aria-label="Statistik sistem" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-bento-gap-desktop mb-space-lg">

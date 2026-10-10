@@ -1,13 +1,14 @@
 <x-layout title="Dashboard Dosen - KampusLMS" active-nav="dashboard">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header class="mb-space-lg">
-            <div class="flex items-center gap-space-xs mb-space-2xs">
-                <span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm uppercase">Ruang dosen</span>
-                <span class="w-1 h-1 rounded-full bg-outline"></span>
-                <span class="font-label-sm text-label-sm text-on-surface-variant">Pengelolaan akademik</span>
+        <header class="dosen-dashboard__header">
+            <div class="dosen-dashboard__header-copy">
+                <h1 class="dosen-dashboard__title">Halo, {{ auth()->user()->name }}</h1>
+                <p class="dosen-dashboard__description">Aktivitas dan penilaian untuk mata kuliah yang Anda ampu.</p>
             </div>
-            <h1 class="font-headline-lg text-headline-lg text-on-surface">Dashboard Dosen</h1>
-            <p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Aktivitas dan penilaian untuk mata kuliah yang Anda ampu.</p>
+            <a href="{{ route('dosen.courses.index') }}" class="dosen-dashboard__action">
+                <span class="material-symbols-outlined" aria-hidden="true">menu_book</span>
+                Mata kuliah saya
+            </a>
         </header>
 
         <section aria-label="Ringkasan aktivitas dosen" class="grid grid-cols-1 md:grid-cols-3 gap-bento-gap-desktop">
