@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "./layout.css";
+@import "./components/footer.css";
 @import "./auth/logout.css";
 @import "./dashboard.css";
 @import "./mahasiswa/index.css";

@@ -1,0 +1,339 @@
+.eduspace-footer {
+    position: relative;
+    isolation: isolate;
+    width: 100%;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    overflow: hidden;
+    color: #52634a;
+    border: 1px solid rgba(61, 107, 31, 0.18);
+    border-bottom: 0;
+    border-radius: 3rem 3rem 0 0;
+    background:
+        radial-gradient(ellipse at 12% 0, rgba(139, 174, 102, 0.2), transparent 42%),
+        linear-gradient(135deg, #e7eedc 0%, #dce8cf 55%, #eaf0e0 100%);
+}
+
+.eduspace-footer__main,
+.eduspace-footer__bottom {
+    width: min(100% - 3rem, 80rem);
+    margin-inline: auto;
+}
+
+.eduspace-footer__main {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(12rem, 0.9fr) minmax(17rem, 1fr);
+    align-items: start;
+    gap: clamp(2rem, 3vw, 3rem);
+    padding: 1.35rem 0 1.25rem;
+}
+
+.eduspace-footer__main section { min-width: 0; }
+
+.eduspace-footer__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.35rem;
+    color: #28451e;
+    font-size: 1.8rem;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    text-decoration: none;
+    text-shadow: 0 0 14px rgba(104, 148, 67, 0.32), 0 0 30px rgba(104, 148, 67, 0.2);
+    transition: color 180ms ease, text-shadow 180ms ease;
+    transform: none;
+}
+
+.eduspace-footer__brand > span:last-child {
+    transform: none;  
+}
+
+.eduspace-footer__brand:hover {
+    color: #3d6b1f;
+    text-shadow: 0 0 12px rgba(104, 148, 67, 0.42), 0 0 32px rgba(104, 148, 67, 0.3);
+}
+
+.eduspace-footer__brand .material-symbols-outlined {
+    color: #4e7b2f;
+    font-size: 2.4rem;
+    filter: drop-shadow(0 0 8px rgba(104, 148, 67, 0.32));
+}
+
+/* ============================================================
+   ABOUT — Deskripsi brand
+   ============================================================ */
+.eduspace-footer__about p,
+.eduspace-footer__address-copy {
+    max-width: 24rem;
+    margin: 0;
+    font-size: 0.90rem;
+    line-height: 1.8;
+}
+
+.eduspace-footer__about p {
+    margin-top: 0.5rem;   /* ← diperbaiki: dari -0.8rem */
+}
+
+.eduspace-footer__main h2 {
+    margin: 0 0 1rem;
+    color: #344b29;
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+
+/* ============================================================
+   SECTION HEADING — "ALAMAT" & "KONTAK ADMIN"
+   ============================================================ */
+.eduspace-footer__section-heading {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+
+.eduspace-footer__section-heading .material-symbols-outlined {
+    flex: 0 0 auto;
+    color: #527c32;
+    font-size: 1.5rem;
+}
+
+.eduspace-footer__section-heading h2 {
+    margin: 0;
+    color: #344b29;
+    font-size: 0.9rem;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;   /* ← diperbaiki: cegah "KONTAK ADMIN" terpotong 2 baris */
+}
+
+/* ============================================================
+   ADDRESS & CONTACT — Layout
+   ============================================================ */
+.eduspace-footer__address,
+.eduspace-footer__contact {
+    padding-top: 2.25rem;
+}
+
+.eduspace-footer__address-copy {
+    margin: 0.7rem 0 0 2.2rem;
+}
+
+.eduspace-footer__contact {
+    display: grid;
+    align-content: start;
+    gap: 0.7rem;
+}
+
+.eduspace-footer__contact-method {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: fit-content;
+    margin-left: 2.2rem;
+    color: inherit;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+}
+
+.eduspace-footer__contact-method:hover { color: #3d6b1f; }
+
+.eduspace-footer__contact-method > .material-symbols-outlined {
+    flex: 0 0 auto;
+    color: #527c32;
+    font-size: 1.2rem;
+}
+
+.eduspace-footer__contact-method > svg {
+    width: 1.2rem;
+    height: 1.2rem;
+    flex: 0 0 auto;
+    fill: none;
+    stroke: #527c32;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.eduspace-footer__contact-method > svg path + path {
+    fill: #527c32;
+    stroke: none;
+}
+
+/* ============================================================
+   ACTIONS — Ikon sosial media
+   ============================================================ */
+.eduspace-footer__actions {
+    display: flex;
+    align-items: center;
+    width: fit-content;
+    flex: 0 0 auto;
+    gap: 0.65rem;
+    padding-top: 0;
+}
+
+.eduspace-footer__action {
+    display: grid;
+    width: 2.35rem;
+    height: 2.35rem;
+    place-items: center;
+    color: #3d6b1f;
+    border: 1px solid rgba(61, 107, 31, 0.22);
+    border-radius: 50%;
+    background: rgba(104, 148, 67, 0.11);
+    box-shadow: 0 4px 12px rgba(42, 77, 21, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    transition: color 160ms ease, background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+a.eduspace-footer__action { text-decoration: none; }
+
+a.eduspace-footer__action:hover {
+    color: #fff;
+    border-color: var(--primary);
+    background: var(--primary);
+    transform: translateY(-2px);
+}
+
+.eduspace-footer__action .material-symbols-outlined { font-size: 1.35rem; }
+
+.eduspace-footer__action svg {
+    width: 1.4rem;
+    height: 1.4rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1.7;
+}
+
+.eduspace-footer__action svg path + path {
+    fill: currentColor;
+    stroke: none;
+}
+
+.eduspace-footer__action--inactive { cursor: default; }
+
+/* ============================================================
+   BOTTOM — Copyright
+   ============================================================ */
+.eduspace-footer__bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-block: 0.75rem 0.5rem;
+    color: #627456;
+    border-top: 1px solid rgba(61, 107, 31, 0.14);
+    font-size: 0.75rem;
+}
+
+.eduspace-footer a:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 4px;
+    border-radius: 0.2rem;
+}
+
+.about-page .eduspace-footer {
+    margin-top: 0.75rem;
+    backdrop-filter: blur(14px);
+}
+
+/* ============================================================
+   DARK MODE
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+    .eduspace-footer {
+        color: #c4d0ba;
+        border-color: rgba(173, 210, 134, 0.18);
+        border-bottom: 0;
+        background:
+            radial-gradient(ellipse at 12% 0, rgba(139, 174, 102, 0.13), transparent 42%),
+            linear-gradient(135deg, #192318 0%, #202b1d 55%, #182116 100%);
+    }
+
+    .eduspace-footer__brand {
+        color: #f2f6ed;
+        text-shadow: 0 0 12px rgba(221, 240, 202, 0.38), 0 0 30px rgba(173, 210, 134, 0.24);
+    }
+
+    .eduspace-footer__brand:hover {
+        color: #fff;
+        text-shadow: 0 0 14px rgba(255, 255, 255, 0.5), 0 0 34px rgba(173, 210, 134, 0.32);
+    }
+
+    .eduspace-footer__brand .material-symbols-outlined {
+        color: #c9e8aa;
+        filter: drop-shadow(0 0 8px rgba(221, 240, 202, 0.38));
+    }
+
+    .eduspace-footer__main h2,
+    .eduspace-footer__section-heading h2 {
+        color: #e1ead8;
+    }
+
+    .eduspace-footer__section-heading .material-symbols-outlined,
+    .eduspace-footer__contact-method > .material-symbols-outlined {
+        color: #b4d88e;
+    }
+
+    .eduspace-footer__contact-method > svg {
+        stroke: #b4d88e;
+    }
+
+    .eduspace-footer__contact-method > svg path + path {
+        fill: #b4d88e;
+    }
+
+    .eduspace-footer__contact-method:hover {
+        color: #e1ead8;
+    }
+
+    .eduspace-footer__bottom {
+        color: #a7b59b;
+        border-top-color: rgba(173, 210, 134, 0.16);
+    }
+
+    .eduspace-footer a:focus-visible { outline-color: #c9e8aa; }
+}
+
+/* ============================================================
+   RESPONSIVE — Tablet
+   ============================================================ */
+@media (max-width: 760px) {
+    .eduspace-footer__main {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem 2rem;
+    }
+
+    .eduspace-footer__about { grid-column: 1 / -1; }
+    .eduspace-footer__main { padding-top: 1.6rem; }
+
+    .eduspace-footer__address,
+    .eduspace-footer__contact {
+        padding-top: 0;
+    }
+
+    .eduspace-footer__address-copy,
+    .eduspace-footer__contact-method {
+        margin-left: 2.2rem;
+    }
+}
+
+/* ============================================================
+   RESPONSIVE — Mobile
+   ============================================================ */
+@media (max-width: 520px) {
+    .eduspace-footer__main,
+    .eduspace-footer__bottom { width: min(100% - 1rem, 80rem); }
+
+    .eduspace-footer__main { grid-template-columns: minmax(0, 1fr); }
+    .eduspace-footer__about { grid-column: auto; }
+    .eduspace-footer__bottom { flex-direction: column; gap: 0.3rem; }
+    .eduspace-footer__main { gap: 1.3rem; }
+    .eduspace-footer { border-radius: 1.25rem 1.25rem 0 0; }
+    .eduspace-footer__about p { transform: none; }
+}

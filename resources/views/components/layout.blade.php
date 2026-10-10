@@ -37,6 +37,10 @@
         @yield('content')
     </div>
 
+    @auth
+        @include('components.footer')
+    @endauth
+
 </body>
 
 </html>
