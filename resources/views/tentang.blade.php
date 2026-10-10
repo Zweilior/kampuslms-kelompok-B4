@@ -275,9 +275,6 @@
         </section>
     </main>
 
-    <footer class="about-footer">
-        <span>© 2026 EduSpace</span>
-        <span>Institut Teknologi Kalimantan</span>
-    </footer>
+    @include('components.footer')
 </body>
 </html>
