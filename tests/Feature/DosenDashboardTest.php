@@ -13,7 +13,7 @@ use Tests\TestCase;
 
 class DosenDashboardTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     public function test_dashboard_shows_counts_limited_to_the_logged_in_lecturers_courses(): void
     {

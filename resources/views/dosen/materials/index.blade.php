@@ -49,7 +49,7 @@
                         @elseif ($material->original_name)
                             <p class="dosen-material-card__file">
                                 <span class="material-symbols-outlined" aria-hidden="true">attach_file</span>
-                                {{ $material->original_name }}
+                                <a href="{{ route('courses.materials.download', [$course, $material]) }}">{{ $material->original_name }}</a>
                                 @if ($material->file_size)
                                     <span>· {{ number_format($material->file_size / 1048576, 1) }} MB</span>
                                 @endif

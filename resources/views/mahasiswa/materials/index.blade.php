@@ -28,6 +28,12 @@
                             Buka materi
                             <span class="material-symbols-outlined">open_in_new</span>
                         </a>
+                    @elseif ($material->type === 'file' && $material->file_path)
+                        <a href="{{ route('courses.materials.download', [$course, $material]) }}"
+                            class="mahasiswa-page__button mahasiswa-page__button--primary">
+                            Unduh materi
+                            <span class="material-symbols-outlined">download</span>
+                        </a>
                     @endif
                 </article>
             @empty
