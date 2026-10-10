@@ -85,6 +85,8 @@ class MahasiswaController extends Controller
 
     public function showCourse(Course $course)
     {
+        Gate::authorize('view', $course);
+
         $course->load('lecturer');
 
         return view('mahasiswa.courses.show', compact('course'));
@@ -126,6 +128,8 @@ class MahasiswaController extends Controller
 
     public function assignments(Course $course)
     {
+        Gate::authorize('viewAny', [Assignment::class, $course]);
+
         $assignments = $course->assignments()
             ->where('status', 'published')
             ->with(['submissions' => fn ($query) => $query
@@ -142,6 +146,8 @@ class MahasiswaController extends Controller
 
     public function materials(Course $course)
     {
+        Gate::authorize('viewAny', [Material::class, $course]);
+        
         $materials = $course->materials()
             ->latest()
             ->get();
@@ -154,6 +160,8 @@ class MahasiswaController extends Controller
 
     public function submissions(Course $course, Assignment $assignment)
     {
+        Gate::authorize('viewAny', [Submission::class, $assignment]);
+
         $submissions = $assignment->submissions()
             ->where('user_id', auth()->id())
             ->with('grade')
@@ -172,6 +180,8 @@ class MahasiswaController extends Controller
 
     public function grades(Course $course)
     {
+        Gate::authorize('view', $course);
+
         $studentId = auth()->id();
         $gradeCategories = [
             'tugas' => ['label' => 'Tugas', 'weight' => 15],
@@ -263,6 +273,8 @@ class MahasiswaController extends Controller
 
     public function createSubmission(Course $course, Assignment $assignment)
     {
+        Gate::authorize('create', [Submission::class, $assignment]);
+
         return view('mahasiswa.submissions.create', compact(
             'course',
             'assignment'

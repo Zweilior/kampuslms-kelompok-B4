@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class DosenAssignmentsTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     public function test_assignment_list_shows_submission_totals_and_only_offers_grading_after_the_deadline(): void
     {
