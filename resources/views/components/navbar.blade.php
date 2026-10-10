@@ -13,13 +13,13 @@
         'admin'     => 'admin.dashboard',
         'dosen'     => 'dosen.dashboard',
         'mahasiswa' => 'mahasiswa.dashboard',
-        default     => 'dashboard',
+        default     => 'login',
     };
     $coursesRoute = match ($userRole) {
         'admin'     => 'admin.courses.index',
         'dosen'     => 'dosen.courses.index',
         'mahasiswa' => 'mahasiswa.courses.index',
-        default     => 'courses.index',
+        default     => 'login',
     };
 
     // Penanda menu aktif
@@ -37,7 +37,7 @@
         request()->routeIs('mahasiswa.grades.*') => 'grades',
         request()->routeIs('mahasiswa.courses.*') => 'courses',
 
-        request()->routeIs('dashboard', 'admin.dashboard', 'dosen.dashboard', 'mahasiswa.dashboard') => 'dashboard',
+        request()->routeIs('admin.dashboard', 'dosen.dashboard', 'mahasiswa.dashboard') => 'dashboard',
         default => $activeNav,
     };
 

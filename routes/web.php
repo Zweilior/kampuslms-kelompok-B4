@@ -16,10 +16,6 @@ Route::get('/', fn () => view('welcome'));
 
 Route::get('/tentang', fn () => view('tentang'))->name('tentang');
 
-Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware('auth')
-    ->name('dashboard');
-
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::get('forgot-password', [LoginController::class, 'showForgotPasswordForm'])->name('password.request');
@@ -27,6 +23,27 @@ Route::post('forgot-password', [LoginController::class, 'sendResetLinkEmail'])->
 Route::get('reset-password/{token}', [LoginController::class, 'showResetForm'])->name('password.reset');
 Route::post('reset-password', [LoginController::class, 'resetPassword'])->name('password.update');
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth')->name('logout');
+
+Route::get('/dashboard', function () {
+    $route = match (auth()->user()->role) {
+        'admin' => 'admin.dashboard',
+        'dosen' => 'dosen.dashboard',
+        'mahasiswa' => 'mahasiswa.dashboard',
+        default => 'login',
+    };
+
+    return redirect()->route($route);
+})->middleware('auth')->name('dashboard');
+
+Route::get('/courses', function () {
+    $route = match (auth()->user()->role) {
+        'admin' => 'admin.courses.index',
+        'dosen' => 'dosen.courses.index',
+        default => 'mahasiswa.courses.index',
+    };
+
+    return redirect()->route($route);
+})->middleware('auth')->name('courses.legacy');
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
@@ -106,20 +123,5 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->middleware(['auth', 'role:mahasi
     Route::get('/courses/{course}/materials', [MahasiswaController::class, 'materials'])->name('courses.materials.index');
     Route::get('/courses/{course}/assignments/{assignment}/submissions', [MahasiswaController::class, 'submissions'])->name('courses.assignments.submissions.index');
     Route::get('/courses/{course}/assignments/{assignment}/submissions/create', [MahasiswaController::class, 'createSubmission'])->name('courses.assignments.submissions.create');
-});
-
-/*
-|--------------------------------------------------------------------------
-| Route umum yang masih dipakai halaman simulasi/dashboard lama
-|--------------------------------------------------------------------------
-*/
-Route::middleware('auth')->group(function () {
-    Route::resource('courses', CourseController::class);
-    Route::resource('users', UserController::class);
-
-    Route::scopeBindings()->group(function () {
-        Route::resource('courses.materials', MaterialController::class);
-        Route::resource('courses.assignments', AssignmentController::class);
-        Route::resource('courses.assignments.submissions', SubmissionController::class);
-    });
+    Route::post('/courses/{course}/assignments/{assignment}/submissions', [SubmissionController::class, 'store'])->name('courses.assignments.submissions.store');
 });

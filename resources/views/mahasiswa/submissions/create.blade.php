@@ -45,7 +45,7 @@
                 </div>
             </div>
 
-            <form action="{{ route('courses.assignments.submissions.store', [$course->id, $assignment->id]) }}"
+            <form action="{{ route('mahasiswa.courses.assignments.submissions.store', [$course->id, $assignment->id]) }}"
                 method="POST" class="mahasiswa-page__form">
                 @csrf
                 <div class="mahasiswa-page__field">

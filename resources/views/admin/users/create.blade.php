@@ -2,7 +2,7 @@
     <div class="max-w-2xl mx-auto px-4">
         <div class="bg-white rounded-lg shadow p-6">
             <h2 class="text-xl font-bold mb-4">Tambah Pengguna</h2>
-            <form action="#" method="POST">
+            <form action="{{ route('admin.users.store') }}" method="POST">
                 @csrf
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Nama Lengkap</label>
@@ -11,6 +11,10 @@
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Email</label>
                     <input type="email" name="email" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700">NIM/NIP</label>
+                    <input type="text" name="nim_nip" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm" required>
                 </div>
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700">Role</label>
