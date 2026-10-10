@@ -38,9 +38,7 @@ class UserController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $userRoutePrefix = $request->routeIs('admin.users.*') ? 'admin.users' : 'users';
-
-        return view('courses.user', compact('users', 'userRoutePrefix'));
+        return view('admin.users.index', compact('users'));
     }
 
     /**
@@ -48,7 +46,7 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('users.create');
+        return view('admin.users.create');
     }
 
     /**
@@ -64,21 +62,18 @@ class UserController extends Controller
             'role' => ['required', 'in:admin,dosen,mahasiswa'],
         ]);
 
-        $user = User::create([
+        $user = new User([
             'name' => $validated['name'],
             'email' => $validated['email'],
             'password' => Hash::make($validated['password']),
             'nim_nip' => $validated['nim_nip'],
         ]);
 
-        // Role tetap diberikan secara eksplisit.
         $user->role = $validated['role'];
         $user->save();
 
-        $userRoutePrefix = $request->routeIs('admin.users.*') ? 'admin.users' : 'users';
-
         return redirect()
-            ->route($userRoutePrefix . '.index')
+            ->route('admin.users.index')
             ->with('success', 'User berhasil ditambahkan.');
     }
 
@@ -87,7 +82,7 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        return view('users.show', compact('user'));
+        return view('admin.users.show', compact('user'));
     }
 
     /**
@@ -95,7 +90,7 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('users.edit', compact('user'));
+        return view('admin.users.edit', compact('user'));
     }
 
     /**
@@ -137,23 +132,19 @@ class UserController extends Controller
 
         $user->save();
 
-        $userRoutePrefix = $request->routeIs('admin.users.*') ? 'admin.users' : 'users';
-
         return redirect()
-            ->route($userRoutePrefix . '.show', $user)
+            ->route('admin.users.show', $user)
             ->with('success', 'User berhasil diperbarui.');
     }
 
     /**
      * Menghapus user.
      */
-    public function destroy(Request $request, User $user)
+    public function destroy(User $user)
     {
         $user->delete();
-        $userRoutePrefix = $request->routeIs('admin.users.*') ? 'admin.users' : 'users';
-
         return redirect()
-            ->route($userRoutePrefix . '.index')
+            ->route('admin.users.index')
             ->with('success', 'User berhasil dihapus.');
     }
 }
