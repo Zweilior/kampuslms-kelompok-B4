@@ -45,6 +45,13 @@ Route::get('/courses', function () {
     return redirect()->route($route);
 })->middleware('auth')->name('courses.legacy');
 
+// Unduh file materi: boleh admin, dosen pemilik, atau mahasiswa terdaftar.
+// Hak akses diputuskan MaterialPolicy@download di MaterialController::download.
+Route::get('/courses/{course}/materials/{material}/download', [MaterialController::class, 'download'])
+    ->middleware('auth')
+    ->scopeBindings()
+    ->name('courses.materials.download');
+
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 

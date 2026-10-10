@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class MahasiswaGradesTest extends TestCase
 {
-    // use RefreshDatabase;
+    use RefreshDatabase;
 
     public function test_monitoring_page_shows_enrolled_courses_and_final_grade_for_selected_status(): void
     {
@@ -122,6 +122,8 @@ class MahasiswaGradesTest extends TestCase
             'sks' => 3,
         ]);
 
+        $course->students()->attach($student->id, ['enrolled_at' => now()]);
+
         $this->actingAs($student)
             ->get(route('mahasiswa.courses.show', $course->id))
             ->assertOk()
@@ -200,6 +202,9 @@ class MahasiswaGradesTest extends TestCase
             'created_by' => $lecturer->id,
             'title' => 'Tugas Analisis',
         ]);
+
+        $course->students()->attach($student->id, ['enrolled_at' => now()]);
+
         $component = GradeComponent::create([
             'course_id' => $course->id,
             'name' => 'Proyek',
@@ -315,6 +320,8 @@ class MahasiswaGradesTest extends TestCase
         $lecturer = User::factory()->dosen()->create();
         $course = Course::factory()->create(['lecturer_id' => $lecturer->id]);
 
+        $course->students()->attach($student->id, ['enrolled_at' => now()]);
+
         foreach ([91.30, 74.53] as $index => $score) {
             $assignment = Assignment::factory()->create([
                 'course_id' => $course->id,
@@ -355,6 +362,9 @@ class MahasiswaGradesTest extends TestCase
             'created_by' => $lecturer->id,
             'title' => 'Tugas Submitted',
         ]);
+        
+        $course->students()->attach($student->id, ['enrolled_at' => now()]);
+
         $assignedAssignment = Assignment::factory()->create([
             'course_id' => $course->id,
             'created_by' => $lecturer->id,

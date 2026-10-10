@@ -95,7 +95,7 @@ class MaterialController extends Controller
         $material->external_url = $material->type === 'link' ? $validated['external_url'] : null;
 
         if ($file) {
-            $material->file_path = $file->store('materials', 'public');
+            $material->file_path = $file->store('materials');
             $material->original_name = $file->getClientOriginalName();
             $material->file_size = $file->getSize();
             $material->mime_type = $file->getMimeType();
@@ -139,7 +139,7 @@ class MaterialController extends Controller
             $material->file_size = null;
             $material->mime_type = null;
         } elseif ($file) {
-            $material->file_path = $file->store('materials', 'public');
+            $material->file_path = $file->store('materials');
             $material->original_name = $file->getClientOriginalName();
             $material->file_size = $file->getSize();
             $material->mime_type = $file->getMimeType();
@@ -148,7 +148,7 @@ class MaterialController extends Controller
         $material->save();
 
         if ($oldFilePath && $oldFilePath !== $material->file_path) {
-            Storage::disk('public')->delete($oldFilePath);
+            Storage::delete($oldFilePath);
         }
 
         return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil diperbarui.');
@@ -165,7 +165,7 @@ class MaterialController extends Controller
         $material->delete();
 
         if ($filePath) {
-            Storage::disk('public')->delete($filePath);
+            Storage::delete($filePath);
         }
 
         return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil dihapus.');
@@ -218,12 +218,15 @@ class MaterialController extends Controller
             'file' => ['nullable', 'file', 'max:20480'],
         ]);
 
+        // Kolom materials.description NOT NULL, sedangkan aturan validasinya nullable.
+        $validated['description'] = $validated['description'] ?? '';
+
         $material = $course->materials()->make($validated);
         $material->uploaded_by = Auth::id() ?? User::where('role', 'dosen')->value('id');
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $material->file_path = $file->store('materials', 'public');
+            $material->file_path = $file->store('materials');
             $material->original_name = $file->getClientOriginalName();
             $material->file_size = $file->getSize();
             $material->mime_type = $file->getMimeType();
@@ -253,12 +256,15 @@ class MaterialController extends Controller
             'file' => ['nullable', 'file', 'max:20480'],
         ]);
 
+        // Kolom materials.description NOT NULL, sedangkan aturan validasinya nullable.
+        $validated['description'] = $validated['description'] ?? '';
+
         $oldFile = $material->file_path;
         $material->fill($validated);
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
-            $material->file_path = $file->store('materials', 'public');
+            $material->file_path = $file->store('materials');
             $material->original_name = $file->getClientOriginalName();
             $material->file_size = $file->getSize();
             $material->mime_type = $file->getMimeType();
@@ -267,7 +273,7 @@ class MaterialController extends Controller
         $material->save();
 
         if ($oldFile && $oldFile !== $material->file_path) {
-            Storage::disk('public')->delete($oldFile);
+            Storage::delete($oldFile);
         }
 
         return redirect()->route('dosen.courses.materials.index', $course)
@@ -282,11 +288,37 @@ class MaterialController extends Controller
         $material->delete();
 
         if ($file) {
-            Storage::disk('public')->delete($file);
+            Storage::delete($file);
         }
 
         return redirect()->route('dosen.courses.materials.index', $course)
             ->with('success', 'Materi berhasil dihapus.');
+    }
+
+    // --------------------------------------------------------------------------
+    // DOWNLOAD (semua peran; hak akses ditentukan MaterialPolicy@download)
+    // --------------------------------------------------------------------------
+
+    /**
+     * Unduh file materi. File disimpan di disk privat, jadi satu-satunya jalan
+     * untuk mengambilnya adalah lewat method ini. Gate dipanggil lebih dulu
+     * (403 untuk yang tidak berhak) sebelum mengecek keberadaan file (404).
+     */
+    public function download(Course $course, Material $material)
+    {
+        Gate::authorize('download', $material);
+
+        abort_unless(
+            $material->type === 'file'
+                && $material->file_path
+                && Storage::exists($material->file_path),
+            404
+        );
+
+        return Storage::download(
+            $material->file_path,
+            $material->original_name ?: basename($material->file_path)
+        );
     }
 
     // --------------------------------------------------------------------------

@@ -75,6 +75,11 @@
                                 <td class="px-space-md py-space-sm font-body-sm text-body-sm text-on-surface-variant">{{ $material->created_at?->format('d M Y') ?? '—' }}</td>
                                 <td class="px-space-md py-space-sm">
                                     <div class="flex items-center justify-end gap-space-xs">
+                                        @if ($material->type === 'file' && $material->file_path && $material->course)
+                                            <a href="{{ route('courses.materials.download', [$material->course, $material]) }}" class="inline-flex items-center gap-1 rounded-lg bg-surface-container-high px-3 py-2 font-label-sm text-on-surface hover:text-primary transition-colors">
+                                                <span class="material-symbols-outlined text-sm">download</span>Unduh
+                                            </a>
+                                        @endif
                                         <a href="{{ route('admin.materials.edit', $material) }}" class="inline-flex items-center gap-1 rounded-lg bg-surface-container-high px-3 py-2 font-label-sm text-on-surface hover:text-primary transition-colors">
                                             <span class="material-symbols-outlined text-sm">edit</span>Edit
                                         </a>
