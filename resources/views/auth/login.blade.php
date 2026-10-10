@@ -158,15 +158,10 @@
 
                     {{-- Password --}}
                     <div x-data="{ show: false }">
-                        <div class="flex items-center justify-between mb-2">
+                        <div class="mb-2">
                             <label for="password" class="block text-sm font-semibold text-on-surface">
                                 Kata Sandi
                             </label>
-                            @if (Route::has('password.request'))
-                                <a href="{{ route('password.request') }}" class="text-xs font-medium text-primary hover:underline">
-                                    Lupa kata sandi?
-                                </a>
-                            @endif
                         </div>
                         <div class="relative">
                             <span class="auth-field-icon material-symbols-outlined text-outline text-xl">
@@ -202,15 +197,14 @@
                         @enderror
                     </div>
 
-                    {{-- Remember --}}
-                    <label class="flex items-center gap-2.5 cursor-pointer select-none">
-                        <input
-                            type="checkbox"
-                            name="remember"
-                            {{ old('remember') ? 'checked' : '' }}
-                            class="w-4 h-4 rounded border-outline-variant text-primary accent-primary focus:ring-primary/30" />
-                        <span class="text-sm text-on-surface-variant">Ingat saya di perangkat ini</span>
-                    </label>
+                    {{-- Lupa Kata Sandi --}}
+                    @if (Route::has('password.request'))
+                        <div class="flex alight left">
+                            <a href="{{ route('password.request') }}" class="text-xs font-medium text-primary hover:underline">
+                                Lupa kata sandi?
+                            </a>
+                        </div>
+                    @endif
 
                     {{-- Submit --}}
                     <button
