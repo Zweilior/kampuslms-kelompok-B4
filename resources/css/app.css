@@ -13,6 +13,7 @@
 @import "./dosen/materials.css";
 @import "./dosen/assignments.css";
 @import "./dosen/grades.css";
+@import "./dosen/courses.css";
 @import "./dosen/dashboard.css";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';

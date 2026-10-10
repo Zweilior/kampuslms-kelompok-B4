@@ -9,6 +9,7 @@ use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate; 
+use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
 {
@@ -172,6 +173,39 @@ class CourseController extends Controller
         Gate::authorize('view', $course);
 
         return view('dosen.courses.show', compact('course'));
+    }
+
+    public function dosenEdit(Course $course)
+    {
+        Gate::authorize('update', $course);
+
+        return view('dosen.courses.edit', compact('course'));
+    }
+
+    public function dosenUpdate(Request $request, Course $course)
+    {
+        Gate::authorize('update', $course);
+
+        $validated = $request->validate([
+            'code' => [
+                'required',
+                'string',
+                'max:20',
+                Rule::unique('courses', 'code')->ignore($course),
+            ],
+            'name' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'sks' => ['required', 'integer', 'between:1,6'],
+        ]);
+
+        $course->update([
+            ...$validated,
+            'description' => $validated['description'] ?? '',
+        ]);
+
+        return redirect()
+            ->route('dosen.courses.show', $course)
+            ->with('success', 'Mata kuliah berhasil diperbarui.');
     }
 
     /**

@@ -8,6 +8,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate; 
+use Illuminate\Validation\Rule;
 
 class AssignmentController extends Controller
 {
@@ -165,7 +166,12 @@ class AssignmentController extends Controller
     public function dosenCreate(Course $course)
     {
         Gate::authorize('create', [Assignment::class, $course]); // BARU
-        return view('dosen.assignments.create', compact('course'));
+
+        $gradeComponents = $course->gradeComponents()
+            ->orderBy('name')
+            ->get();
+
+        return view('dosen.assignments.create', compact('course', 'gradeComponents'));
     }
 
     public function dosenStore(Request $request, Course $course)
@@ -174,6 +180,10 @@ class AssignmentController extends Controller
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'grade_component_id' => [
+                'nullable',
+                Rule::exists('grade_components', 'id')->where('course_id', $course->id),
+            ],
             'due_at' => ['required', 'date'],
             'instructions' => ['nullable', 'string'],
             'max_score' => ['required', 'integer', 'min:0', 'max:255'],
@@ -193,7 +203,12 @@ class AssignmentController extends Controller
     public function dosenEdit(Course $course, Assignment $assignment)
     {
         Gate::authorize('update', $assignment); // BARU
-        return view('dosen.assignments.edit', compact('course', 'assignment'));
+
+        $gradeComponents = $course->gradeComponents()
+            ->orderBy('name')
+            ->get();
+
+        return view('dosen.assignments.edit', compact('course', 'assignment', 'gradeComponents'));
     }
 
     public function dosenUpdate(Request $request, Course $course, Assignment $assignment)
@@ -202,6 +217,10 @@ class AssignmentController extends Controller
 
         $validated = $request->validate([
             'title' => ['required', 'string', 'max:255'],
+            'grade_component_id' => [
+                'nullable',
+                Rule::exists('grade_components', 'id')->where('course_id', $course->id),
+            ],
             'due_at' => ['required', 'date'],
             'instructions' => ['nullable', 'string'],
             'max_score' => ['required', 'integer', 'min:0', 'max:255'],

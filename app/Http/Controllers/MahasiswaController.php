@@ -183,13 +183,9 @@ class MahasiswaController extends Controller
         Gate::authorize('view', $course);
 
         $studentId = auth()->id();
-        $gradeCategories = [
-            'tugas' => ['label' => 'Tugas', 'weight' => 15],
-            'kehadiran' => ['label' => 'Kehadiran', 'weight' => 5],
-            'kuis' => ['label' => 'Kuis', 'weight' => 10],
-            'uts' => ['label' => 'UTS', 'weight' => 25],
-            'uas' => ['label' => 'UAS', 'weight' => 45],
-        ];
+        $gradeComponents = $course->gradeComponents()
+            ->orderBy('name')
+            ->get();
         $assignments = $course->assignments()
             ->where('status', 'published')
             ->with([
@@ -201,21 +197,26 @@ class MahasiswaController extends Controller
             ])
             ->orderBy('due_at')
             ->get();
-        $assignments->each(function (Assignment $assignment) use ($gradeCategories) {
-            $category = $this->gradeCategoryForAssignment($assignment);
-            $assignment->setAttribute('grade_category', $category);
-            $assignment->setAttribute('grade_category_label', $gradeCategories[$category]['label']);
-            $assignment->setAttribute('grade_category_weight', $gradeCategories[$category]['weight']);
+        $assignments->each(function (Assignment $assignment) {
+            $assignment->setAttribute(
+                'grade_category_label',
+                $assignment->gradeComponent?->name ?? 'Belum masuk rubrik'
+            );
+            $assignment->setAttribute(
+                'grade_category_weight',
+                $assignment->gradeComponent?->weight
+            );
         });
         $gradedAssignments = $assignments->filter(
-            fn (Assignment $assignment) => $assignment->submissions->first()?->grade
+            fn (Assignment $assignment) => $assignment->grade_component_id !== null
+                && $assignment->submissions->first()?->grade
         );
-        $gradedCategoryGroups = $gradedAssignments->groupBy('grade_category');
-        $gradedWeight = $gradedCategoryGroups->sum(
-            fn ($group) => (float) $group->first()->grade_category_weight
+        $gradedComponentGroups = $gradedAssignments->groupBy('grade_component_id');
+        $gradedWeight = $gradedComponentGroups->sum(
+            fn ($group) => (float) $group->first()->gradeComponent->weight
         );
-        $totalWeightedScore = $gradedCategoryGroups->sum(function ($group) {
-            $weight = (float) $group->first()->grade_category_weight;
+        $totalWeightedScore = $gradedComponentGroups->sum(function ($group) {
+            $weight = (float) $group->first()->gradeComponent->weight;
             $componentAverage = $group->avg(function (Assignment $assignment) {
                 $submission = $assignment->submissions->first();
 
@@ -240,35 +241,16 @@ class MahasiswaController extends Controller
             $finalScore >= 36 => 'D',
             default => 'E',
         };
+        $totalRubricWeight = (float) $gradeComponents->sum('weight');
 
         return view('mahasiswa.grades.show', compact(
             'course',
             'assignments',
-            'gradeCategories',
+            'gradeComponents',
+            'totalRubricWeight',
             'finalScore',
             'finalLetterGrade'
         ));
-    }
-
-    private function gradeCategoryForAssignment(Assignment $assignment): string
-    {
-        $name = mb_strtolower(implode(' ', array_filter([
-            $assignment->title,
-            $assignment->gradeComponent?->name,
-        ])));
-
-        return match (true) {
-            str_contains($name, 'kehadiran'),
-            str_contains($name, 'presensi'),
-            str_contains($name, 'attendance') => 'kehadiran',
-            str_contains($name, 'kuis'),
-            str_contains($name, 'quiz') => 'kuis',
-            str_contains($name, 'uts'),
-            str_contains($name, 'ujian tengah') => 'uts',
-            str_contains($name, 'uas'),
-            str_contains($name, 'ujian akhir') => 'uas',
-            default => 'tugas',
-        };
     }
 
     public function createSubmission(Course $course, Assignment $assignment)

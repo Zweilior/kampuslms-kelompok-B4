@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Assignment;
 use App\Models\Course;
+use App\Models\GradeComponent;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -91,9 +92,15 @@ class DosenAssignmentsTest extends TestCase
     {
         $lecturer = User::factory()->dosen()->create();
         $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $component = GradeComponent::create([
+            'course_id' => $course->id,
+            'name' => 'Ujian Tengah Semester',
+            'weight' => 30,
+        ]);
         $assignment = Assignment::factory()->for($course)->create([
             'title' => 'Proyek Antarmuka',
             'allow_late' => false,
+            'grade_component_id' => $component->id,
         ]);
 
         $this->actingAs($lecturer)
@@ -103,6 +110,8 @@ class DosenAssignmentsTest extends TestCase
             ->assertSee('datetime-local', false)
             ->assertSee('Pengumpulan Terlambat')
             ->assertSee('Tidak diizinkan')
+            ->assertSee('Ujian Tengah Semester (30.00%)')
+            ->assertSee('value="' . $component->id . '" selected', false)
             ->assertSee('dosen-assignment-form__card', false);
     }
 
@@ -110,6 +119,11 @@ class DosenAssignmentsTest extends TestCase
     {
         $lecturer = User::factory()->dosen()->create();
         $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $component = GradeComponent::create([
+            'course_id' => $course->id,
+            'name' => 'Proyek',
+            'weight' => 70,
+        ]);
 
         $this->actingAs($lecturer)
             ->withSession([
@@ -119,6 +133,7 @@ class DosenAssignmentsTest extends TestCase
                     'max_score' => 80,
                     'allow_late' => '0',
                     'instructions' => 'Kumpulkan laporan praktikum.',
+                    'grade_component_id' => (string) $component->id,
                 ],
             ])
             ->get(route('dosen.courses.assignments.create', $course))
@@ -128,6 +143,72 @@ class DosenAssignmentsTest extends TestCase
             ->assertSee('datetime-local', false)
             ->assertSee('Pengumpulan Terlambat')
             ->assertSee('Kumpulkan laporan praktikum.')
+            ->assertSee('Proyek (70.00%)')
+            ->assertSee('value="' . $component->id . '" selected', false)
             ->assertSee('dosen-assignment-form__card', false);
+    }
+
+    public function test_assignment_create_and_edit_save_course_rubric_selection(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $otherCourse = Course::factory()->for($lecturer, 'lecturer')->create();
+        $component = GradeComponent::create([
+            'course_id' => $course->id,
+            'name' => 'Tugas Praktik',
+            'weight' => 40,
+        ]);
+        $otherComponent = GradeComponent::create([
+            'course_id' => $otherCourse->id,
+            'name' => 'Rubrik kelas lain',
+            'weight' => 50,
+        ]);
+
+        $this->actingAs($lecturer)
+            ->post(route('dosen.courses.assignments.store', $course), [
+                'title' => 'Implementasi Form',
+                'grade_component_id' => $component->id,
+                'due_at' => now()->addDays(7)->format('Y-m-d H:i:s'),
+                'instructions' => 'Selesaikan implementasi.',
+                'max_score' => 100,
+                'allow_late' => true,
+                'status' => 'published',
+            ])
+            ->assertRedirect(route('dosen.courses.assignments.index', $course));
+
+        $assignment = Assignment::where('course_id', $course->id)
+            ->where('title', 'Implementasi Form')
+            ->firstOrFail();
+        $this->assertSame($component->id, $assignment->grade_component_id);
+
+        $this->put(route('dosen.courses.assignments.update', [$course, $assignment]), [
+            'title' => 'Implementasi Form Revisi',
+            'grade_component_id' => null,
+            'due_at' => now()->addDays(8)->format('Y-m-d H:i:s'),
+            'instructions' => 'Selesaikan implementasi.',
+            'max_score' => 100,
+            'allow_late' => true,
+            'status' => 'published',
+        ])->assertRedirect(route('dosen.courses.assignments.index', $course));
+
+        $this->assertDatabaseHas('assignments', [
+            'id' => $assignment->id,
+            'title' => 'Implementasi Form Revisi',
+            'grade_component_id' => null,
+        ]);
+
+        $this->from(route('dosen.courses.assignments.create', $course))
+            ->post(route('dosen.courses.assignments.store', $course), [
+                'title' => 'Invalid rubric',
+                'grade_component_id' => $otherComponent->id,
+                'due_at' => now()->addDays(7)->format('Y-m-d H:i:s'),
+                'instructions' => 'Test scope.',
+                'max_score' => 100,
+                'allow_late' => true,
+                'status' => 'published',
+            ])
+            ->assertSessionHasErrors('grade_component_id');
+
+        $this->assertDatabaseMissing('assignments', ['title' => 'Invalid rubric']);
     }
 }

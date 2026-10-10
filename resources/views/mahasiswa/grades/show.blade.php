@@ -15,12 +15,17 @@
         </header>
 
         <div class="mahasiswa-page__grade-weights" aria-label="Komposisi bobot penilaian">
-            @foreach ($gradeCategories as $category)
+            @forelse ($gradeComponents as $component)
                 <span class="mahasiswa-page__grade-weight">
-                    <span>{{ $category['label'] }}</span>
-                    <strong>{{ $category['weight'] }}%</strong>
+                    <span>{{ $component->name }}</span>
+                    <strong>{{ number_format((float) $component->weight, 2) }}%</strong>
                 </span>
-            @endforeach
+            @empty
+                <span class="mahasiswa-page__grade-weight">
+                    <span>Rubrik belum tersedia</span>
+                    <strong>—</strong>
+                </span>
+            @endforelse
         </div>
 
         <section class="mahasiswa-page__card mahasiswa-page__table-wrap">
@@ -53,7 +58,9 @@
                             </td>
                             <td>
                                 <span class="mahasiswa-page__grade-weight-value">
-                                    {{ $assignment->grade_category_weight }}%
+                                    {{ $assignment->grade_category_weight !== null
+                                        ? number_format((float) $assignment->grade_category_weight, 2) . '%'
+                                        : '—' }}
                                 </span>
                             </td>
                             <td>
@@ -73,8 +80,8 @@
                         </tr>
                     @endforelse
                     <tr class="mahasiswa-page__grade-summary">
-                        <th>Total</th>
-                        <td>100%</td>
+                        <th>Total bobot rubrik</th>
+                        <td>{{ number_format($totalRubricWeight, 2) }}%</td>
                         <td>
                             @if ($finalScore !== null)
                                 {{ number_format($finalScore, 2) }}
