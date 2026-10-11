@@ -66,7 +66,7 @@
                                         @if ($assignment->due_at->lte(now()))
                                             <a href="{{ route('dosen.courses.assignments.submissions.index', [$course, $assignment]) }}" class="dosen-assignment__btn dosen-assignment__btn--grade">
                                                 <span class="material-symbols-outlined" aria-hidden="true">grading</span>
-                                                Edit Nilai
+                                                Detail Nilai
                                             </a>
                                             <a href="{{ route('dosen.courses.assignments.submissions.export', [$course, $assignment]) }}" class="dosen-assignment__btn dosen-assignment__btn--grade">
                                                 <span class="material-symbols-outlined" aria-hidden="true">download</span>

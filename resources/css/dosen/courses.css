@@ -1,7 +1,7 @@
 .dosen-course-hero {
     position: relative;
     display: flex;
-    min-height: 12rem;
+    min-height: 0;
     align-items: flex-start;
     gap: 1rem;
     overflow: hidden;
@@ -57,6 +57,7 @@
 }
 
 .dosen-course-hero__content {
+    flex: 1 1 auto;
     min-width: 0;
 }
 
@@ -109,6 +110,119 @@
 .dosen-course-hero__action:hover {
     transform: translateY(-1px);
     background: #fff;
+}
+
+.dosen-course-detail__header {
+    margin-bottom: 1.25rem;
+}
+
+.dosen-course-detail__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 150ms ease;
+}
+
+.dosen-course-detail__back:hover {
+    color: var(--primary);
+}
+
+.dosen-course-management-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.dosen-course-management-card {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem;
+    border: 1px solid var(--border-hairline);
+    border-radius: 1rem;
+    background: var(--bg-elevated);
+    box-shadow: var(--shadow-sm);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: border-color 160ms ease, background-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.dosen-course-management-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--border-hover);
+    background: var(--bg-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.dosen-course-management-card:focus-visible {
+    outline: 3px solid var(--primary);
+    outline-offset: 3px;
+}
+
+.dosen-course-management-card__icon {
+    display: grid;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 1rem;
+    place-items: center;
+    border-radius: 0.8rem;
+}
+
+.dosen-course-management-card__icon .material-symbols-outlined {
+    font-size: 1.4rem;
+}
+
+.dosen-course-management-card__icon--materials {
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+    color: var(--primary);
+}
+
+.dosen-course-management-card__icon--assignments {
+    background: rgba(139, 174, 102, 0.2);
+    color: var(--primary-dark);
+}
+
+.dosen-course-management-card h2 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.dosen-course-management-card:hover h2 {
+    color: var(--primary);
+}
+
+.dosen-course-management-card p {
+    margin: 0.4rem 0 1rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    line-height: 1.6;
+}
+
+.dosen-course-management-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: auto;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.dosen-course-management-card__link .material-symbols-outlined {
+    font-size: 1rem;
+    transition: transform 160ms ease;
+}
+
+.dosen-course-management-card:hover .dosen-course-management-card__link .material-symbols-outlined {
+    transform: translateX(3px);
 }
 
 .dosen-course-edit {
@@ -832,6 +946,15 @@
 }
 
 @media (max-width: 720px) {
+    .dosen-course-management-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .dosen-course-management-card {
+        padding: 1.25rem;
+    }
+
     .dosen-course-hero {
         gap: 0.75rem;
         padding: 1rem;
