@@ -1,80 +1,315 @@
-<x-layout title="Kelola Mata Kuliah - Admin">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="bg-white rounded-lg shadow p-6 mb-6 flex justify-between">
+<x-layout :title="'Kelola Mata Kuliah - ' . $course->name">
+    <main id="admin-course-detail" class="admin-course-detail">
+        <header class="admin-course-detail__hero">
             <div>
-                <h1 class="text-2xl font-bold">Pemrograman Web (IF-2023)</h1>
-                <p class="text-gray-600">Dosen: Budi Santoso</p>
+                <span class="admin-course-detail__eyebrow">Kelola Mata Kuliah</span>
+                <h1 class="admin-course-detail__title">{{ $course->name }} <span>({{ $course->code }})</span></h1>
+                <p class="admin-course-detail__subtitle">Dosen: {{ $course->lecturer?->name ?? 'Belum ditentukan' }}</p>
             </div>
-            <a href="{{ route('admin.courses.index') }}" class="text-blue-600 hover:underline">← Kembali</a>
-        </div>
+            <a href="{{ route('admin.courses.index') }}" class="admin-course-detail__back">
+                <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+                Kembali
+            </a>
+        </header>
 
         {{-- Section Enrollment --}}
-        <div class="bg-white rounded-lg shadow p-4 mb-6">
-            <div class="flex justify-between items-center mb-3">
-                <h3 class="font-bold">Enrollment Mahasiswa</h3>
-                <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm">+ Enroll Mahasiswa</button>
+        <section class="admin-course-detail__panel" aria-labelledby="course-students-title">
+            <div class="admin-course-detail__panel-heading">
+                <div>
+                    <h2 id="course-students-title">
+                        <span class="material-symbols-outlined" aria-hidden="true">groups</span>
+                        Enrollment Mahasiswa
+                    </h2>
+                    <p>Daftar peserta mata kuliah ini, diurutkan berdasarkan nama.</p>
+                </div>
+                <span class="admin-course-detail__count">{{ $students->count() }} mahasiswa</span>
             </div>
-            <ul class="text-sm text-gray-700">
-                <li>Andi Saputra - 12345678</li>
-                <li>Budi Pratama - 12345679</li>
-            </ul>
-        </div>
+
+            @if (session('success'))
+                <div class="admin-course-detail__notice admin-course-detail__notice--success" role="status">
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div class="admin-course-detail__notice admin-course-detail__notice--error" role="alert">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+
+            @if ($availableStudents->isNotEmpty())
+                <form action="{{ route('admin.courses.enrollments.store', $course) }}" method="POST" class="admin-course-detail__enroll-form">
+                    @csrf
+                    <div>
+                        <label for="student_id">Tambah mahasiswa</label>
+                        <select id="student_id" name="student_id" required>
+                            <option value="">Pilih mahasiswa yang belum terdaftar</option>
+                            @foreach ($availableStudents as $student)
+                                <option value="{{ $student->id }}" @selected((string) old('student_id') === (string) $student->id)>
+                                    {{ $student->name }} · {{ $student->nim_nip }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="admin-course-detail__button admin-course-detail__button--primary">
+                        <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
+                        Enroll Mahasiswa
+                    </button>
+                </form>
+            @else
+                <p class="admin-course-detail__empty-note">Semua mahasiswa sudah terdaftar atau belum ada akun mahasiswa.</p>
+            @endif
+
+            @if ($students->isNotEmpty())
+                <div class="admin-course-detail__table-wrap">
+                    <table class="admin-course-detail__table">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Nama</th>
+                                <th scope="col">NIM</th>
+                                <th scope="col">Email</th>
+                                <th scope="col"><span class="sr-only">Aksi</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($students as $student)
+                                <tr>
+                                    <td class="admin-course-detail__number">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="admin-course-detail__student-name">{{ $student->name }}</td>
+                                    <td>{{ $student->nim_nip ?? '—' }}</td>
+                                    <td class="admin-course-detail__email">{{ $student->email }}</td>
+                                    <td class="admin-course-detail__actions">
+                                        <button type="button"
+                                                class="admin-course-detail__button admin-course-detail__button--remove"
+                                                data-remove-url="{{ route('admin.courses.enrollments.destroy', [$course, $student]) }}"
+                                                data-student-name="{{ $student->name }}">
+                                            <span class="material-symbols-outlined" aria-hidden="true">person_remove</span>
+                                            Keluarkan
+                                        </button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="admin-course-detail__empty">Belum ada mahasiswa terdaftar di mata kuliah ini.</p>
+            @endif
+        </section>
 
         {{-- Section Materi --}}
-        <div class="bg-white rounded-lg shadow mb-6">
-            <div class="p-4 border-b flex justify-between bg-gray-50">
-                <h3 class="font-bold">Materi</h3>
-                <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm">+ Tambah Materi</button>
+        <section class="admin-course-detail__panel" aria-labelledby="course-materials-title">
+            <div class="admin-course-detail__panel-heading">
+                <div>
+                    <h2 id="course-materials-title">
+                        <span class="material-symbols-outlined" aria-hidden="true">library_books</span>
+                        Materi
+                    </h2>
+                    <p>{{ $course->materials->count() }} materi · diurutkan berdasarkan judul</p>
+                </div>
+                <a href="{{ route('admin.materials.create', ['course_id' => $course->id]) }}" class="admin-course-detail__button admin-course-detail__button--primary">
+                    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                    Tambah Materi
+                </a>
             </div>
-            <ul class="divide-y">
-                <li class="p-4 flex justify-between">
-                    <span>Pertemuan 1 - Pengenalan HTML</span>
-                    <div>
-                        <button class="text-yellow-600 mr-2 text-sm">Edit</button>
-                        <button class="text-red-600 text-sm">Hapus</button>
-                    </div>
-                </li>
-            </ul>
-        </div>
+            @if ($course->materials->isNotEmpty())
+                <div class="admin-course-detail__table-wrap">
+                    <table class="admin-course-detail__table">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Judul Materi</th>
+                                <th scope="col">Jenis</th>
+                                <th scope="col">Tanggal Ditambahkan</th>
+                                <th scope="col">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($course->materials as $material)
+                                <tr>
+                                    <td class="admin-course-detail__number">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="admin-course-detail__student-name">{{ $material->title }}</td>
+                                    <td><span class="admin-course-detail__badge">{{ $material->type === 'link' ? 'Link' : 'File' }}</span></td>
+                                    <td>{{ $material->created_at?->format('d M Y') ?? '—' }}</td>
+                                    <td class="admin-course-detail__actions">
+                                        <a href="{{ route('admin.materials.edit', $material) }}" class="admin-course-detail__button admin-course-detail__button--edit">
+                                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                                            Edit
+                                        </a>
+                                        <form action="{{ route('admin.materials.destroy', $material) }}" method="POST" onsubmit="return confirm('Hapus materi ini?')">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="submit" class="admin-course-detail__button admin-course-detail__button--remove">
+                                                <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                                                Hapus
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="admin-course-detail__empty">Belum ada materi untuk mata kuliah ini.</p>
+            @endif
+        </section>
 
         {{-- Section Tugas --}}
-        <div class="bg-white rounded-lg shadow mb-6">
-            <div class="p-4 border-b flex justify-between bg-gray-50">
-                <h3 class="font-bold">Tugas</h3>
-                <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm">+ Buat Tugas</button>
+        <section class="admin-course-detail__panel" aria-labelledby="course-assignments-title">
+            <div class="admin-course-detail__panel-heading">
+                <div>
+                    <h2 id="course-assignments-title">
+                        <span class="material-symbols-outlined" aria-hidden="true">assignment</span>
+                        Tugas
+                    </h2>
+                    <p>{{ $course->assignments->count() }} tugas · diurutkan berdasarkan judul</p>
+                </div>
+                <a href="{{ route('admin.assignments.create', ['course_id' => $course->id]) }}" class="admin-course-detail__button admin-course-detail__button--primary">
+                    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                    Buat Tugas
+                </a>
             </div>
-            <ul class="divide-y">
-                <li class="p-4 flex justify-between">
-                    <span>Tugas 1: Portofolio</span>
-                    <div>
-                        <button class="text-yellow-600 mr-2 text-sm">Edit</button>
-                        <button class="text-red-600 text-sm">Hapus</button>
-                    </div>
-                </li>
-            </ul>
-        </div>
+            @if ($course->assignments->isNotEmpty())
+                <div class="admin-course-detail__table-wrap">
+                    <table class="admin-course-detail__table">
+                        <thead>
+                            <tr>
+                                <th scope="col">No.</th>
+                                <th scope="col">Judul Tugas</th>
+                                <th scope="col">Deadline</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($course->assignments as $assignment)
+                                <tr>
+                                    <td class="admin-course-detail__number">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
+                                    <td class="admin-course-detail__student-name">{{ $assignment->title }}</td>
+                                    <td>{{ $assignment->due_at?->format('d M Y, H:i') ?? '—' }}</td>
+                                    <td><span class="admin-course-detail__badge">{{ ucfirst($assignment->status) }}</span></td>
+                                    <td class="admin-course-detail__actions">
+                                        <a href="{{ route('admin.assignments.edit', $assignment) }}" class="admin-course-detail__button admin-course-detail__button--edit">
+                                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                                            Edit
+                                        </a>
+                                        @if ($assignment->submissions_count === 0)
+                                            <form action="{{ route('admin.assignments.destroy', $assignment) }}" method="POST" onsubmit="return confirm('Hapus tugas ini?')">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="admin-course-detail__button admin-course-detail__button--remove">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @else
+                                            <span class="admin-course-detail__locked" title="Tugas memiliki submission">Tidak dapat dihapus</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @else
+                <p class="admin-course-detail__empty">Belum ada tugas untuk mata kuliah ini.</p>
+            @endif
+        </section>
 
         {{-- Section Nilai --}}
-        <div class="bg-white rounded-lg shadow">
-            <div class="p-4 border-b bg-gray-50">
-                <h3 class="font-bold">Rekap Nilai</h3>
+        <section class="admin-course-detail__panel" aria-labelledby="course-grades-title">
+            <div class="admin-course-detail__panel-heading">
+                <div>
+                    <h2 id="course-grades-title">
+                        <span class="material-symbols-outlined" aria-hidden="true">grade</span>
+                        Rekap Nilai
+                    </h2>
+                    <p>Nilai akhir mahasiswa yang telah tersedia.</p>
+                </div>
             </div>
-            <table class="min-w-full divide-y">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs">Nama</th>
-                        <th class="px-6 py-3 text-left text-xs">NIM</th>
-                        <th class="px-6 py-3 text-left text-xs">Nilai</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y">
-                    <tr>
-                        <td class="px-6 py-4">Andi Saputra</td>
-                        <td class="px-6 py-4">12345678</td>
-                        <td class="px-6 py-4 font-bold text-blue-600">A</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+            <div class="admin-course-detail__table-wrap">
+                <table class="admin-course-detail__table">
+                    <thead>
+                        <tr>
+                            <th scope="col">No.</th>
+                            <th scope="col">Nama</th>
+                            <th scope="col">NIM</th>
+                            <th scope="col">Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($students as $student)
+                            @php($finalGrade = $finalGrades->get($student->id))
+                            <tr>
+                                <td class="admin-course-detail__number">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
+                                <td class="admin-course-detail__student-name">{{ $student->name }}</td>
+                                <td>{{ $student->nim_nip ?? '—' }}</td>
+                                <td class="admin-course-detail__grade">{{ $finalGrade?->letter_grade ?? '—' }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="admin-course-detail__empty">Belum ada mahasiswa terdaftar.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div id="remove-student-dialog" class="logout-dialog-backdrop admin-course-detail__dialog" hidden role="presentation">
+        <section class="logout-dialog logout-dialog--confirmation" role="dialog" aria-modal="true" aria-labelledby="remove-course-student-title">
+            <h2 class="logout-dialog__title" id="remove-course-student-title">Keluarkan mahasiswa?</h2>
+            <p class="logout-dialog__message">
+                <strong id="remove-student-name"></strong> tidak lagi dapat mengakses mata kuliah ini. Apakah Anda yakin ingin mengeluarkannya?
+            </p>
+            <div class="logout-dialog__actions">
+                <button type="button" id="cancel-remove-student" class="logout-dialog__button">Batal</button>
+                <form id="remove-student-form" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="logout-dialog__button logout-dialog__button--confirm">Ya, keluarkan</button>
+                </form>
+            </div>
+        </section>
     </div>
+
+    <script>
+        (() => {
+            const dialog = document.getElementById('remove-student-dialog');
+            const studentName = document.getElementById('remove-student-name');
+            const removeForm = document.getElementById('remove-student-form');
+            const cancelButton = document.getElementById('cancel-remove-student');
+            let triggerButton = null;
+
+            if (!dialog || !studentName || !removeForm || !cancelButton) {
+                return;
+            }
+
+            const closeDialog = () => {
+                dialog.hidden = true;
+                triggerButton?.focus();
+            };
+
+            document.querySelectorAll('[data-remove-url]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    triggerButton = button;
+                    studentName.textContent = button.dataset.studentName ?? '';
+                    removeForm.action = button.dataset.removeUrl ?? '';
+                    dialog.hidden = false;
+                    cancelButton.focus();
+                });
+            });
+
+            cancelButton.addEventListener('click', closeDialog);
+            dialog.addEventListener('click', (event) => {
+                if (event.target === dialog) closeDialog();
+            });
+            document.addEventListener('keydown', (event) => {
+                if (event.key === 'Escape' && !dialog.hidden) closeDialog();
+            });
+        })();
+    </script>
 </x-layout>

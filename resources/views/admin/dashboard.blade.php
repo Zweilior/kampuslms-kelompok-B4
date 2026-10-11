@@ -3,7 +3,7 @@
         <header class="admin-dashboard__header">
             <div class="admin-dashboard__header-copy">
                 <h1 class="admin-dashboard__title">Halo, {{ auth()->user()->name }}</h1>
-                <p class="admin-dashboard__description">Pantau pengguna dan mata kuliah yang tersimpan di KampusLMS.</p>
+                <p class="admin-dashboard__description">Pantau pengguna dan mata kuliah yang tersimpan di EduSpace.</p>
             </div>
             <a href="{{ route('admin.users.index') }}" class="admin-dashboard__action">
                 <span class="material-symbols-outlined" aria-hidden="true">group</span>

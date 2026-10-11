@@ -11,6 +11,8 @@
 @import "./admin/user/modal.css";
 @import "./admin/admin-form.css";
 @import "./admin/dashboard.css";
+@import "./admin/course-detail.css";
+@import "./admin/course-management-modals.css";
 @import "./dosen/materials.css";
 @import "./dosen/assignments.css";
 @import "./dosen/grades.css";

@@ -9,7 +9,7 @@
             <h2 class="text-lg font-bold mb-4">Informasi Pengguna</h2>
             <p class="border-b pb-2">NIM/NIP: {{ $user->nim_nip }}</p>
             <div class="mt-4 flex justify-end gap-2">
-                <a href="{{ route('admin.users.index') }}" class="px-4 py-2 bg-gray-200 rounded-lg">Kembali</a>
+                <a href="{{ route('admin.users.index') }}" class="users-show__back">Kembali</a>
                 <a href="{{ route('admin.users.edit', $user) }}" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Edit</a>
                 <form action="{{ route('admin.users.destroy', $user) }}" method="POST">
                     @csrf
