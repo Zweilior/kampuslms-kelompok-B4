@@ -57,8 +57,8 @@ class CourseController extends Controller
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
-                $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%");
+                $q->where('code', 'like', "{$search}%")
+                  ->orWhere('name', 'like', "{$search}%");
             });
         }
 
@@ -69,6 +69,7 @@ class CourseController extends Controller
 
         $courses = $query
             ->orderBy('code')
+            ->orderBy('id')
             ->paginate(15)
             ->withQueryString();
 
@@ -123,7 +124,38 @@ class CourseController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view($this->isAdminRoute() ? 'admin.courses.show' : 'courses.show', compact('course', 'lecturers'));
+        if ($this->isAdminRoute()) {
+            $students = $course->students()
+                ->where('users.role', 'mahasiswa')
+                ->orderBy('users.name')
+                ->get();
+            $course->load([
+                'materials' => fn ($query) => $query->orderByRaw('LOWER(title)')->orderBy('id'),
+                'assignments' => fn ($query) => $query
+                    ->withCount('submissions')
+                    ->orderByRaw('LOWER(title)')
+                    ->orderBy('id'),
+            ]);
+            $finalGrades = $course->finalGrades()
+                ->whereIn('user_id', $students->modelKeys())
+                ->get()
+                ->keyBy('user_id');
+            $availableStudents = User::query()
+                ->where('role', 'mahasiswa')
+                ->whereDoesntHave('courses', fn ($query) => $query->where('courses.id', $course->id))
+                ->orderBy('name')
+                ->get();
+
+            return view('admin.courses.show', compact(
+                'course',
+                'lecturers',
+                'students',
+                'finalGrades',
+                'availableStudents'
+            ));
+        }
+
+        return view('courses.show', compact('course', 'lecturers'));
     }
 
     /**

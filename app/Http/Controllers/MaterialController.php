@@ -62,10 +62,16 @@ class MaterialController extends Controller
      * [ADMIN] Form tambah materi.
      * CATATAN: Keamanan bergantung pada middleware 'role:admin'.
      */
-    public function adminCreate()
+    public function adminCreate(Request $request)
     {
         $courses = Course::query()->orderBy('name')->get(['id', 'name']);
-        return view('admin.materials.form', ['material' => null, 'courses' => $courses]);
+        $selectedCourseId = $courses->firstWhere('id', (int) $request->query('course_id'))?->id;
+
+        return view('admin.materials.form', [
+            'material' => null,
+            'courses' => $courses,
+            'selectedCourseId' => $selectedCourseId,
+        ]);
     }
 
     /**

@@ -58,6 +58,8 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
 
     Route::resource('users', UserController::class);
     Route::resource('courses', CourseController::class);
+    Route::post('/courses/{course}/enrollments', [CourseEnrollmentController::class, 'adminStore'])->name('courses.enrollments.store');
+    Route::delete('/courses/{course}/enrollments/{student}', [CourseEnrollmentController::class, 'adminDestroy'])->name('courses.enrollments.destroy');
 
     Route::get('/materials', [MaterialController::class, 'adminIndex'])->name('materials.index');
     Route::get('/materials/create', [MaterialController::class, 'adminCreate'])->name('materials.create');

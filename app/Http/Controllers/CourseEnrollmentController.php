@@ -10,6 +10,46 @@ use Illuminate\Validation\Rule;
 
 class CourseEnrollmentController extends Controller
 {
+    public function adminStore(Request $request, Course $course)
+    {
+        Gate::authorize('manageEnrollment', $course);
+
+        $validated = $request->validate([
+            'student_id' => [
+                'required',
+                Rule::exists('users', 'id')->where('role', 'mahasiswa'),
+            ],
+        ], [
+            'student_id.required' => 'Pilih mahasiswa yang akan didaftarkan.',
+            'student_id.exists' => 'Mahasiswa yang dipilih tidak valid.',
+        ]);
+
+        $course->students()->syncWithoutDetaching([
+            $validated['student_id'] => ['enrolled_at' => now()],
+        ]);
+
+        return redirect()
+            ->route('admin.courses.show', $course)
+            ->with('success', 'Mahasiswa berhasil didaftarkan ke mata kuliah.');
+    }
+
+    public function adminDestroy(Course $course, User $student)
+    {
+        Gate::authorize('manageEnrollment', $course);
+
+        abort_unless(
+            $student->role === 'mahasiswa'
+                && $course->students()->whereKey($student->id)->exists(),
+            404
+        );
+
+        $course->students()->detach($student->id);
+
+        return redirect()
+            ->route('admin.courses.show', $course)
+            ->with('success', 'Mahasiswa berhasil dikeluarkan dari mata kuliah.');
+    }
+
     public function dosenIndex(Course $course)
     {
         Gate::authorize('manageEnrollment', $course);
