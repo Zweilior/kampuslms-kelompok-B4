@@ -30,17 +30,59 @@ class MahasiswaGradesTest extends TestCase
             $archivedCourse->id => ['enrolled_at' => now()],
         ]);
 
+        $activeComponent = GradeComponent::create([
+            'course_id' => $activeCourse->id,
+            'name' => 'Tugas',
+            'weight' => 100,
+        ]);
+        $activeAssignment = Assignment::factory()->create([
+            'course_id' => $activeCourse->id,
+            'grade_component_id' => $activeComponent->id,
+            'created_by' => $lecturer->id,
+            'max_score' => 100,
+        ]);
+        $activeSubmission = Submission::factory()->create([
+            'assignment_id' => $activeAssignment->id,
+            'user_id' => $student->id,
+        ]);
+        $activeGrade = Grade::create([
+            'submission_id' => $activeSubmission->id,
+            'graded_by' => $lecturer->id,
+            'score' => 86.5,
+            'graded_at' => now(),
+        ]);
+        $archivedComponent = GradeComponent::create([
+            'course_id' => $archivedCourse->id,
+            'name' => 'Tugas',
+            'weight' => 100,
+        ]);
+        $archivedAssignment = Assignment::factory()->create([
+            'course_id' => $archivedCourse->id,
+            'grade_component_id' => $archivedComponent->id,
+            'created_by' => $lecturer->id,
+            'max_score' => 100,
+        ]);
+        $archivedSubmission = Submission::factory()->create([
+            'assignment_id' => $archivedAssignment->id,
+            'user_id' => $student->id,
+        ]);
+        Grade::create([
+            'submission_id' => $archivedSubmission->id,
+            'graded_by' => $lecturer->id,
+            'score' => 52.25,
+            'graded_at' => now(),
+        ]);
         FinalGrade::create([
             'course_id' => $activeCourse->id,
             'user_id' => $student->id,
-            'total_score' => 86.5,
-            'letter_grade' => 'A',
+            'total_score' => 10,
+            'letter_grade' => 'E',
         ]);
         FinalGrade::create([
             'course_id' => $archivedCourse->id,
             'user_id' => $student->id,
-            'total_score' => 52.25,
-            'letter_grade' => 'C',
+            'total_score' => 100,
+            'letter_grade' => 'A',
         ]);
 
         $monitoringResponse = $this->actingAs($student)
@@ -55,7 +97,9 @@ class MahasiswaGradesTest extends TestCase
             ->assertSee('Mata Kuliah Arsip')
             ->assertSee('86.50')
             ->assertSee('A')
+            ->assertSee('<strong>A</strong>', false)
             ->assertSee('52.25')
+            ->assertSee('<strong>C</strong>', false)
             ->assertSee('selected: null', false)
             ->assertSee('x-cloak', false)
             ->assertSee('x-show="selected !== null"', false);
@@ -70,6 +114,63 @@ class MahasiswaGradesTest extends TestCase
             ->assertSee('52.25')
             ->assertSee('86.50')
             ->assertSee("selected: 'archived'", false);
+
+        $activeGrade->update(['score' => 92]);
+        $this->get(route('mahasiswa.grades.index'))
+            ->assertOk()
+            ->assertSee('92.00')
+            ->assertSee('<strong>A</strong>', false);
+    }
+
+    public function test_course_list_separates_active_and_archived_courses_in_alphabetical_order(): void
+    {
+        $student = User::factory()->mahasiswa()->create();
+        $lecturer = User::factory()->dosen()->create();
+        $activeZ = Course::factory()->create([
+            'lecturer_id' => $lecturer->id,
+            'name' => 'Web Development',
+        ]);
+        $activeA = Course::factory()->create([
+            'lecturer_id' => $lecturer->id,
+            'name' => 'Algoritma Aktif',
+        ]);
+        $archivedZ = Course::factory()->create([
+            'lecturer_id' => $lecturer->id,
+            'name' => 'Zoologi Arsip',
+            'status' => 'archived',
+        ]);
+        $archivedA = Course::factory()->create([
+            'lecturer_id' => $lecturer->id,
+            'name' => 'Basis Data Arsip',
+            'status' => 'archived',
+        ]);
+        $draft = Course::factory()->create([
+            'lecturer_id' => $lecturer->id,
+            'name' => 'Draft Tidak Ditampilkan',
+            'status' => 'draft',
+        ]);
+        $student->courses()->attach([
+            $activeZ->id => ['enrolled_at' => now()],
+            $activeA->id => ['enrolled_at' => now()],
+            $archivedZ->id => ['enrolled_at' => now()],
+            $archivedA->id => ['enrolled_at' => now()],
+            $draft->id => ['enrolled_at' => now()],
+        ]);
+
+        $response = $this->actingAs($student)
+            ->get(route('mahasiswa.courses.index'));
+
+        $response
+            ->assertOk()
+            ->assertSeeInOrder(['Algoritma Aktif', 'Web Development'])
+            ->assertSeeInOrder(['Basis Data Arsip', 'Zoologi Arsip'])
+            ->assertSee('Mata Kuliah Aktif')
+            ->assertSee('Mata Kuliah Arsip')
+            ->assertSee(route('mahasiswa.courses.show', $activeA->id))
+            ->assertSee(route('mahasiswa.courses.show', $archivedA->id))
+            ->assertDontSee($draft->name)
+            ->assertSee('selected: null', false)
+            ->assertSee('Lihat mata kuliah');
     }
 
     public function test_dashboard_summarizes_courses_assignments_and_links_to_monitoring(): void

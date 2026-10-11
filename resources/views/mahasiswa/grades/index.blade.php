@@ -70,7 +70,6 @@
 
             <div class="dosen-course-list" x-show="selected === 'active'" id="mahasiswa-active-course-list">
                 @forelse ($activeCourses as $course)
-                    @php($finalGrade = $course->finalGrades->first())
                     <article class="dosen-course-row mahasiswa-grade-row">
                         <div class="dosen-course-row__identity">
                             <span class="dosen-course-row__code">{{ $course->code }}</span>
@@ -92,14 +91,14 @@
                             <div class="dosen-course-row__metric">
                                 <span class="dosen-course-row__metric-icon material-symbols-outlined" aria-hidden="true">monitoring</span>
                                 <span class="dosen-course-row__metric-copy">
-                                    <strong>{{ $finalGrade ? number_format((float) $finalGrade->total_score, 2) : '—' }}</strong>
+                                    <strong>{{ $course->monitoring_final_score !== null ? number_format($course->monitoring_final_score, 2) : '—' }}</strong>
                                     <small>Nilai akhir</small>
                                 </span>
                             </div>
                             <div class="dosen-course-row__metric">
                                 <span class="dosen-course-row__metric-icon material-symbols-outlined" aria-hidden="true">workspace_premium</span>
                                 <span class="dosen-course-row__metric-copy">
-                                    <strong>{{ $finalGrade?->letter_grade ?? '—' }}</strong>
+                                    <strong>{{ $course->monitoring_letter_grade ?? '—' }}</strong>
                                     <small>Predikat</small>
                                 </span>
                             </div>
@@ -122,7 +121,6 @@
 
             <div class="dosen-course-list" x-show="selected === 'archived'" id="mahasiswa-archived-course-list">
                 @forelse ($archivedCourses as $course)
-                    @php($finalGrade = $course->finalGrades->first())
                     <article class="dosen-course-row dosen-course-row--archived mahasiswa-grade-row">
                         <div class="dosen-course-row__identity">
                             <span class="dosen-course-row__code">{{ $course->code }}</span>
@@ -144,14 +142,14 @@
                             <div class="dosen-course-row__metric">
                                 <span class="dosen-course-row__metric-icon material-symbols-outlined" aria-hidden="true">monitoring</span>
                                 <span class="dosen-course-row__metric-copy">
-                                    <strong>{{ $finalGrade ? number_format((float) $finalGrade->total_score, 2) : '—' }}</strong>
+                                    <strong>{{ $course->monitoring_final_score !== null ? number_format($course->monitoring_final_score, 2) : '—' }}</strong>
                                     <small>Nilai akhir</small>
                                 </span>
                             </div>
                             <div class="dosen-course-row__metric">
                                 <span class="dosen-course-row__metric-icon material-symbols-outlined" aria-hidden="true">workspace_premium</span>
                                 <span class="dosen-course-row__metric-copy">
-                                    <strong>{{ $finalGrade?->letter_grade ?? '—' }}</strong>
+                                    <strong>{{ $course->monitoring_letter_grade ?? '—' }}</strong>
                                     <small>Predikat</small>
                                 </span>
                             </div>
