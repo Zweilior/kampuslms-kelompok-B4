@@ -16,6 +16,7 @@
 @import "./dosen/grades.css";
 @import "./dosen/courses.css";
 @import "./dosen/dashboard.css";
+@import "./shared-role-pages.css";
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

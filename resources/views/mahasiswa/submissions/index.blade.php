@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="mahasiswa-page mahasiswa-page--submissions">
-        <header class="mahasiswa-page__header">
+        <header class="mahasiswa-page__header lms-page-header">
             <div class="mahasiswa-page__header-copy">
                 <a href="{{ route('mahasiswa.courses.assignments.index', $course->id) }}" class="mahasiswa-page__back">
                     <span class="material-symbols-outlined">arrow_back</span>
@@ -15,7 +15,7 @@
         </header>
 
         <section class="mahasiswa-page__card mahasiswa-page__table-wrap">
-            <table class="mahasiswa-page__table">
+            <table class="mahasiswa-page__table lms-data-table">
                 <thead>
                     <tr>
                         <th>Nama File</th>

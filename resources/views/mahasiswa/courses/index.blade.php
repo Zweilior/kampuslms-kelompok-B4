@@ -3,7 +3,7 @@
 @section('content')
     <main class="mahasiswa-page mahasiswa-page--courses mahasiswa-course-listing"
         x-data="{ selected: @js($status) }">
-        <header class="mahasiswa-page__header">
+        <header class="mahasiswa-page__header lms-page-header">
             <div class="mahasiswa-page__header-copy">
                 <span class="mahasiswa-page__eyebrow">Perkuliahan</span>
                 <h1 class="mahasiswa-page__title">Mata kuliah saya</h1>

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Assignment;
 use App\Models\Course;
+use App\Models\Grade;
 use App\Models\GradeComponent;
 use App\Models\Submission;
 use App\Models\User;
@@ -38,12 +39,96 @@ class DosenAssignmentsTest extends TestCase
             ->assertDontSee("confirm('Hapus tugas ini?')")
             ->assertDontSee(route('dosen.courses.assignments.submissions.index', [$course, $openAssignment]))
             ->assertSee(route('dosen.courses.assignments.submissions.index', [$course, $closedAssignment]));
+        $this->assertStringContainsString(
+            route('dosen.courses.assignments.submissions.export', [$course, $closedAssignment]),
+            $this->get(route('dosen.courses.assignments.index', $course))->getContent()
+        );
+        $this->assertStringNotContainsString(
+            route('dosen.courses.assignments.submissions.export', [$course, $openAssignment]),
+            $this->get(route('dosen.courses.assignments.index', $course))->getContent()
+        );
 
         $this->get(route('dosen.courses.assignments.submissions.index', [$course, $closedAssignment]))
             ->assertOk()
             ->assertSee('Nilai')
             ->assertSee('Umpan Balik')
             ->assertSee('dosen-grade-card', false);
+    }
+
+    public function test_submission_list_can_be_filtered_sorted_by_nim_and_exported_as_csv(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $assignment = Assignment::factory()->for($course)->past()->create([
+            'title' => 'Tugas Export CSV',
+        ]);
+        $gradedStudent = User::factory()->mahasiswa()->create([
+            'name' => 'Budi',
+            'nim_nip' => 'NIM002',
+        ]);
+        $ungradedStudent = User::factory()->mahasiswa()->create([
+            'name' => 'Ani',
+            'nim_nip' => '=NIM001',
+        ]);
+        $gradedSubmission = Submission::factory()
+            ->for($assignment)
+            ->for($gradedStudent, 'student')
+            ->create();
+        Submission::factory()
+            ->for($assignment)
+            ->for($ungradedStudent, 'student')
+            ->create(['original_name' => 'jawaban.csv']);
+        Grade::factory()->create([
+            'submission_id' => $gradedSubmission->id,
+            'graded_by' => $lecturer->id,
+            'score' => 88,
+            'feedback' => 'Bagus',
+        ]);
+
+        $listUrl = route('dosen.courses.assignments.submissions.index', [$course, $assignment]);
+        $response = $this->actingAs($lecturer)
+            ->get($listUrl)
+            ->assertOk()
+            ->assertSee('Unduh CSV')
+            ->assertSee('Sudah dinilai (1)')
+            ->assertSee('Belum dinilai (1)');
+
+        $this->assertLessThan(
+            strpos($response->getContent(), 'NIM002'),
+            strpos($response->getContent(), '=NIM001')
+        );
+
+        $this->get($listUrl.'?status=ungraded')
+            ->assertOk()
+            ->assertSee('Ani')
+            ->assertDontSee('Budi')
+            ->assertSee('status=ungraded');
+
+        $csvResponse = $this->get(route(
+            'dosen.courses.assignments.submissions.export',
+            [$course, $assignment, 'status' => 'ungraded']
+        ));
+        $csvResponse->assertOk()
+            ->assertHeader('content-type', 'text/csv; charset=UTF-8')
+            ->assertHeader('content-disposition', 'attachment; filename=nilai-tugas-export-csv-'.$assignment->id.'.csv');
+
+        $csv = $csvResponse->streamedContent();
+        $this->assertStringContainsString("\xEF\xBB\xBF", $csv);
+        $this->assertStringContainsString("'=NIM001", $csv);
+        $this->assertStringContainsString('Belum dinilai', $csv);
+        $this->assertStringNotContainsString('Budi', $csv);
+    }
+
+    public function test_lecturer_cannot_export_submissions_for_another_lecturers_course(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $otherLecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($otherLecturer, 'lecturer')->create();
+        $assignment = Assignment::factory()->for($course)->past()->create();
+
+        $this->actingAs($lecturer)
+            ->get(route('dosen.courses.assignments.submissions.export', [$course, $assignment]))
+            ->assertForbidden();
     }
 
     public function test_lecturer_can_grade_a_submission_after_deadline_and_cannot_grade_before_it(): void
@@ -111,7 +196,7 @@ class DosenAssignmentsTest extends TestCase
             ->assertSee('Pengumpulan Terlambat')
             ->assertSee('Tidak diizinkan')
             ->assertSee('Ujian Tengah Semester (30.00%)')
-            ->assertSee('value="' . $component->id . '" selected', false)
+            ->assertSee('value="'.$component->id.'" selected', false)
             ->assertSee('dosen-assignment-form__card', false);
     }
 
@@ -144,7 +229,7 @@ class DosenAssignmentsTest extends TestCase
             ->assertSee('Pengumpulan Terlambat')
             ->assertSee('Kumpulkan laporan praktikum.')
             ->assertSee('Proyek (70.00%)')
-            ->assertSee('value="' . $component->id . '" selected', false)
+            ->assertSee('value="'.$component->id.'" selected', false)
             ->assertSee('dosen-assignment-form__card', false);
     }
 

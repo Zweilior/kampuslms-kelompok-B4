@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="mahasiswa-page mahasiswa-page--dashboard">
-        <header class="mahasiswa-page__header">
+        <header class="mahasiswa-page__header lms-page-header">
             <div class="mahasiswa-page__header-copy">
                 <h1 class="mahasiswa-page__title">Halo, {{ auth()->user()->name }}</h1>
                 <p class="mahasiswa-page__description">Ringkasan mata kuliah, tugas, pengumpulan, dan akses cepat ke nilai akademikmu.</p>

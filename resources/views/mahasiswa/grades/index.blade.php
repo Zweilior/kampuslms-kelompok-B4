@@ -3,7 +3,7 @@
 @section('content')
     <main class="mahasiswa-page mahasiswa-page--grades-index mahasiswa-grade-monitoring"
         x-data="{ selected: @js($status) }">
-        <header class="mahasiswa-page__header">
+        <header class="mahasiswa-page__header lms-page-header">
             <div class="mahasiswa-page__header-copy">
                 <div class="mahasiswa-grade-monitoring__eyebrow">
                     <span aria-hidden="true"></span>

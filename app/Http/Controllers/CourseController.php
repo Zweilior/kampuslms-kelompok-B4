@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Course;
-use App\Models\User;
-use Illuminate\Http\Request;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate; 
+use App\Models\Course;
+use App\Models\User;
+use App\Support\CourseGradeCalculator;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
 
 class CourseController extends Controller
@@ -58,7 +58,7 @@ class CourseController extends Controller
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('code', 'like', "%{$search}%")
-                  ->orWhere('name', 'like', "%{$search}%");
+                    ->orWhere('name', 'like', "%{$search}%");
             });
         }
 
@@ -77,7 +77,7 @@ class CourseController extends Controller
             ->orderBy('name')
             ->get();
 
-        return view($this->routePrefix() . '.index', compact('courses', 'lecturers'));
+        return view($this->routePrefix().'.index', compact('courses', 'lecturers'));
     }
 
     /**
@@ -106,7 +106,7 @@ class CourseController extends Controller
         $course = Course::create($data);
 
         return redirect()
-            ->route($this->routePrefix() . '.show', $course)
+            ->route($this->routePrefix().'.show', $course)
             ->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
 
@@ -135,12 +135,14 @@ class CourseController extends Controller
 
         $courses = Course::where('lecturer_id', $request->user()->id)
             ->with('lecturer')
-            ->orderBy('code')
+            ->whereIn('status', ['active', 'archived'])
+            ->orderBy('name')
             ->get();
 
-        $focus = $request->input('focus', 'materials');
+        $activeCourses = $courses->where('status', 'active')->values();
+        $archivedCourses = $courses->where('status', 'archived')->values();
 
-        return view('dosen.courses.index', compact('courses', 'focus'));
+        return view('dosen.courses.index', compact('activeCourses', 'archivedCourses'));
     }
 
     /**
@@ -152,9 +154,40 @@ class CourseController extends Controller
 
         $courses = Course::where('lecturer_id', $request->user()->id)
             ->withCount('students')
-            ->withAvg('finalGrades', 'total_score')
-            ->orderBy('code')
+            ->with([
+                'students:id',
+                'assignments.gradeComponent',
+                'assignments.submissions.grade',
+            ])
+            ->orderBy('name')
             ->get();
+
+        $courses->each(function (Course $course): void {
+            $studentScores = $course->students
+                ->map(function (User $student) use ($course): ?float {
+                    $assignments = $course->assignments->map(function ($assignment) use ($student) {
+                        $studentAssignment = clone $assignment;
+                        $studentAssignment->setRelation(
+                            'submissions',
+                            $assignment->submissions
+                                ->where('user_id', $student->id)
+                                ->values()
+                        );
+
+                        return $studentAssignment;
+                    });
+
+                    return CourseGradeCalculator::finalScore($assignments);
+                })
+                ->filter(fn (?float $score): bool => $score !== null)
+                ->values();
+
+            $course->setAttribute(
+                'monitoring_average',
+                $studentScores->isNotEmpty() ? round($studentScores->avg(), 2) : null
+            );
+            $course->setAttribute('monitoring_graded_students_count', $studentScores->count());
+        });
 
         $activeCourses = $courses->where('status', 'active')->values();
         $archivedCourses = $courses->where('status', 'archived')->values();
@@ -234,7 +267,7 @@ class CourseController extends Controller
         $course->update($data);
 
         return redirect()
-            ->route($this->routePrefix() . '.show', $course)
+            ->route($this->routePrefix().'.show', $course)
             ->with('success', 'Mata kuliah berhasil diperbarui.');
     }
 
@@ -248,7 +281,7 @@ class CourseController extends Controller
         $course->delete();
 
         return redirect()
-            ->route($this->routePrefix() . '.index')
+            ->route($this->routePrefix().'.index')
             ->with('success', 'Mata kuliah berhasil dihapus.');
     }
 }

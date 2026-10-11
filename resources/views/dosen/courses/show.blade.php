@@ -1,5 +1,5 @@
 <x-layout title="Detail Mata Kuliah - Dosen" active-nav="courses">
-    <div class="max-w-7xl mx-auto px-4">
+    <main class="dosen-course-detail-page">
         @php
             $focus = request('focus') === 'assignments' ? 'assignments' : 'materials';
         @endphp
@@ -26,7 +26,7 @@
                             <span class="material-symbols-outlined" aria-hidden="true">edit_note</span>
                             Edit Rubrik
                         </a>
-                    </div>
+                    </main>
                 </div>
                 <span class="dosen-course-hero__badge">Aktif</span>
             </div>

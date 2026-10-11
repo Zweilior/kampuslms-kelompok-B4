@@ -90,6 +90,7 @@ Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scop
     Route::get('/courses/{course}', [CourseController::class, 'dosenShow'])->name('courses.show');
     Route::get('/courses/{course}/edit', [CourseController::class, 'dosenEdit'])->name('courses.edit');
     Route::put('/courses/{course}', [CourseController::class, 'dosenUpdate'])->name('courses.update');
+    Route::get('/courses/{course}/grades/export', [SubmissionController::class, 'dosenExportCourseGrades'])->name('courses.grades.export');
     Route::get('/courses/{course}/enrollments', [CourseEnrollmentController::class, 'dosenIndex'])->name('courses.enrollments.index');
     Route::post('/courses/{course}/enrollments', [CourseEnrollmentController::class, 'dosenStore'])->name('courses.enrollments.store');
     Route::delete('/courses/{course}/enrollments/{student}', [CourseEnrollmentController::class, 'dosenDestroy'])->name('courses.enrollments.destroy');
@@ -108,6 +109,7 @@ Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scop
     Route::put('/courses/{course}/assignments/{assignment}', [AssignmentController::class, 'dosenUpdate'])->name('courses.assignments.update');
     Route::delete('/courses/{course}/assignments/{assignment}', [AssignmentController::class, 'dosenDestroy'])->name('courses.assignments.destroy');
     Route::get('/courses/{course}/assignments/{assignment}/submissions', [SubmissionController::class, 'dosenIndex'])->name('courses.assignments.submissions.index');
+    Route::get('/courses/{course}/assignments/{assignment}/submissions/export', [SubmissionController::class, 'dosenExport'])->name('courses.assignments.submissions.export');
     Route::put('/courses/{course}/assignments/{assignment}/submissions/{submission}/grade', [SubmissionController::class, 'dosenGrade'])->name('courses.assignments.submissions.grade');
 
     // Tambahkan route ini di dalam group dosen, setelah route assignments/submissions

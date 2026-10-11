@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="mahasiswa-page mahasiswa-page--grades">
-        <header class="mahasiswa-page__header">
+        <header class="mahasiswa-page__header lms-page-header">
             <div class="mahasiswa-page__header-copy">
                 <a href="{{ route('mahasiswa.courses.show', $course->id) }}" class="mahasiswa-page__back">
                     <span class="material-symbols-outlined">arrow_back</span>
@@ -29,7 +29,7 @@
         </div>
 
         <section class="mahasiswa-page__card mahasiswa-page__table-wrap">
-            <table class="mahasiswa-page__table mahasiswa-page__grade-detail-table">
+            <table class="mahasiswa-page__table mahasiswa-page__grade-detail-table lms-data-table">
                 <thead>
                     <tr>
                         <th>Item penilaian</th>

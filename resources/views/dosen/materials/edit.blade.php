@@ -5,7 +5,7 @@
             Kembali ke daftar materi
         </a>
 
-        <header class="dosen-assignment-form__header">
+        <header class="dosen-assignment-form__header lms-page-header">
             <span class="dosen-assignment-form__icon material-symbols-outlined" aria-hidden="true">edit_document</span>
             <div>
                 <div class="dosen-assignment-form__eyebrow">

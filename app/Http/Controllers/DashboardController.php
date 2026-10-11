@@ -6,8 +6,6 @@ use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\Submission;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 
 class DashboardController extends Controller
 {
@@ -39,13 +37,29 @@ class DashboardController extends Controller
         $ungradedSubmissions = Submission::whereHas('assignment.course', function ($query) use ($lecturerId) {
             $query->where('lecturer_id', $lecturerId);
         })
+            ->whereHas('assignment', fn ($query) => $query
+                ->where('status', 'published')
+                ->where('due_at', '<=', now()))
             ->whereDoesntHave('grade')
             ->count();
+        $gradingAssignments = Assignment::query()
+            ->with('course')
+            ->withCount([
+                'submissions as ungraded_submissions_count' => fn ($query) => $query->whereDoesntHave('grade'),
+            ])
+            ->whereHas('course', fn ($query) => $query->where('lecturer_id', $lecturerId))
+            ->where('status', 'published')
+            ->where('due_at', '<=', now())
+            ->whereHas('submissions', fn ($query) => $query->whereDoesntHave('grade'))
+            ->orderBy('due_at')
+            ->limit(5)
+            ->get();
 
         return view('dosen.dashboard', compact(
             'totalCourses',
             'openAssignments',
-            'ungradedSubmissions'
+            'ungradedSubmissions',
+            'gradingAssignments'
         ));
     }
 }
