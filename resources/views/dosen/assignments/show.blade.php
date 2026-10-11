@@ -5,7 +5,7 @@
             Kembali ke daftar tugas
         </a>
 
-        <header class="dosen-grades__header">
+        <header class="dosen-grades__header lms-page-header">
             <div>
                 <div class="dosen-assignment-form__eyebrow">
                     <span>{{ $course->code }}</span>
@@ -19,9 +19,26 @@
             </div>
             <div class="dosen-grades__count">
                 <span class="material-symbols-outlined" aria-hidden="true">groups</span>
-                <span>{{ $submissions->count() }} pengumpulan</span>
+                <span>{{ $submissionCounts['all'] }} pengumpulan</span>
             </div>
         </header>
+
+        <div class="mb-space-md flex flex-wrap items-center justify-between gap-space-sm">
+            <form method="GET" action="{{ route('dosen.courses.assignments.submissions.index', [$course, $assignment]) }}" class="flex flex-wrap items-center gap-space-sm">
+                <label for="submission-status" class="font-label-md text-label-md text-on-surface">Status penilaian</label>
+                <select id="submission-status" name="status" onchange="this.form.submit()" class="rounded-xl border border-outline/20 bg-surface-container-low px-space-sm py-2 font-body-sm text-body-sm text-on-surface">
+                    <option value="all" @selected($status === 'all')>Semua ({{ $submissionCounts['all'] }})</option>
+                    <option value="graded" @selected($status === 'graded')>Sudah dinilai ({{ $submissionCounts['graded'] }})</option>
+                    <option value="ungraded" @selected($status === 'ungraded')>Belum dinilai ({{ $submissionCounts['ungraded'] }})</option>
+                </select>
+                <button type="submit" class="rounded-xl border border-outline/20 px-space-sm py-2 font-label-sm text-label-sm text-on-surface hover:bg-surface-container">Terapkan</button>
+            </form>
+            <a href="{{ route('dosen.courses.assignments.submissions.export', [$course, $assignment, 'status' => $status]) }}"
+               class="inline-flex items-center gap-space-xs rounded-xl bg-primary px-space-md py-2.5 font-label-md text-on-primary hover:bg-primary-container">
+                <span class="material-symbols-outlined text-base" aria-hidden="true">download</span>
+                Unduh CSV
+            </a>
+        </div>
 
         @if (session('success'))
             <div class="dosen-grades__notice dosen-grades__notice--success" role="status">
@@ -58,7 +75,7 @@
                             </span>
                             <div class="dosen-grade-card__student-info">
                                 <h2>{{ $submission->student->name }}</h2>
-                                <p>{{ $submission->student->nim_nip }}</p>
+                                <p>NIM {{ $submission->student->nim_nip }}</p>
                             </div>
                             @if ($submission->grade)
                                 <span class="dosen-grade-card__status dosen-grade-card__status--graded">

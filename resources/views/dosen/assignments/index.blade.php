@@ -1,9 +1,9 @@
 <x-layout title="Tugas dan Nilai - Dosen" active-nav="courses">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
+    <main class="dosen-assignment-list"
          x-data="{ deleteOpen: false, deleteAction: '', deleteTitle: '' }"
          @keydown.escape.window="deleteOpen = false">
-        <header class="mb-space-lg">
-            <a href="{{ route('dosen.courses.show', ['course' => $course, 'focus' => 'assignments']) }}" class="mb-space-md inline-flex items-center gap-space-xs font-label-md text-on-surface-variant hover:text-primary">
+        <header class="mb-space-lg lms-page-header">
+            <a href="{{ route('dosen.courses.show', ['course' => $course, 'focus' => 'assignments']) }}" class="lms-page-back mb-space-md inline-flex items-center gap-space-xs font-label-md text-on-surface-variant hover:text-primary">
                 <span class="material-symbols-outlined text-base">arrow_back</span>{{ $course->name }}
             </a>
             <div class="flex flex-wrap items-end justify-between gap-space-md">
@@ -31,7 +31,7 @@
 
         <section aria-label="Daftar tugas mata kuliah" class="overflow-hidden rounded-2xl border border-outline/10 bg-surface-container-low shadow-sm">
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-outline/10">
+                <table class="min-w-full divide-y divide-outline/10 lms-data-table">
                     <thead class="bg-surface-container">
                         <tr>
                             <th scope="col" class="px-space-md py-space-sm text-left font-label-sm text-label-sm uppercase text-on-surface-variant">No.</th>
@@ -68,6 +68,10 @@
                                                 <span class="material-symbols-outlined" aria-hidden="true">grading</span>
                                                 Edit Nilai
                                             </a>
+                                            <a href="{{ route('dosen.courses.assignments.submissions.export', [$course, $assignment]) }}" class="dosen-assignment__btn dosen-assignment__btn--grade">
+                                                <span class="material-symbols-outlined" aria-hidden="true">download</span>
+                                                Unduh CSV
+                                            </a>
                                         @endif
                                         <form action="{{ route('dosen.courses.assignments.destroy', [$course, $assignment]) }}" method="POST" class="inline">
                                             @csrf
@@ -82,7 +86,7 @@
                                                 Hapus
                                             </button>
                                         </form>
-                                    </div>
+                                    </main>
                                 </td>
                             </tr>
                         @empty

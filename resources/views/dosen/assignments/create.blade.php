@@ -5,7 +5,7 @@
             Kembali ke daftar tugas
         </a>
 
-        <header class="dosen-assignment-form__header">
+        <header class="dosen-assignment-form__header lms-page-header">
             <span class="dosen-assignment-form__icon material-symbols-outlined" aria-hidden="true">assignment_add</span>
             <div>
                 <div class="dosen-assignment-form__eyebrow">

@@ -10,6 +10,7 @@ use App\Models\GradeComponent;
 use App\Models\Material;
 use App\Models\Submission;
 use App\Models\User;
+use App\Support\GradeScale;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
@@ -513,22 +514,10 @@ class DatabaseSeeder extends Seeder
                 ['course_id' => $course->id, 'user_id' => $student->id],
                 [
                     'total_score' => $total,
-                    'letter_grade' => $this->letterGrade($total),
+                    'letter_grade' => GradeScale::letterGradeForScore($total),
                 ]
             );
         }
     }
 
-    private function letterGrade(float $score): string
-    {
-        return match (true) {
-            $score >= 86 => 'A',
-            $score >= 76 => 'AB',
-            $score >= 66 => 'B',
-            $score >= 56 => 'BC',
-            $score >= 46 => 'C',
-            $score >= 36 => 'D',
-            default => 'E',
-        };
-    }
 }

@@ -576,6 +576,16 @@
     min-width: 0;
 }
 
+.mahasiswa-page--materials .mahasiswa-page__list-copy {
+    flex: 1;
+    text-align: left;
+}
+
+.mahasiswa-page--materials .mahasiswa-page__list-copy strong,
+.mahasiswa-page--materials .mahasiswa-page__list-copy p {
+    text-align: left;
+}
+
 .mahasiswa-page__list-copy strong {
     display: block;
     color: var(--text-primary);
@@ -2500,6 +2510,41 @@
     margin-top: 1.2rem;
 }
 
+.mahasiswa-course-panel {
+    margin-top: 1.2rem;
+}
+
+.mahasiswa-course-listing .mahasiswa-course-row {
+    grid-template-columns: minmax(12rem, 1.3fr) minmax(19rem, 1.5fr) auto;
+}
+
+.mahasiswa-course-row__link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    min-height: 2.4rem;
+    padding: 0.55rem 0.8rem;
+    border-radius: 0.7rem;
+    background: var(--primary);
+    color: var(--on-primary, #fff);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color 160ms ease, transform 160ms ease;
+}
+
+.mahasiswa-course-row__link:hover {
+    background: var(--primary-dark, #315d20);
+    transform: translateY(-1px);
+}
+
+.mahasiswa-course-listing :focus-visible {
+    outline: 3px solid color-mix(in srgb, var(--primary) 48%, transparent);
+    outline-offset: 3px;
+}
+
 .mahasiswa-grade-row {
     grid-template-columns: minmax(12rem, 1.3fr) minmax(19rem, 1.5fr) auto;
 }
@@ -2590,6 +2635,23 @@
         justify-content: flex-start;
         flex-wrap: wrap;
         gap: 1rem;
+    }
+
+    .mahasiswa-course-listing .mahasiswa-course-row {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .mahasiswa-course-row .dosen-course-row__metrics {
+        grid-column: 1 / -1;
+        grid-row: 2;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .mahasiswa-course-row__link {
+        grid-column: 2;
+        grid-row: 1;
     }
 
     .mahasiswa-grade-row__link {

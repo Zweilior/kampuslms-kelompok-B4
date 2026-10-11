@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="mahasiswa-rubric">
-        <header class="mahasiswa-rubric__header">
+        <header class="mahasiswa-rubric__header lms-page-header">
             <a href="{{ route('mahasiswa.courses.show', $course->id) }}" class="mahasiswa-rubric__back">
                 <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
                 Kembali ke kelas

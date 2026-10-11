@@ -7,14 +7,16 @@
             Kembali ke mata kuliah
         </a>
 
-        <header class="dosen-enrollments__header">
-            <div class="dosen-enrollments__eyebrow">
-                <span>{{ $course->code }}</span>
-                <span aria-hidden="true"></span>
-                <span>ENROLLMENT</span>
+        <header class="dosen-enrollments__header lms-page-header">
+            <div class="lms-page-header__copy">
+                <div class="dosen-enrollments__eyebrow">
+                    <span>{{ $course->code }}</span>
+                    <span aria-hidden="true"></span>
+                    <span>ENROLLMENT</span>
+                </div>
+                <h1>Mahasiswa Terdaftar</h1>
+                <p>Kelola peserta untuk mata kuliah {{ $course->name }}.</p>
             </div>
-            <h1>Mahasiswa Terdaftar</h1>
-            <p>Kelola peserta untuk mata kuliah {{ $course->name }}.</p>
         </header>
 
         @if (session('success'))

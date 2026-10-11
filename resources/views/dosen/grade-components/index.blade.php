@@ -7,8 +7,8 @@
             Kembali ke mata kuliah
         </a>
 
-        <header class="dosen-rubric__header">
-            <div>
+        <header class="dosen-rubric__header lms-page-header">
+            <div class="lms-page-header__copy">
                 <div class="dosen-rubric__eyebrow">
                     <span>{{ $course->code }}</span>
                     <span aria-hidden="true"></span>
@@ -46,7 +46,7 @@
             </div>
 
             <div class="dosen-rubric__table-wrap">
-                <table class="dosen-rubric__table">
+                <table class="dosen-rubric__table lms-data-table">
                     <thead>
                         <tr>
                             <th scope="col">Komponen</th>

@@ -5,8 +5,8 @@
             Kembali ke mata kuliah
         </a>
 
-        <header class="dosen-materials__header">
-            <div>
+        <header class="dosen-materials__header lms-page-header">
+            <div class="lms-page-header__copy">
                 <div class="dosen-assignment-form__eyebrow">
                     <span>{{ $course->code }}</span>
                     <span class="dosen-assignment-form__dot" aria-hidden="true"></span>
