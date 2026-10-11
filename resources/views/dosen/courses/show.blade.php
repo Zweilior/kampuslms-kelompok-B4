@@ -28,7 +28,7 @@
                         </a>
                     </div>
                 </div>
-                <span class="dosen-course-hero__badge">Aktif</span>
+                <span class="dosen-course-hero__badge">{{ $course->status }}</span>
             </div>
         </header>
 
