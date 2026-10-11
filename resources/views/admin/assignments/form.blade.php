@@ -19,7 +19,7 @@
                 <select id="course_id" name="course_id" required class="w-full rounded-xl border border-outline/10 bg-surface-container px-space-md py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
                     <option value="">Pilih mata kuliah</option>
                     @foreach ($courses as $course)
-                        <option value="{{ $course->id }}" @selected((string) old('course_id', $assignment?->course_id) === (string) $course->id)>{{ $course->name }}</option>
+                        <option value="{{ $course->id }}" @selected((string) old('course_id', $assignment?->course_id ?? $selectedCourseId ?? '') === (string) $course->id)>{{ $course->name }}</option>
                     @endforeach
                 </select>
                 @error('course_id') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror

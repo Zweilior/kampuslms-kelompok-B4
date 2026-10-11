@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Course;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class AdminUserManagementTest extends TestCase
@@ -73,6 +75,29 @@ class AdminUserManagementTest extends TestCase
             ->assertForbidden();
 
         $this->get('/users')->assertNotFound();
+    }
+
+    public function test_admin_cannot_delete_a_user_who_is_enrolled_in_a_course(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $student = User::factory()->mahasiswa()->create();
+        $course = Course::factory()->for($admin, 'lecturer')->create();
+        $now = now();
+
+        DB::table('course_user')->insert([
+            'course_id' => $course->id,
+            'user_id' => $student->id,
+            'enrolled_at' => $now,
+            'created_at' => $now,
+            'updated_at' => $now,
+        ]);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.users.destroy', $student))
+            ->assertRedirect(route('admin.users.index'))
+            ->assertSessionHas('error', 'User tidak dapat dihapus karena masih terhubung dengan data akademik. Pindahkan atau hapus keterkaitan datanya terlebih dahulu.');
+
+        $this->assertDatabaseHas('users', ['id' => $student->id]);
     }
 
     public function test_legacy_courses_path_redirects_by_role_and_general_course_views_are_gone(): void

@@ -771,8 +771,40 @@ button {
    ============================================ */
 
 .admin-courses {
-    width: 100%;
+    width: min(100%, 1600px);
+    margin: 0 auto;
+    padding: 0 32px;
     color: var(--text-primary);
+}
+
+.admin-courses__page-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.875rem;
+}
+
+.admin-courses__eyebrow {
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.admin-courses__page-title {
+    margin: 0.3125rem 0 0.625rem;
+    color: var(--text-primary);
+    font-family: "Plus Jakarta Sans", sans-serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+}
+
+.admin-courses__page-subtitle {
+    margin: 0;
+    color: var(--text-secondary);
 }
 
 /* Card container */
@@ -784,33 +816,115 @@ button {
     box-shadow: var(--shadow-md);
 }
 
-/* Header */
-.admin-courses__header {
+/* Toolbar: judul tabel di kiri, filter dan pencarian di kanan */
+.admin-courses__toolbar {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 1rem;
-    padding: 1.25rem 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem 1.5rem;
+    padding: 1.125rem 1.5rem;
     border-bottom: 1px solid var(--border-hairline);
-    background: var(--color-surface-container);
-}
-
-.admin-courses__header-left {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
+    background: var(--bg-hover);
 }
 
 .admin-courses__header-icon {
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     color: var(--primary);
 }
 
 .admin-courses__title {
-    font-size: 1.125rem;
-    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin: 0;
     color: var(--text-primary);
-    letter-spacing: -0.01em;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+/* Pencarian dan filter */
+.admin-courses__filter-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.admin-courses__search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex: 0 1 13.25rem;
+}
+
+.admin-courses__search > .material-symbols-outlined {
+    position: absolute;
+    left: 0.7rem;
+    color: var(--text-muted);
+    font-size: 1.125rem;
+    pointer-events: none;
+}
+
+.admin-courses__search input,
+.admin-courses__status-filter select {
+    height: 2.375rem;
+    border: 1px solid var(--border-hairline);
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 0.85rem;
+    outline: none;
+    transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+
+.admin-courses__search input {
+    width: 100%;
+    padding: 0.5rem 0.75rem 0.5rem 2.25rem;
+}
+
+.admin-courses__search input::placeholder {
+    color: var(--text-muted);
+}
+
+.admin-courses__status-filter select {
+    min-width: 7.25rem;
+    padding: 0.5rem 1.75rem 0.5rem 0.75rem;
+}
+
+.admin-courses__search input:focus,
+.admin-courses__status-filter select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+}
+
+.admin-courses__count {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--border-hairline);
+    border-radius: 999px;
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.admin-courses__search-feedback,
+.search-feedback {
+    flex-basis: 100%;
+    color: #f87171;
+    font-size: 0.8rem;
+}
+
+.admin-courses__filter-form[aria-busy="true"],
+.filter-search-wrapper[aria-busy="true"] {
+    opacity: 0.75;
+}
+
+.admin-courses__pagination {
+    padding: 1rem 1.5rem;
+    border-top: 1px solid var(--border-hairline);
 }
 
 /* Tombol Tambah */
@@ -1007,9 +1121,44 @@ button {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .admin-courses__header {
+    .admin-courses {
+        padding: 0 1rem;
+    }
+
+    .admin-courses__page-header {
         flex-direction: column;
         align-items: flex-start;
+        margin-bottom: 1.25rem;
+    }
+
+    .admin-courses__page-title {
+        font-size: 2rem;
+    }
+
+    .admin-courses__toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 1rem;
+    }
+
+    .admin-courses__filter-form {
+        width: 100%;
+    }
+
+    .admin-courses__search {
+        flex: 1 1 12rem;
+    }
+
+    .admin-courses__status-filter {
+        flex: 1 1 8rem;
+    }
+
+    .admin-courses__status-filter select {
+        width: 100%;
+    }
+
+    .admin-courses__count {
+        margin-left: auto;
     }
 
     .admin-courses__table th,
@@ -1028,6 +1177,11 @@ button {
 
     .admin-courses__btn .material-symbols-outlined {
         font-size: 0.875rem;
+    }
+
+    .admin-courses__pagination {
+        overflow-x: auto;
+        padding: 1rem;
     }
 }
 

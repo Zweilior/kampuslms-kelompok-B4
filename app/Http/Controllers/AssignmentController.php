@@ -61,10 +61,16 @@ class AssignmentController extends Controller
      * [ADMIN] Form tambah tugas.
      * CATATAN: Keamanan bergantung pada middleware 'role:admin'.
      */
-    public function adminCreate()
+    public function adminCreate(Request $request)
     {
         $courses = Course::query()->orderBy('name')->get(['id', 'name']);
-        return view('admin.assignments.form', ['assignment' => null, 'courses' => $courses]);
+        $selectedCourseId = $courses->firstWhere('id', (int) $request->query('course_id'))?->id;
+
+        return view('admin.assignments.form', [
+            'assignment' => null,
+            'courses' => $courses,
+            'selectedCourseId' => $selectedCourseId,
+        ]);
     }
 
     /**

@@ -335,6 +335,53 @@
             padding: 0 32px;
         }
 
+        .users-index__header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 1.5rem;
+            margin-bottom: 1.875rem;
+        }
+
+        .users-index__eyebrow {
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .users-index__title {
+            margin: 0.3125rem 0 0.625rem;
+            color: var(--text-primary);
+            font-family: "Plus Jakarta Sans", sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+        }
+
+        .users-index__subtitle {
+            margin: 0;
+            color: var(--text-secondary);
+        }
+
+        .users-index__count {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex: 0 0 auto;
+            min-height: 38px;
+            padding: 0 14px;
+            border: 1px solid var(--border-hairline);
+            border-radius: 999px;
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
         /* Style untuk Filter & Search Toolbar */
         .filter-search-wrapper {
             display: flex;
@@ -384,6 +431,39 @@
 
         .filter-search-wrapper input::placeholder {
             color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .users-container {
+                padding: 0 1rem;
+            }
+
+            .users-index__header {
+                align-items: flex-start;
+                flex-direction: column;
+                margin-bottom: 1.25rem;
+            }
+
+            .users-index__title {
+                font-size: 2rem;
+            }
+
+            .filter-search-wrapper {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .filter-search-wrapper select {
+                flex: 1 1 8rem;
+            }
+
+            .filter-search-wrapper .input-group {
+                flex: 1 1 12rem;
+            }
+
+            .filter-search-wrapper input {
+                width: 100%;
+            }
         }
 
         /* Style Tabel Profesional */
@@ -491,23 +571,162 @@
         .btn-delete:hover {
             background: rgba(239, 68, 68, 0.2);
         }
+
+        .users-modal.modal-overlay {
+            position: fixed;
+            z-index: 2000;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            overflow-y: auto;
+            padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right))
+                max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+            background: rgba(5, 9, 5, 0.72);
+            backdrop-filter: blur(9px);
+            -webkit-backdrop-filter: blur(9px);
+        }
+
+        .users-modal .modal-content {
+            width: min(100%, 43rem);
+            max-height: calc(100vh - 2rem);
+            max-height: calc(100dvh - 2rem);
+            margin: auto;
+            border-color: var(--border-hairline);
+            border-radius: 1.1rem;
+            background: var(--bg-elevated);
+            box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.48), 0 0 2rem var(--glow-sage);
+        }
+
+        .users-modal .modal-header,
+        .users-modal .modal-footer {
+            flex: 0 0 auto;
+        }
+
+        .users-modal form {
+            display: flex;
+            min-height: 0;
+            flex: 1 1 auto;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .users-modal .modal-body {
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .users-modal form .modal-body {
+            flex: 1 1 auto;
+        }
+
+        #modal-detail.modal-overlay {
+            align-items: center;
+        }
+
+        #modal-detail .modal-content {
+            width: min(100%, 38rem);
+        }
+
+        #modal-detail .modal-header {
+            flex: 0 0 auto;
+            padding: 1rem 1.25rem;
+            border-bottom-color: var(--border-hairline);
+            background: linear-gradient(110deg, var(--bg-hover), var(--bg-elevated));
+        }
+
+        #modal-detail .modal-header h2 {
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+
+        #modal-detail .modal-header h2 .material-symbols-outlined {
+            color: var(--primary);
+        }
+
+        #modal-detail .modal-body {
+            min-height: 0;
+            overflow-y: auto;
+            padding: 1.1rem 1.25rem;
+        }
+
+        #modal-detail .detail-grid {
+            gap: 0.75rem;
+        }
+
+        #modal-detail .detail-item {
+            gap: 0.35rem;
+            padding: 0.85rem 1rem;
+            border-color: var(--border-hairline);
+            border-radius: 0.8rem;
+            background: var(--bg-hover);
+        }
+
+        #modal-detail .detail-label {
+            color: var(--text-muted);
+            font-size: 0.68rem;
+            letter-spacing: 0.08em;
+        }
+
+        #modal-detail .detail-value {
+            color: var(--text-primary);
+            font-size: 0.92rem;
+            overflow-wrap: anywhere;
+        }
+
+        #modal-detail .detail-value.role-badge {
+            padding: 0.25rem 0.7rem;
+            font-size: 0.8rem;
+        }
+
+        #modal-detail .modal-footer {
+            flex: 0 0 auto;
+            padding: 0.8rem 1.25rem;
+            border-top-color: var(--border-hairline);
+            background: var(--bg-hover);
+        }
+
+        #modal-detail .btn-secondary {
+            min-width: 5rem;
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+            border-color: var(--border-hairline);
+        }
+
+        #modal-detail .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        @media (max-width: 600px) {
+            .users-modal.modal-overlay {
+                padding: max(0.65rem, env(safe-area-inset-top)) max(0.65rem, env(safe-area-inset-right))
+                    max(0.65rem, env(safe-area-inset-bottom)) max(0.65rem, env(safe-area-inset-left));
+            }
+
+            .users-modal .modal-content {
+                max-height: calc(100vh - 1.3rem);
+                max-height: calc(100dvh - 1.3rem);
+            }
+
+            #modal-detail .modal-header,
+            #modal-detail .modal-body,
+            #modal-detail .modal-footer {
+                padding-inline: 1rem;
+            }
+        }
     </style>
 
     {{-- KONTEN UTAMA --}}
     <div class="users-container">
 
         {{-- Header Halaman --}}
-        <div class="users-index__header"
-            style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+        <div class="users-index__header">
             <div class="users-index__title-group">
-                <span class="users-index__eyebrow"
-                    style="color: #a3e635; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; font-size: 0.8rem;">Manajemen
-                    Pengguna</span>
-                <h1 class="users-index__title"
-                    style="font-size: 2.5rem; color: #fff; margin: 5px 0 10px 0; font-family: 'Plus Jakarta Sans', sans-serif;">
-                    Daftar User</h1>
-                <p class="users-index__subtitle" style="color: #aaa; margin: 0;">Kelola akun admin, dosen, dan mahasiswa
-                    di sini.</p>
+                <span class="users-index__eyebrow">Manajemen Pengguna</span>
+                <h1 class="users-index__title">Daftar User</h1>
+                <p class="users-index__subtitle">Kelola akun admin, dosen, dan mahasiswa di sini.</p>
             </div>
 
             <button type="button" class="btn btn--primary" onclick="openCreateModal()"
@@ -525,6 +744,13 @@
                 {{ session('success') }}
             </div>
         @endif
+        @if (session('error'))
+            <div class="alert alert--error" role="alert"
+                style="background: rgba(220, 80, 72, 0.1); border: 1px solid rgba(220, 80, 72, 0.4); color: #e77d76; padding: 15px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                {{ session('error') }}
+            </div>
+        @endif
 
         {{-- Card Tabel --}}
         <div class="users-index__card"
@@ -538,34 +764,30 @@
                 <h2 class="users-index__card-title"
                     style="color: #fff; margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 10px;">
                     <span class="material-symbols-outlined" style="color: #a3e635;">group</span>
-                    Semua Pengguna
+                    Daftar Pengguna
                 </h2>
 
-                {{-- Kanan: Search, Filter, dan Count --}}
-                <form method="GET" action="{{ route('admin.users.index') }}" class="filter-search-wrapper">
-                    {{-- Input Pencarian --}}
-                    <div class="input-group">
-                        <span class="material-symbols-outlined">search</span>
-                        <input type="search" id="searchInput" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM...">
-                    </div>
-
+                {{-- Filter di kiri, pencarian dan jumlah hasil di kanan --}}
+                <form method="GET" action="{{ route('admin.users.index') }}" class="filter-search-wrapper" data-live-search data-live-target="#usersTable tbody" data-live-count=".users-index__count" data-live-pagination=".users-pagination">
                     {{-- Dropdown Filter Role --}}
-                    <select id="roleFilter" name="role" onchange="this.form.submit()">
+                    <select id="roleFilter" name="role" aria-label="Filter berdasarkan role">
                         <option value="">Semua Role</option>
                         <option value="admin" @selected(request('role') === 'admin')>Admin</option>
                         <option value="dosen" @selected(request('role') === 'dosen')>Dosen</option>
                         <option value="mahasiswa" @selected(request('role') === 'mahasiswa')>Mahasiswa</option>
                     </select>
 
-                    <button type="submit" class="table-action-btn btn-edit" title="Cari user" aria-label="Cari user">
-                        <span class="material-symbols-outlined">search</span>
-                    </button>
+                    {{-- Input Pencarian --}}
+                    <div class="input-group">
+                        <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                        <input type="search" id="searchInput" name="search" value="{{ request('search') }}" placeholder="Cari nama, email, NIM...">
+                    </div>
 
                     {{-- Badge Count --}}
-                    <span class="users-index__count"
-                        style="background: #333; color: #ccc; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+                    <span class="users-index__count">
                         {{ number_format($users->total()) }} user
                     </span>
+                    <span class="search-feedback" data-live-feedback role="status" aria-live="polite"></span>
                 </form>
             </div>
 
@@ -819,7 +1041,11 @@
     <script>
         // --- Logic Modal ---
         function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
+            const modal = document.getElementById(modalId);
+            if (modal.parentElement !== document.body) {
+                document.body.append(modal);
+            }
+            modal.classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 

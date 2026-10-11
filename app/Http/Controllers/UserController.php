@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
 
 class UserController extends Controller
 {
@@ -22,9 +23,9 @@ class UserController extends Controller
             $search = $request->input('search');
 
             $query->where(function ($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%")
-                    ->orWhere('nim_nip', 'like', "%{$search}%");
+                $q->where('name', 'like', "{$search}%")
+                    ->orWhere('email', 'like', "{$search}%")
+                    ->orWhere('nim_nip', 'like', "{$search}%");
             });
         }
 
@@ -143,9 +144,33 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        if (auth()->id() === $user->id) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'Akun yang sedang digunakan tidak dapat dihapus.');
+        }
+
+        if ($this->hasLinkedAcademicRecords($user)) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'User tidak dapat dihapus karena masih terhubung dengan data akademik. Pindahkan atau hapus keterkaitan datanya terlebih dahulu.');
+        }
+
         $user->delete();
+
         return redirect()
             ->route('admin.users.index')
             ->with('success', 'User berhasil dihapus.');
+    }
+
+    private function hasLinkedAcademicRecords(User $user): bool
+    {
+        return DB::table('courses')->where('lecturer_id', $user->id)->exists()
+            || DB::table('course_user')->where('user_id', $user->id)->exists()
+            || DB::table('materials')->where('uploaded_by', $user->id)->exists()
+            || DB::table('assignments')->where('created_by', $user->id)->exists()
+            || DB::table('submissions')->where('user_id', $user->id)->exists()
+            || DB::table('grades')->where('graded_by', $user->id)->exists()
+            || DB::table('final_grades')->where('user_id', $user->id)->exists();
     }
 }
