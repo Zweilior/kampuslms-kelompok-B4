@@ -24,6 +24,23 @@
 13. Kembali ke menu Laragon dan klik "Root" kemudian akan diarahkan ke folder "www" yang berisi fileLaravel yang sudah dibuat sebelumnya.
 14. Terakhir bisa membuka VSCode dan project Laravel yang sudah dibuat tadi bisa digunakan.
 
+### Konfigurasi Unggah Berkas
+Materi dan pengumpulan tugas disimpan di disk privat (`storage/app/private`), bukan di `storage/app/public`, jadi tidak perlu `php artisan storage:link` untuk keduanya. Berkas hanya bisa diunduh lewat controller yang memeriksa hak akses.
+
+Batas di `php.ini` mengalahkan batas validasi Laravel. Pastikan nilainya cukup:
+
+| Pengaturan | Nilai minimal |
+|------------|---------------|
+| `upload_max_filesize` | 20M |
+| `post_max_size` | 25M |
+
+Di Laragon: klik kanan Laragon > PHP > php.ini, ubah nilai di atas, lalu restart Apache (Stop All lalu Start All). Jika berkas di bawah 20 MB tetap gagal diunggah dengan pesan "Berkas gagal diunggah", periksa dua nilai ini.
+
+Pastikan `.env` tidak mengubah disk default: `FILESYSTEM_DISK=local` (atau tidak diisi).
+
+### Menjalankan Tes
+`php artisan test`
+
 
 ### Jobdesk
 |Anggota | Tugasnya |
