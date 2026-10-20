@@ -13,12 +13,17 @@ use Illuminate\Notifications\Notification;
  */
 class PengumpulanBaru extends Notification
 {
+    public Assignment $assignment;
+    public User $student;
+
     public function __construct(
         public Submission $submission,
-        public Assignment $assignment,
-        public User $student,
+        ?Assignment $assignment = null,
+        ?User $student = null,
         public bool $updated = false,
     ) {
+        $this->assignment = $assignment ?? $submission->assignment;
+        $this->student = $student ?? $submission->student;
     }
 
     public function via(object $notifiable): array
