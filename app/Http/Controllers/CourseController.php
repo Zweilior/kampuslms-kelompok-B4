@@ -10,6 +10,8 @@ use App\Support\CourseGradeCalculator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
+use App\Models\Submission;
+use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
