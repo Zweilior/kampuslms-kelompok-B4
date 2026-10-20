@@ -2,18 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreSubmissionRequest;
 use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\Grade;
 use App\Models\Submission;
 use App\Notifications\NilaiDiberikan;
+use App\Notifications\PengumpulanBaru;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class SubmissionController extends Controller
 {
@@ -203,34 +207,81 @@ class SubmissionController extends Controller
     }
 
     /**
-     * Menyimpan pengumpulan tugas.
+     * Menyimpan pengumpulan tugas (unggah file sungguhan).
      */
     public function store(
-        Request $request,
+        StoreSubmissionRequest $request,
         Course $course,
         Assignment $assignment
     ) {
         Gate::authorize('create', [Submission::class, $assignment]);
 
-        $validated = $request->validate([
-            'file_path' => ['required', 'string', 'max:255'],
-            'original_name' => ['required', 'string', 'max:255'],
-            'file_size' => ['nullable', 'integer', 'min:0'],
-            'note' => ['nullable', 'string'],
-        ]);
+        // Cek pengumpulan sebelumnya
+        $existingSubmission = $assignment->submissions()
+            ->where('user_id', $request->user()->id)
+            ->first();
 
-        $assignment->submissions()->create([
-            ...$validated,
-            'file_size' => $validated['file_size'] ?? 0,
-            'user_id' => $request->user()->id,
-            'submitted_at' => now(),
-        ]);
+        // 1. Blokir kumpul ulang jika tugas sudah dinilai
+        if ($existingSubmission && $existingSubmission->grade()->exists()) {
+            throw ValidationException::withMessages([
+                'file' => 'Tugas sudah dinilai dan tidak dapat dikumpulkan ulang.',
+            ]);
+        }
 
-        return redirect()
-            ->route(
-                'mahasiswa.courses.assignments.submissions.index',
-                [$course, $assignment]
-            )
-            ->with('success', 'Tugas berhasil dikumpulkan.');
+        // 2. Cek keterlambatan & batasan allow_late
+        $isLate = now()->gt($assignment->due_at);
+        if ($isLate && ! $assignment->allow_late) {
+            throw ValidationException::withMessages([
+                'file' => 'Batas waktu pengumpulan telah berakhir dan tugas ini tidak menerima keterlambatan.',
+            ]);
+        }
+
+        // 3. Simpan file baru ke penyimpanan lokal
+        $file = $request->file('file');
+        $newFilePath = $file->store("submissions/{$assignment->id}", 'local');
+        $oldFilePath = $existingSubmission?->file_path;
+
+        try {
+            // 4. Update atau buat baru (updateOrCreate)
+            $submission = Submission::updateOrCreate(
+                [
+                    'assignment_id' => $assignment->id,
+                    'user_id' => $request->user()->id,
+                ],
+                [
+                    'file_path' => $newFilePath,
+                    'original_name' => $file->getClientOriginalName(),
+                    'file_size' => $file->getSize(),
+                    'note' => $request->validated()['note'] ?? null,
+                    'submitted_at' => now(),
+                ]
+            );
+
+            // 5. Hapus file lama jika kumpul ulang berhasil
+            if ($oldFilePath && Storage::disk('local')->exists($oldFilePath)) {
+                Storage::disk('local')->delete($oldFilePath);
+            }
+
+            // 6. Kirim notifikasi PengumpulanBaru ke Dosen
+            $lecturer = $course->lecturer;
+            if ($lecturer) {
+                $lecturer->notify(new PengumpulanBaru($submission));
+            }
+
+            return redirect()
+                ->route(
+                    'mahasiswa.courses.assignments.submissions.index',
+                    [$course, $assignment]
+                )
+                ->with('success', 'Tugas berhasil dikumpulkan.');
+
+        } catch (\Throwable $e) {
+            // Jika ada error saat simpan DB, hapus file baru yang terlanjur ter-upload
+            if (Storage::disk('local')->exists($newFilePath)) {
+                Storage::disk('local')->delete($newFilePath);
+            }
+
+            throw $e;
+        }
     }
 }
