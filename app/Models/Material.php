@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Storage;
 
 class Material extends Model
 {
@@ -21,6 +22,15 @@ class Material extends Model
         'mime_type',
         'external_url',
     ];
+
+    protected static function booted(): void
+    {
+        static::deleting(function (Material $material) {
+            if ($material->file_path) {
+                Storage::disk('local')->delete($material->file_path);
+            }
+        });
+    }
 
     protected function casts(): array
     {
