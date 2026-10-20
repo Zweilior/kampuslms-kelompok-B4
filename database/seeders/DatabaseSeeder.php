@@ -14,6 +14,7 @@ use App\Support\GradeScale;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -291,6 +292,13 @@ class DatabaseSeeder extends Seeder
 
             $material->save();
 
+            if ($type === 'file') {
+                $this->putDummyFile($material->file_path, $material->original_name);
+                $material->update([
+                    'file_size' => Storage::disk('local')->size($material->file_path),
+                ]);
+            }            
+
             $this->totalMaterials++;
         }
     }
@@ -340,6 +348,15 @@ class DatabaseSeeder extends Seeder
                 ]
             );
         });
+    }
+
+    private function putDummyFile(string $path, string $name): void
+    {
+        $content = str_ends_with($path, '.pdf')
+            ? "%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj\n2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj\n3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 300 100]>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n"
+            : "Berkas dummy seeder: {$name}\n";
+
+        Storage::disk('local')->put($path, $content);
     }
 
 
@@ -418,6 +435,12 @@ class DatabaseSeeder extends Seeder
                 'is_late' => $late,
             ]
         );
+        $this->putDummyFile($submission->file_path, $submission->original_name);
+        $submission->update([
+            'file_size' => Storage::disk('local')->size($submission->file_path),
+        ]);
+
+        return $submission;
     }
 
     private function createGrade(Submission $submission, User $lecturer, int $ability): Grade
