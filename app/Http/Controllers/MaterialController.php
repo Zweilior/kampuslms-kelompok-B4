@@ -112,6 +112,15 @@ class MaterialController extends Controller
         return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil ditambahkan.');
     }
 
+    private function fileMessages(): array
+    {
+        return [
+            'file.mimes' => 'Format berkas harus PDF, PPT, PPTX, DOC, atau DOCX.',
+            'file.max'   => 'Ukuran berkas maksimal 20 MB.',
+            'file.uploaded' => 'Berkas gagal diunggah. Periksa ukuran berkas (batas server mungkin lebih kecil dari 20 MB).',
+        ];
+    }
+
     /**
      * [ADMIN] Edit materi.
      */
@@ -167,21 +176,16 @@ class MaterialController extends Controller
     {
         Gate::authorize('delete', $material); // BARU
 
-        $filePath = $material->file_path;
         $material->delete();
-
-        if ($filePath) {
-            Storage::delete($filePath);
-        }
 
         return redirect()->route('admin.materials.index')->with('success', 'Materi berhasil dihapus.');
     }
 
     private function adminMaterialRules(Request $request, bool $requireFile): array
     {
-        $fileRules = ['nullable', 'file', 'max:20480'];
+        $fileRules = ['nullable', 'file', 'mimes:pdf,ppt,pptx,doc,docx', 'max:20480'];
         if ($requireFile && $request->input('type') === 'file') {
-            $fileRules = ['required', 'file', 'max:20480'];
+            $fileRules = ['required', 'file', 'mimes:pdf,ppt,pptx,doc,docx', 'max:20480'];
         }
 
         return [
@@ -221,7 +225,7 @@ class MaterialController extends Controller
             'description' => ['nullable', 'string'],
             'type' => ['required', 'in:file,link'],
             'external_url' => ['nullable', 'required_if:type,link', 'url', 'max:2048'],
-            'file' => ['nullable', 'file', 'max:20480'],
+            'file' => ['nullable', 'file', 'mimes:pdf,ppt,pptx,doc,docx', 'max:20480'],
         ]);
 
         // Kolom materials.description NOT NULL, sedangkan aturan validasinya nullable.
@@ -259,7 +263,7 @@ class MaterialController extends Controller
             'description' => ['nullable', 'string'],
             'type' => ['required', 'in:file,link'],
             'external_url' => ['nullable', 'required_if:type,link', 'url', 'max:2048'],
-            'file' => ['nullable', 'file', 'max:20480'],
+            'file' => ['nullable', 'file', 'mimes:pdf,ppt,pptx,doc,docx', 'max:20480'],
         ]);
 
         // Kolom materials.description NOT NULL, sedangkan aturan validasinya nullable.
@@ -268,13 +272,24 @@ class MaterialController extends Controller
         $oldFile = $material->file_path;
         $material->fill($validated);
 
-        if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $material->file_path = $file->store('materials');
-            $material->original_name = $file->getClientOriginalName();
-            $material->file_size = $file->getSize();
-            $material->mime_type = $file->getMimeType();
+        // ↓↓↓ blok baru menggantikan `if ($request->hasFile('file')) {...}` ↓↓↓
+        if ($material->type === 'link') {
+            $material->file_path = null;
+            $material->original_name = null;
+            $material->file_size = null;
+            $material->mime_type = null;
+        } else {
+            $material->external_url = null;
+
+            if ($request->hasFile('file')) {
+                $file = $request->file('file');
+                $material->file_path = $file->store('materials');
+                $material->original_name = $file->getClientOriginalName();
+                $material->file_size = $file->getSize();
+                $material->mime_type = $file->getMimeType();
+            }
         }
+        // ↑↑↑ sampai sini ↑↑↑
 
         $material->save();
 
@@ -290,12 +305,7 @@ class MaterialController extends Controller
     {
         Gate::authorize('delete', $material); // BARU
 
-        $file = $material->file_path;
         $material->delete();
-
-        if ($file) {
-            Storage::delete($file);
-        }
 
         return redirect()->route('dosen.courses.materials.index', $course)
             ->with('success', 'Materi berhasil dihapus.');
