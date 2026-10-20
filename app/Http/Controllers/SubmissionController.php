@@ -262,27 +262,9 @@ class SubmissionController extends Controller
                     'file_size' => $file->getSize(),
                     'note' => $request->validated()['note'] ?? null,
                     'submitted_at' => now(),
+                    'is_late' => $isLate,
                 ]
             );
-
-            // 5. Hapus file lama jika kumpul ulang berhasil
-            if ($oldFilePath && Storage::disk('local')->exists($oldFilePath)) {
-                Storage::disk('local')->delete($oldFilePath);
-            }
-
-            // 6. Kirim notifikasi PengumpulanBaru ke Dosen
-            $lecturer = $course->lecturer;
-            if ($lecturer) {
-                $lecturer->notify(new PengumpulanBaru($submission));
-            }
-
-            return redirect()
-                ->route(
-                    'mahasiswa.courses.assignments.submissions.index',
-                    [$course, $assignment]
-                )
-                ->with('success', 'Tugas berhasil dikumpulkan.');
-
         } catch (\Throwable $e) {
             // Jika ada error saat simpan DB, hapus file baru yang terlanjur ter-upload
             if (Storage::disk('local')->exists($newFilePath)) {
@@ -291,6 +273,31 @@ class SubmissionController extends Controller
 
             throw $e;
         }
+
+        $created = $submission->wasRecentlyCreated;
+
+        // Hapus file lama hanya setelah record baru berhasil disimpan.
+        if ($oldFilePath && $oldFilePath !== $newFilePath) {
+            Storage::disk('local')->delete($oldFilePath);
+        }
+
+        // Kirim notifikasi yang membedakan pengumpulan baru dan pengumpulan ulang.
+        $lecturer = $course->lecturer;
+        if ($lecturer) {
+            $lecturer->notify(new PengumpulanBaru(
+                $submission,
+                $assignment,
+                $request->user(),
+                updated: ! $created
+            ));
+        }
+
+        return redirect()
+            ->route(
+                'mahasiswa.courses.assignments.submissions.index',
+                [$course, $assignment]
+            )
+            ->with('success', 'Tugas berhasil dikumpulkan.');
     }
 
     /**
