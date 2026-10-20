@@ -53,6 +53,11 @@ Route::get('/courses/{course}/materials/{material}/download', [MaterialControlle
     ->scopeBindings()
     ->name('courses.materials.download');
 
+// Unduh file submission: hak akses diputuskan oleh SubmissionPolicy@download
+Route::get('/submissions/{submission}/download', [SubmissionController::class, 'download'])
+    ->middleware('auth')
+    ->name('submissions.download');
+
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'adminDashboard'])->name('dashboard');
 
@@ -114,7 +119,6 @@ Route::prefix('dosen')->name('dosen.')->middleware(['auth', 'role:dosen'])->scop
     Route::get('/courses/{course}/assignments/{assignment}/submissions/export', [SubmissionController::class, 'dosenExport'])->name('courses.assignments.submissions.export');
     Route::put('/courses/{course}/assignments/{assignment}/submissions/{submission}/grade', [SubmissionController::class, 'dosenGrade'])->name('courses.assignments.submissions.grade');
 
-    // Tambahkan route ini di dalam group dosen, setelah route assignments/submissions
     Route::get('/courses/{course}/grade-components', [GradeComponentController::class, 'dosenIndex'])->name('courses.grade-components.index');
     Route::post('/courses/{course}/grade-components', [GradeComponentController::class, 'dosenStore'])->name('courses.grade-components.store');
     Route::put('/courses/{course}/grade-components/{gradeComponent}', [GradeComponentController::class, 'dosenUpdate'])->name('courses.grade-components.update');
