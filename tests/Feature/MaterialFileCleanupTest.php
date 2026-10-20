@@ -326,4 +326,31 @@ class MaterialFileCleanupTest extends TestCase
         $this->assertSame('2,0 KB', (new Submission(['file_size' => 2048]))->file_size_for_humans);
         $this->assertNull((new Material())->file_size_for_humans);
     }
+
+    public function test_dosen_index_lists_enrolled_students_who_have_not_submitted(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->create(['lecturer_id' => $lecturer->id]);
+        $assignment = Assignment::factory()->create([
+            'course_id' => $course->id,
+            'created_by' => $lecturer->id,
+        ]);
+
+        $done = User::factory()->mahasiswa()->create();
+        $pending = User::factory()->mahasiswa()->create();
+        $course->students()->attach([
+            $done->id => ['enrolled_at' => now()],
+            $pending->id => ['enrolled_at' => now()],
+        ]);
+        Submission::factory()->create([
+            'assignment_id' => $assignment->id,
+            'user_id' => $done->id,
+        ]);
+
+        $this->actingAs($lecturer)
+            ->get(route('dosen.courses.assignments.submissions.index', [$course, $assignment]))
+            ->assertOk()
+            ->assertViewHas('notSubmitted')
+            ->assertViewHas('notSubmitted', fn ($list) => $list->pluck('id')->all() === [$pending->id]);
+    }
 }

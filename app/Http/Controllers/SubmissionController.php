@@ -33,15 +33,23 @@ class SubmissionController extends Controller
             'all' => $assignment->submissions()->count(),
             'graded' => $assignment->submissions()->whereHas('grade')->count(),
             'ungraded' => $assignment->submissions()->whereDoesntHave('grade')->count(),
+            'late' => $assignment->submissions()->where('is_late', true)->count(), // BARU
         ];
         $submissions = $this->dosenSubmissionsQuery($assignment, $status)->get();
+
+        // BARU: mahasiswa terdaftar yang belum mengumpulkan tugas ini
+        $notSubmitted = $course->students()
+            ->whereDoesntHave('submissions', fn ($q) => $q->where('assignment_id', $assignment->id))
+            ->orderBy('nim_nip')
+            ->get();
 
         return view('dosen.assignments.show', compact(
             'course',
             'assignment',
             'submissions',
             'submissionCounts',
-            'status'
+            'status',
+            'notSubmitted' // BARU
         ));
     }
 
