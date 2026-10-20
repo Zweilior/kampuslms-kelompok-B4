@@ -7,6 +7,8 @@ use App\Models\Course;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class MahasiswaSubmissionRouteTest extends TestCase
@@ -15,6 +17,8 @@ class MahasiswaSubmissionRouteTest extends TestCase
 
     public function test_enrolled_student_can_submit_using_the_mahasiswa_route(): void
     {
+        Storage::fake('local');
+
         $student = User::factory()->mahasiswa()->create();
         $lecturer = User::factory()->dosen()->create();
         $course = Course::factory()->create(['lecturer_id' => $lecturer->id]);
@@ -24,10 +28,11 @@ class MahasiswaSubmissionRouteTest extends TestCase
             'created_by' => $lecturer->id,
         ]);
 
+        $file = UploadedFile::fake()->create('tugas.pdf', 100, 'application/pdf');
+
         $this->actingAs($student)
             ->post(route('mahasiswa.courses.assignments.submissions.store', [$course, $assignment]), [
-                'file_path' => 'https://example.test/tugas.pdf',
-                'original_name' => 'tugas.pdf',
+                'file' => $file,
                 'note' => 'Tugas selesai.',
             ])
             ->assertRedirect(route('mahasiswa.courses.assignments.submissions.index', [$course, $assignment]));
@@ -50,10 +55,11 @@ class MahasiswaSubmissionRouteTest extends TestCase
             'created_by' => $lecturer->id,
         ]);
 
+        $file = UploadedFile::fake()->create('tugas.pdf', 100, 'application/pdf');
+
         $this->actingAs($student)
             ->post(route('mahasiswa.courses.assignments.submissions.store', [$course, $assignment]), [
-                'file_path' => 'https://example.test/tugas.pdf',
-                'original_name' => 'tugas.pdf',
+                'file' => $file,
             ])
             ->assertForbidden();
 

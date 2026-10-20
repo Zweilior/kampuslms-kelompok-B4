@@ -37,29 +37,36 @@
                 @error('description') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
             </div>
 
-            <div>
-                <label for="type" class="mb-1 block font-label-md text-label-md text-on-surface">Jenis Materi</label>
-                <select id="type" name="type" required class="w-full rounded-xl border border-outline/10 bg-surface-container px-space-md py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
-                    <option value="link" @selected(old('type', $material?->type ?? 'link') === 'link')>Link</option>
-                    <option value="file" @selected(old('type', $material?->type) === 'file')>File</option>
-                </select>
-                @error('type') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
-            </div>
+            <div x-data="{ type: @js(old('type', $material?->type ?? 'file')) }" class="space-y-space-md">
+                <div>
+                    <label for="type" class="mb-1 block font-label-md text-label-md text-on-surface">Jenis Materi</label>
+                    <select id="type" name="type" x-model="type" required class="w-full rounded-xl border border-outline/10 bg-surface-container px-space-md py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
+                        <option value="file">File</option>
+                        <option value="link">Link</option>
+                    </select>
+                    @error('type') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
+                </div>
 
-            <div>
-                <label for="external_url" class="mb-1 block font-label-md text-label-md text-on-surface">URL Materi</label>
-                <input id="external_url" type="url" name="external_url" value="{{ old('external_url', $material?->external_url) }}" placeholder="https://..." class="w-full rounded-xl border border-outline/10 bg-surface-container px-space-md py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
-                @error('external_url') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
-            </div>
+                <div x-cloak x-show="type === 'link'" x-transition.opacity>
+                    <label for="external_url" class="mb-1 block font-label-md text-label-md text-on-surface">URL Materi <span class="text-error">*</span></label>
+                    <input id="external_url" type="url" name="external_url" value="{{ old('external_url', $material?->external_url) }}" placeholder="https://..." :required="type === 'link'" class="w-full rounded-xl border border-outline/10 bg-surface-container px-space-md py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary">
+                    @error('external_url') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
+                </div>
 
-            <div>
-                <label for="file" class="mb-1 block font-label-md text-label-md text-on-surface">File Materi</label>
-                @if ($material?->original_name)
-                    <p class="mb-2 font-body-sm text-body-sm text-on-surface-variant">File saat ini: {{ $material->original_name }}</p>
-                @endif
-                <input id="file" type="file" name="file" class="w-full rounded-xl border border-outline/10 bg-surface-container px-space-md py-3 text-on-surface file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-on-primary">
-                <p class="mt-1 text-sm text-on-surface-variant">Wajib diisi untuk jenis File; maksimal 20 MB. Saat mengedit, file lama tetap digunakan jika tidak memilih file baru.</p>
-                @error('file') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
+                <div x-cloak x-show="type === 'file'" x-transition.opacity>
+                    <label for="file" class="mb-1 block font-label-md text-label-md text-on-surface">File Materi</label>
+                    @if ($material?->original_name)
+                        <p class="mb-2 font-body-sm text-body-sm text-on-surface-variant">
+                            File saat ini: <strong class="text-on-surface">{{ $material->original_name }}</strong>
+                            @if ($material->fileSizeForHumans)
+                                <span class="text-xs">({{ $material->fileSizeForHumans }})</span>
+                            @endif
+                        </p>
+                    @endif
+                    <input id="file" type="file" name="file" accept=".pdf,.ppt,.pptx,.doc,.docx" class="w-full rounded-xl border border-outline/10 bg-surface-container px-space-md py-3 text-on-surface file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-on-primary">
+                    <p class="mt-1 text-sm text-on-surface-variant">Format berkas: PDF, PPT, PPTX, DOC, atau DOCX. Ukuran file maksimal 20 MB</p>
+                    @error('file') <p class="mt-1 text-sm text-error">{{ $message }}</p> @enderror
+                </div>
             </div>
 
             <div class="flex justify-end gap-space-sm border-t border-outline/10 pt-space-md">
