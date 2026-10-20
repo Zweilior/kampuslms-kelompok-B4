@@ -23,7 +23,7 @@ class DosenCourseEditTest extends TestCase
             ->assertOk()
             ->assertSee('Edit Mata Kuliah')
             ->assertSee(route('dosen.courses.edit', $course))
-            ->assertSee('Enrolment')
+            ->assertSee('Enrollment')
             ->assertSee(route('dosen.courses.enrollments.index', $course));
 
         $this->get(route('dosen.courses.edit', $course))
