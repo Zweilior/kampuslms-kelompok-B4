@@ -312,7 +312,24 @@ class CourseController extends Controller
     {
         Gate::authorize('delete', $course);
 
+        // FK submissions tidak cascade, jadi tolak dengan pesan yang jelas
+        // (konsisten dengan keputusan Q6 pada penghapusan tugas).
+        $hasSubmissions = Submission::whereHas(
+            'assignment',
+            fn ($q) => $q->where('course_id', $course->id)
+        )->exists();
+
+        if ($hasSubmissions) {
+            return back()->with('error', 'Mata kuliah tidak dapat dihapus karena sudah memiliki pengumpulan tugas.');
+        }
+
+        // Ambil path dulu: cascade di DB tidak memicu event model.
+        $paths = $course->materials()->whereNotNull('file_path')->pluck('file_path');
+
         $course->delete();
+
+        // Hapus berkas hanya setelah baris database berhasil dihapus.
+        Storage::disk('local')->delete($paths->all());
 
         return redirect()
             ->route($this->routePrefix().'.index')
