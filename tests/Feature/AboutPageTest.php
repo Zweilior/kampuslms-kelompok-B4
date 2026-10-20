@@ -13,7 +13,7 @@ class AboutPageTest extends TestCase
             ->assertSee('TENTANG EDUSPACE')
             ->assertSee('Tim Pengembang')
             ->assertSee('Muhammad Arif Saputra')
-            ->assertSee('Ketua Tim Pengembang')
+            ->assertSee('Full-stack Developer')
             ->assertSee('10241044')
             ->assertSee('Program Studi')
             ->assertSee('Sistem Informasi')
