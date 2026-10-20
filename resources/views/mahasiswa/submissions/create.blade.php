@@ -2,20 +2,15 @@
 
 @section('content')
     <div class="mahasiswa-page mahasiswa-page--submission-create">
-        <header class="mahasiswa-page__header lms-page-header">
-            <div class="mahasiswa-page__header-copy">
-                <a href="{{ route('mahasiswa.courses.assignments.index', $course->id) }}" class="mahasiswa-page__back">
-                    <span class="material-symbols-outlined">arrow_back</span>
-                    Kembali ke daftar tugas
-                </a>
-            </div>
-            <span class="mahasiswa-page__icon-box"><span class="material-symbols-outlined">upload_file</span></span>
-        </header>
-
         @php
             $isLate = now()->gt($assignment->due_at);
             $existingSubmission = $assignment->submissions()->where('user_id', auth()->id())->first();
         @endphp
+
+        <a href="{{ route('mahasiswa.courses.assignments.index', $course->id) }}" class="mahasiswa-page__submission-back">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Kembali ke daftar tugas
+        </a>
 
         {{-- Notifikasi Di Atas Informasi Tugas Yang Dikumpulkan --}}
         <div class="w-full max-w-[880px] mx-auto space-y-3 mb-4">
@@ -67,7 +62,7 @@
             @endif
         </div>
 
-        <section class="mahasiswa-page__card mahasiswa-page__submission-context" aria-label="Informasi tugas">
+        <section class="mahasiswa-page__card mahasiswa-page__submission-context mahasiswa-page__submission-context--hero" aria-label="Informasi tugas">
             <span class="mahasiswa-page__icon-box">
                 <span class="material-symbols-outlined">assignment</span>
             </span>

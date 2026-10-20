@@ -7,10 +7,12 @@
                 <p class="admin-courses__page-subtitle">Kelola mata kuliah, dosen pengampu, dan status perkuliahan di sini.</p>
             </div>
 
-            <a href="{{ route('admin.courses.create') }}" class="admin-courses__btn-add">
-                <span class="material-symbols-outlined" aria-hidden="true">add</span>
-                Tambah MK
-            </a>
+            @can('create', \App\Models\Course::class)
+                <a href="{{ route('admin.courses.create') }}" class="admin-courses__btn-add">
+                    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                    Tambah MK
+                </a>
+            @endcan
         </header>
 
         <div class="admin-courses__card">
@@ -74,37 +76,43 @@
                             <td class="admin-courses__sks">{{ $course->sks }}</td>
                             <td class="admin-courses__dosen">{{ $course->lecturer?->name ?? 'Belum ditentukan' }}</td>
                             <td class="admin-courses__actions">
-                                <a href="{{ route('admin.courses.show', $course->id) }}" class="admin-courses__btn admin-courses__btn--detail">
-                                    <span class="material-symbols-outlined">visibility</span>
-                                    Kelola
-                                </a>
-                                <button
-                                    type="button"
-                                    class="admin-courses__btn admin-courses__btn--edit"
-                                    data-edit-course
-                                    data-update-url="{{ route('admin.courses.update', $course->id) }}"
-                                    data-course-id="{{ $course->id }}"
-                                    data-course-code="{{ $course->code }}"
-                                    data-course-name="{{ $course->name }}"
-                                    data-course-description="{{ $course->description }}"
-                                    data-course-sks="{{ $course->sks }}"
-                                    data-course-lecturer="{{ $course->lecturer_id }}"
-                                    data-course-status="{{ $course->status }}"
-                                >
-                                    <span class="material-symbols-outlined">edit</span>
-                                    Edit
-                                </button>
-                                <button
-                                    type="button"
-                                    class="admin-courses__btn admin-courses__btn--danger"
-                                    data-delete-course
-                                    data-delete-url="{{ route('admin.courses.destroy', $course->id) }}"
-                                    data-course-name="{{ $course->name }}"
-                                    data-course-code="{{ $course->code }}"
-                                >
-                                    <span class="material-symbols-outlined">delete</span>
-                                    Hapus
-                                </button>
+                                @can('view', $course)
+                                    <a href="{{ route('admin.courses.show', $course->id) }}" class="admin-courses__btn admin-courses__btn--detail">
+                                        <span class="material-symbols-outlined">visibility</span>
+                                        Kelola
+                                    </a>
+                                @endcan
+                                @can('update', $course)
+                                    <button
+                                        type="button"
+                                        class="admin-courses__btn admin-courses__btn--edit"
+                                        data-edit-course
+                                        data-update-url="{{ route('admin.courses.update', $course->id) }}"
+                                        data-course-id="{{ $course->id }}"
+                                        data-course-code="{{ $course->code }}"
+                                        data-course-name="{{ $course->name }}"
+                                        data-course-description="{{ $course->description }}"
+                                        data-course-sks="{{ $course->sks }}"
+                                        data-course-lecturer="{{ $course->lecturer_id }}"
+                                        data-course-status="{{ $course->status }}"
+                                    >
+                                        <span class="material-symbols-outlined">edit</span>
+                                        Edit
+                                    </button>
+                                @endcan
+                                @can('delete', $course)
+                                    <button
+                                        type="button"
+                                        class="admin-courses__btn admin-courses__btn--danger"
+                                        data-delete-course
+                                        data-delete-url="{{ route('admin.courses.destroy', $course->id) }}"
+                                        data-course-name="{{ $course->name }}"
+                                        data-course-code="{{ $course->code }}"
+                                    >
+                                        <span class="material-symbols-outlined">delete</span>
+                                        Hapus
+                                    </button>
+                                @endcan
                             </td>
                         </tr>
                         @empty
