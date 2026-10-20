@@ -15,10 +15,12 @@
                 <h1>{{ $course->name }}</h1>
                 <p>Kelola materi belajar dan sumber referensi untuk mata kuliah ini.</p>
             </div>
-            <a href="{{ route('dosen.courses.materials.create', $course) }}" class="dosen-assignment__create">
-                <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>
-                Upload Materi
-            </a>
+            @can('create', [\App\Models\Material::class, $course])
+                <a href="{{ route('dosen.courses.materials.create', $course) }}" class="dosen-assignment__create">
+                    <span class="material-symbols-outlined" aria-hidden="true">upload_file</span>
+                    Upload Materi
+                </a>
+            @endcan
         </header>
 
         @if (session('success'))
@@ -57,20 +59,24 @@
                         @endif
                     </div>
                     <div class="dosen-assignment__actions dosen-material-card__actions">
-                        <a href="{{ route('dosen.courses.materials.edit', [$course, $material]) }}" class="dosen-assignment__btn dosen-assignment__btn--edit">
-                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>Edit
-                        </a>
-                        <form action="{{ route('dosen.courses.materials.destroy', [$course, $material]) }}" method="POST">
-                            @csrf
-                            @method('DELETE')
-                            <button type="button"
-                                    class="dosen-assignment__btn dosen-assignment__btn--danger"
-                                    data-delete-url="{{ route('dosen.courses.materials.destroy', [$course, $material]) }}"
-                                    data-material-title="{{ $material->title }}"
-                                    @click="deleteAction = $el.dataset.deleteUrl; deleteTitle = $el.dataset.materialTitle; deleteOpen = true">
-                                <span class="material-symbols-outlined" aria-hidden="true">delete</span>Hapus
-                            </button>
-                        </form>
+                        @can('update', $material)
+                            <a href="{{ route('dosen.courses.materials.edit', [$course, $material]) }}" class="dosen-assignment__btn dosen-assignment__btn--edit">
+                                <span class="material-symbols-outlined" aria-hidden="true">edit</span>Edit
+                            </a>
+                        @endcan
+                        @can('delete', $material)
+                            <form action="{{ route('dosen.courses.materials.destroy', [$course, $material]) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button"
+                                        class="dosen-assignment__btn dosen-assignment__btn--danger"
+                                        data-delete-url="{{ route('dosen.courses.materials.destroy', [$course, $material]) }}"
+                                        data-material-title="{{ $material->title }}"
+                                        @click="deleteAction = $el.dataset.deleteUrl; deleteTitle = $el.dataset.materialTitle; deleteOpen = true">
+                                    <span class="material-symbols-outlined" aria-hidden="true">delete</span>Hapus
+                                </button>
+                            </form>
+                        @endcan
                     </div>
                 </article>
             @empty
@@ -78,9 +84,11 @@
                     <span class="material-symbols-outlined" aria-hidden="true">auto_stories</span>
                     <h2>Belum ada materi</h2>
                     <p>Tambahkan file atau tautan referensi agar mahasiswa bisa mengakses materi kelas.</p>
-                    <a href="{{ route('dosen.courses.materials.create', $course) }}" class="dosen-assignment__create">
-                        <span class="material-symbols-outlined" aria-hidden="true">add</span>Tambah Materi
-                    </a>
+                    @can('create', [\App\Models\Material::class, $course])
+                        <a href="{{ route('dosen.courses.materials.create', $course) }}" class="dosen-assignment__create">
+                            <span class="material-symbols-outlined" aria-hidden="true">add</span>Tambah Materi
+                        </a>
+                    @endcan
                 </div>
             @endforelse
         </section>

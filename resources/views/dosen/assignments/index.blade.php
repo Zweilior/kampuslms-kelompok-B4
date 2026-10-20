@@ -2,24 +2,26 @@
     <main class="dosen-assignment-list"
          x-data="{ deleteOpen: false, deleteAction: '', deleteTitle: '' }"
          @keydown.escape.window="deleteOpen = false">
+        <a href="{{ route('dosen.courses.show', ['course' => $course, 'focus' => 'assignments']) }}" class="dosen-assignment-form__back">
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+            {{ $course->name }}
+        </a>
+
         <header class="mb-space-lg lms-page-header">
-            <a href="{{ route('dosen.courses.show', ['course' => $course, 'focus' => 'assignments']) }}" class="lms-page-back mb-space-md inline-flex items-center gap-space-xs font-label-md text-on-surface-variant hover:text-primary">
-                <span class="material-symbols-outlined text-base">arrow_back</span>{{ $course->name }}
-            </a>
-            <div class="flex flex-wrap items-end justify-between gap-space-md">
-                <div>
-                    <div class="flex items-center gap-space-xs mb-space-2xs">
-                        <span class="px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm uppercase">Pengelolaan kelas</span>
-                        <span class="w-1 h-1 rounded-full bg-outline"></span>
-                        <span class="font-label-sm text-label-sm text-on-surface-variant">{{ $course->code }}</span>
-                    </div>
-                    <h1 class="font-headline-lg text-headline-lg text-on-surface">Tugas dan Nilai</h1>
-                    <p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Pantau pengumpulan dan kelola nilai tugas mata kuliah ini.</p>
+            <div class="lms-page-header__copy">
+                <div class="dosen-assignment-form__eyebrow">
+                    <span>{{ $course->code }}</span>
+                    <span class="dosen-assignment-form__dot" aria-hidden="true"></span>
+                    <span>Pengelolaan kelas</span>
                 </div>
+                <h1>Tugas dan Nilai</h1>
+                <p>Pantau pengumpulan dan kelola nilai tugas mata kuliah ini.</p>
+            </div>
+            @can('create', [\App\Models\Assignment::class, $course])
                 <a href="{{ route('dosen.courses.assignments.create', $course) }}" class="dosen-assignment__create">
                     <span class="material-symbols-outlined text-base">add</span>Buat Tugas
                 </a>
-            </div>
+            @endcan
         </header>
 
         @if (session('success'))
@@ -59,10 +61,12 @@
                                 </td>
                                 <td class="px-space-md py-space-md">
                                     <div class="dosen-assignment__actions">
-                                        <a href="{{ route('dosen.courses.assignments.edit', [$course, $assignment]) }}" class="dosen-assignment__btn dosen-assignment__btn--edit">
-                                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
-                                            Edit
-                                        </a>
+                                        @can('update', $assignment)
+                                            <a href="{{ route('dosen.courses.assignments.edit', [$course, $assignment]) }}" class="dosen-assignment__btn dosen-assignment__btn--edit">
+                                                <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                                                Edit
+                                            </a>
+                                        @endcan
                                         @if ($assignment->due_at->lte(now()))
                                             <a href="{{ route('dosen.courses.assignments.submissions.index', [$course, $assignment]) }}" class="dosen-assignment__btn dosen-assignment__btn--grade">
                                                 <span class="material-symbols-outlined" aria-hidden="true">grading</span>
@@ -73,19 +77,21 @@
                                                 Unduh CSV
                                             </a>
                                         @endif
-                                        <form action="{{ route('dosen.courses.assignments.destroy', [$course, $assignment]) }}" method="POST" class="inline">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button"
-                                                    class="dosen-assignment__btn dosen-assignment__btn--danger"
-                                                    data-delete-url="{{ route('dosen.courses.assignments.destroy', [$course, $assignment]) }}"
-                                                    data-assignment-title="{{ $assignment->title }}"
-                                                    aria-haspopup="dialog"
-                                                    @click="deleteAction = $el.dataset.deleteUrl; deleteTitle = $el.dataset.assignmentTitle; deleteOpen = true">
-                                                <span class="material-symbols-outlined" aria-hidden="true">delete</span>
-                                                Hapus
-                                            </button>
-                                        </form>
+                                        @can('delete', $assignment)
+                                            <form action="{{ route('dosen.courses.assignments.destroy', [$course, $assignment]) }}" method="POST" class="inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button"
+                                                        class="dosen-assignment__btn dosen-assignment__btn--danger"
+                                                        data-delete-url="{{ route('dosen.courses.assignments.destroy', [$course, $assignment]) }}"
+                                                        data-assignment-title="{{ $assignment->title }}"
+                                                        aria-haspopup="dialog"
+                                                        @click="deleteAction = $el.dataset.deleteUrl; deleteTitle = $el.dataset.assignmentTitle; deleteOpen = true">
+                                                    <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                                                    Hapus
+                                                </button>
+                                            </form>
+                                        @endcan
                                     </main>
                                 </td>
                             </tr>

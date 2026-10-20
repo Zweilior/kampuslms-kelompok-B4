@@ -7,7 +7,7 @@
 
         <header class="dosen-assignment-form__header lms-page-header">
             <span class="dosen-assignment-form__icon material-symbols-outlined" aria-hidden="true">upload_file</span>
-            <div>
+            <div class="lms-page-header__copy">
                 <div class="dosen-assignment-form__eyebrow">
                     <span>{{ $course->code }}</span>
                     <span class="dosen-assignment-form__dot" aria-hidden="true"></span>

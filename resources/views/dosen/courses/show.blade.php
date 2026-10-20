@@ -14,18 +14,24 @@
                     <h1 class="dosen-course-hero__title">{{ $course->name }}</h1>
                     <p class="dosen-course-hero__description">{{ $course->sks }} SKS · Kelas yang Anda ampu</p>
                     <div class="dosen-course-hero__actions">
-                        <a href="{{ route('dosen.courses.edit', $course) }}" class="dosen-course-hero__action">
-                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
-                            Edit Mata Kuliah
-                        </a>
-                        <a href="{{ route('dosen.courses.enrollments.index', $course) }}" class="dosen-course-hero__action">
-                            <span class="material-symbols-outlined" aria-hidden="true">group_add</span>
-                            Enrollment
-                        </a>
-                        <a href="{{ route('dosen.courses.grade-components.index', $course) }}" class="dosen-course-hero__action">
-                            <span class="material-symbols-outlined" aria-hidden="true">edit_note</span>
-                            Edit Rubrik
-                        </a>
+                        @can('update', $course)
+                            <a href="{{ route('dosen.courses.edit', $course) }}" class="dosen-course-hero__action">
+                                <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                                Edit Mata Kuliah
+                            </a>
+                        @endcan
+                        @can('manageEnrollment', $course)
+                            <a href="{{ route('dosen.courses.enrollments.index', $course) }}" class="dosen-course-hero__action">
+                                <span class="material-symbols-outlined" aria-hidden="true">group_add</span>
+                                Enrollment
+                            </a>
+                        @endcan
+                        @can('create', [\App\Models\GradeComponent::class, $course])
+                            <a href="{{ route('dosen.courses.grade-components.index', $course) }}" class="dosen-course-hero__action">
+                                <span class="material-symbols-outlined" aria-hidden="true">edit_note</span>
+                                Edit Rubrik
+                            </a>
+                        @endcan
                     </div>
                 </div>
                 <span class="dosen-course-hero__badge">{{ $course->status }}</span>
