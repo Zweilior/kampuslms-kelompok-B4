@@ -20,6 +20,14 @@
                     <div class="mahasiswa-page__icon-box"><span class="material-symbols-outlined">description</span></div>
                     <div class="mahasiswa-page__list-copy">
                         <strong>{{ $material->title }}</strong>
+                        @if ($material->type === 'file' && $material->original_name)
+                            <p class="text-xs text-on-surface-variant font-medium">
+                                {{ $material->original_name }}
+                                @if ($material->fileSizeForHumans)
+                                    · {{ $material->fileSizeForHumans }}
+                                @endif
+                            </p>
+                        @endif
                         <p>{{ $material->description }}</p>
                     </div>
                     @if ($material->external_url)

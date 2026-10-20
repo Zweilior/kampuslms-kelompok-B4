@@ -67,6 +67,14 @@
                                 <td class="px-space-md py-space-sm">
                                     <span class="font-label-md text-label-md text-on-surface">{{ $material->title }}</span>
                                     <span class="block max-w-md truncate font-body-sm text-body-sm text-on-surface-variant">{{ $material->description }}</span>
+                                    @if ($material->type === 'file' && $material->original_name)
+                                        <span class="block font-label-sm text-xs text-outline">
+                                            {{ $material->original_name }}
+                                            @if ($material->fileSizeForHumans)
+                                                · {{ $material->fileSizeForHumans }}
+                                            @endif
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="px-space-md py-space-sm">
                                     <span class="inline-flex px-2.5 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm">{{ $material->type === 'link' ? 'Link' : 'File' }}</span>

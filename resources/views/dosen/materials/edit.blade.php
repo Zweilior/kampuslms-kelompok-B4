@@ -77,12 +77,18 @@
                         @if ($material->original_name)
                             <div class="dosen-material-form__current-file">
                                 <span class="material-symbols-outlined" aria-hidden="true">description</span>
-                                <span><small>File saat ini</small><strong>{{ $material->original_name }}</strong></span>
+                                <span>
+                                    <small>File saat ini</small>
+                                    <strong>{{ $material->original_name }}</strong>
+                                    @if ($material->fileSizeForHumans)
+                                        <span class="text-xs font-normal text-on-surface-variant">({{ $material->fileSizeForHumans }})</span>
+                                    @endif
+                                </span>
                             </div>
                         @endif
                         <label for="material-file">Ganti File</label>
-                        <input id="material-file" class="dosen-material-form__file-input" type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.png,.jpg,.jpeg">
-                        <p class="dosen-assignment-form__hint">Kosongkan jika tidak ingin mengganti file. Ukuran maksimal 20 MB.</p>
+                        <input id="material-file" class="dosen-material-form__file-input" type="file" name="file" accept=".pdf,.ppt,.pptx,.doc,.docx">
+                        <p class="dosen-assignment-form__hint">Kosongkan jika tidak ingin mengganti file. Format berkas: PDF, PPT, PPTX, DOC, atau DOCX. Ukuran maksimal 20 MB.</p>
                         @error('file')
                             <p class="dosen-assignment-form__field-error">{{ $message }}</p>
                         @enderror

@@ -12,6 +12,61 @@
             <span class="mahasiswa-page__icon-box"><span class="material-symbols-outlined">upload_file</span></span>
         </header>
 
+        @php
+            $isLate = now()->gt($assignment->due_at);
+            $existingSubmission = $assignment->submissions()->where('user_id', auth()->id())->first();
+        @endphp
+
+        {{-- Notifikasi Di Atas Informasi Tugas Yang Dikumpulkan --}}
+        <div class="w-full max-w-[880px] mx-auto space-y-3 mb-4">
+            {{-- Peringatan Lewat Tenggat --}}
+            @if ($isLate)
+                @if ($assignment->allow_late)
+                    <div class="flex items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-300 shadow-sm" role="alert">
+                        <span class="material-symbols-outlined text-2xl text-amber-400 shrink-0 mt-0.5" aria-hidden="true">warning</span>
+                        <div class="text-sm">
+                            <strong class="font-semibold block text-amber-200">Perhatian: Tugas telah melewati tenggat waktu ({{ $assignment->due_at->format('d M Y, H:i') }}).</strong>
+                            <p class="text-amber-300/90 mt-0.5">Tugas masih menerima pengumpulan, namun berkas Anda akan ditandai terlambat.</p>
+                        </div>
+                    </div>
+                @else
+                    <div class="flex items-start gap-3 rounded-2xl border border-error/30 bg-error/10 p-4 text-error shadow-sm" role="alert">
+                        <span class="material-symbols-outlined text-2xl text-error shrink-0 mt-0.5" aria-hidden="true">error</span>
+                        <div class="text-sm">
+                            <strong class="font-semibold block text-red-200">Batas waktu pengumpulan telah berakhir.</strong>
+                            <p class="text-red-300/90 mt-0.5">Tugas ini tidak mengizinkan pengumpulan setelah tenggat waktu ({{ $assignment->due_at->format('d M Y, H:i') }}).</p>
+                        </div>
+                    </div>
+                @endif
+            @endif
+
+            {{-- Pesan Error Tenggat dari Backend --}}
+            @error('assignment')
+                <div class="flex items-start gap-3 rounded-2xl border border-error/30 bg-error/10 p-4 text-error shadow-sm" role="alert">
+                    <span class="material-symbols-outlined text-2xl text-error shrink-0 mt-0.5" aria-hidden="true">error</span>
+                    <span class="text-sm">{{ $message }}</span>
+                </div>
+            @enderror
+
+            {{-- Info Kumpul Ulang --}}
+            @if ($existingSubmission)
+                <div class="flex items-start gap-3.5 rounded-2xl border border-primary/30 bg-primary/10 p-4 text-on-surface shadow-sm" role="status">
+                    <span class="material-symbols-outlined text-2xl text-primary shrink-0 mt-0.5" aria-hidden="true">info</span>
+                    <div class="text-sm leading-relaxed">
+                        <strong class="font-semibold block text-primary text-base mb-1">Pengumpulan Ulang</strong>
+                        <p class="text-on-surface-variant">
+                            Anda telah mengumpulkan berkas: <strong class="text-on-surface font-semibold">{{ $existingSubmission->original_name }}</strong>
+                            @if ($existingSubmission->fileSizeForHumans)
+                                <span class="text-outline text-xs">({{ $existingSubmission->fileSizeForHumans }})</span>
+                            @endif
+                            pada <span class="text-on-surface">{{ $existingSubmission->submitted_at?->format('d M Y, H:i') }}</span>.
+                            Mengunggah berkas baru akan menggantikan berkas lama Anda.
+                        </p>
+                    </div>
+                </div>
+            @endif
+        </div>
+
         <section class="mahasiswa-page__card mahasiswa-page__submission-context" aria-label="Informasi tugas">
             <span class="mahasiswa-page__icon-box">
                 <span class="material-symbols-outlined">assignment</span>
@@ -41,42 +96,40 @@
             <div class="mahasiswa-page__form-card-heading">
                 <div>
                     <h2 class="mahasiswa-page__form-heading">Detail jawaban</h2>
-                    <p class="mahasiswa-page__form-intro">Lengkapi informasi pengumpulan sebelum mengirim ke dosen.</p>
+                    <p class="mahasiswa-page__form-intro">Unggah berkas tugas Anda sebelum tenggat waktu berakhir.</p>
                 </div>
             </div>
 
             <form action="{{ route('mahasiswa.courses.assignments.submissions.store', [$course->id, $assignment->id]) }}"
-                method="POST" class="mahasiswa-page__form">
+                method="POST" enctype="multipart/form-data" class="mahasiswa-page__form">
                 @csrf
-                <div class="mahasiswa-page__field">
-                    <label for="original_name">Nama file / judul dokumen <span aria-hidden="true">*</span></label>
-                    <input id="original_name" type="text" name="original_name" value="{{ old('original_name') }}"
-                        placeholder="Contoh: Tugas1_NIM.pdf" required @class(['is-invalid' => $errors->has('original_name')])>
-                    @error('original_name')
-                        <span class="mahasiswa-page__field-error">{{ $message }}</span>
-                    @enderror
-                </div>
 
                 <div class="mahasiswa-page__field">
-                    <label for="file_path">Link file <span aria-hidden="true">*</span></label>
-                    <input id="file_path" type="text" name="file_path" value="{{ old('file_path') }}"
-                        placeholder="Tempel tautan Drive, GitHub, atau path file" required @class(['is-invalid' => $errors->has('file_path')])>
-                    <span class="mahasiswa-page__field-hint">Pastikan tautan dapat dibuka oleh dosen.</span>
-                    @error('file_path')
+                    <label for="file">Berkas Tugas <span aria-hidden="true">*</span></label>
+                    <input id="file" type="file" name="file" accept=".pdf,.doc,.docx" required
+                        @disabled($isLate && ! $assignment->allow_late)
+                        @class(['is-invalid' => $errors->has('file')])
+                        class="w-full rounded-xl border border-outline/10 bg-surface-container px-space-md py-3 text-on-surface file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-on-primary">
+                    <span class="mahasiswa-page__field-hint">Format yang diizinkan: PDF, DOC, atau DOCX. Ukuran maksimal 5 MB. Pastikan tautan dapat dibuka oleh dosen.</span>
+                    @error('file')
                         <span class="mahasiswa-page__field-error">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="mahasiswa-page__field">
                     <label for="note">Catatan <span>(opsional)</span></label>
-                    <textarea id="note" name="note" rows="4" placeholder="Tambahkan pesan atau catatan jika ada...">{{ old('note') }}</textarea>
+                    <textarea id="note" name="note" rows="4"
+                        @disabled($isLate && ! $assignment->allow_late)
+                        placeholder="Tambahkan pesan atau catatan jika ada...">{{ old('note', $existingSubmission?->note) }}</textarea>
                     @error('note')
                         <span class="mahasiswa-page__field-error">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="mahasiswa-page__form-actions">
-                    <button type="submit" class="mahasiswa-page__button mahasiswa-page__button--primary">
+                    <button type="submit"
+                        @disabled($isLate && ! $assignment->allow_late)
+                        class="mahasiswa-page__button mahasiswa-page__button--primary {{ ($isLate && ! $assignment->allow_late) ? 'opacity-50 cursor-not-allowed' : '' }}">
                         Kumpulkan sekarang
                         <span class="material-symbols-outlined">arrow_forward</span>
                     </button>

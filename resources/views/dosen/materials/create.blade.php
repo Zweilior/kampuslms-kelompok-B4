@@ -74,8 +74,8 @@
 
                     <div class="dosen-material-form__conditional" x-cloak x-show="type === 'file'" x-transition.opacity>
                         <label for="material-file">File Materi</label>
-                        <input id="material-file" class="dosen-material-form__file-input" type="file" name="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.zip,.png,.jpg,.jpeg">
-                        <p class="dosen-assignment-form__hint">Ukuran file maksimal 20 MB.</p>
+                        <input id="material-file" class="dosen-material-form__file-input" type="file" name="file" accept=".pdf,.ppt,.pptx,.doc,.docx">
+                        <p class="dosen-assignment-form__hint">Format berkas: PDF, PPT, PPTX, DOC, atau DOCX. Ukuran file maksimal 20 MB.</p>
                         @error('file')
                             <p class="dosen-assignment-form__field-error">{{ $message }}</p>
                         @enderror
