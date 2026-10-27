@@ -4,20 +4,19 @@ namespace App\Notifications;
 
 use App\Models\Grade;
 use App\Models\Submission;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-/**
- * Dikirim ke mahasiswa saat dosen memberi atau memperbarui nilai.
- * Disimpan ke tabel notifications (channel database), tampil di GET /notifications.
- */
-class NilaiDiberikan extends Notification
+class NilaiDiberikan extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public function __construct(
         public Submission $submission,
         public Grade $grade,
-        public bool $updated = false,
-    ) {
-    }
+        public bool $updated = false
+    ) {}
 
     public function via(object $notifiable): array
     {
@@ -26,13 +25,13 @@ class NilaiDiberikan extends Notification
 
     public function toArray(object $notifiable): array
     {
-        $title = $this->submission->assignment->title;
+        $assignment = $this->submission->assignment;
+        $action = $this->updated ? 'diperbarui' : 'diberikan';
 
+        // Payload bersih tanpa atribut score dan feedback
         return [
-            'message' => $this->updated
-                ? "Nilai tugas \"{$title}\" telah diperbarui."
-                : "Tugas \"{$title}\" telah dinilai.",
-            'assignment_id' => $this->submission->assignment_id,
+            'message' => "Nilai untuk tugas \"{$assignment?->title}\" telah {$action}.",
+            'assignment_id' => $assignment?->id,
             'submission_id' => $this->submission->id,
         ];
     }
