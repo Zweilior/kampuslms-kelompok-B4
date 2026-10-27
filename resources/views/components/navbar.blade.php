@@ -7,7 +7,6 @@
     $user     = Auth::user();
     $userRole = $user->role ?? 'mahasiswa';
     $userName = $user->name ?? 'User';
-
     // Route dinamis per role
     $dashboardRoute = match ($userRole) {
         'admin'     => 'admin.dashboard',
@@ -109,16 +108,156 @@
                 <span class="navbar__status-text">Online</span>
             </div>
 
+            @if ($userRole !== 'admin')
+                {{-- Notifications --}}
+                <div class="navbar__notifications"
+                x-data="{
+                    open: false,
+                    count: 0,
+                    notifications: [],
+                    poller: null,
+                    init() {
+                        this.fetchNotifications();
+                        this.poller = setInterval(() => this.fetchNotifications(), 30000);
+                    },
+                    destroy() {
+                        clearInterval(this.poller);
+                    },
+                    formatDate(value) {
+                        if (!value) {
+                            return '';
+                        }
+
+                        return new Date(value).toLocaleString('id-ID', {
+                            dateStyle: 'short',
+                            timeStyle: 'short',
+                        });
+                    },
+                    async fetchNotifications() {
+                        try {
+                            const response = await fetch('{{ route('notifications.unread-count') }}', {
+                                headers: { Accept: 'application/json' },
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`Notification request failed: ${response.status}`);
+                            }
+
+                            const payload = await response.json();
+                            if (!Number.isInteger(payload.count) || !Array.isArray(payload.latest)) {
+                                throw new Error('Invalid notification response contract');
+                            }
+
+                            this.count = payload.count;
+                            this.notifications = payload.latest.slice(0, 5);
+                        } catch (error) {
+                            console.error('Unable to load notifications from the database.', error);
+                        }
+                    },
+                    async markAsRead(notification) {
+                        if (notification.is_read) {
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch(`{{ url('/notifications') }}/${notification.id}/read`, {
+                                method: 'POST',
+                                headers: {
+                                    Accept: 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                },
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`Mark as read failed: ${response.status}`);
+                            }
+
+                            notification.is_read = true;
+                            this.count = Math.max(0, this.count - 1);
+                        } catch (error) {
+                            console.error('Unable to mark notification as read.', error);
+                        }
+                    },
+                    async markAllAsRead() {
+                        if (this.count === 0) {
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch('{{ route('notifications.read-all') }}', {
+                                method: 'POST',
+                                headers: {
+                                    Accept: 'application/json',
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                },
+                            });
+
+                            if (!response.ok) {
+                                throw new Error(`Mark all as read failed: ${response.status}`);
+                            }
+
+                            this.notifications.forEach(notification => notification.is_read = true);
+                            this.count = 0;
+                        } catch (error) {
+                            console.error('Unable to mark all notifications as read.', error);
+                        }
+                    }
+                }"
+                @click.outside="open = false"
+                @keydown.escape.window="open = false">
+                <button type="button" class="navbar__notification-button" title="Notifikasi"
+                    aria-label="Buka notifikasi" :aria-expanded="open"
+                    @click="open = !open">
+                    <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+                    <span class="navbar__notification-badge" x-show="count > 0" x-text="count > 99 ? '99+' : count"
+                        x-cloak></span>
+                </button>
+
+                <div class="navbar__notification-dropdown" x-show="open" x-transition x-cloak>
+                    <div class="navbar__notification-header">
+                        <h2>Notifikasi</h2>
+                        <button type="button" class="navbar__notification-mark-all"
+                            x-show="count > 0" @click="markAllAsRead()">
+                            Tandai semua dibaca
+                        </button>
+                    </div>
+
+                    <div class="navbar__notification-list">
+                        <template x-for="notification in notifications" :key="notification.id">
+                            <article class="navbar__notification-item" :class="{ 'is-unread': !notification.is_read }">
+                                <a class="navbar__notification-content"
+                                    :href="notification.url || '{{ route('notifications.index') }}'">
+                                    <span class="navbar__notification-message" x-text="notification.message || 'Notifikasi baru'"></span>
+                                    <time class="navbar__notification-time" x-text="formatDate(notification.created_at)"></time>
+                                </a>
+                                <button type="button" class="navbar__notification-read"
+                                    x-show="!notification.is_read" @click="markAsRead(notification)">
+                                    Tandai dibaca
+                                </button>
+                            </article>
+                        </template>
+                        <p class="navbar__notification-empty" x-show="notifications.length === 0">
+                            Belum ada notifikasi.
+                        </p>
+                    </div>
+
+                    <a href="{{ route('notifications.index') }}" class="navbar__notification-all">
+                        Lihat semua
+                    </a>
+                </div>
+                </div>
+            @endif
+
             {{-- User Info --}}
-            <div style="display: flex; align-items: center; gap: 10px; margin-left: 10px;">
+            <div class="navbar__user-info">
                 <div class="navbar__avatar" title="{{ $userName }}">
                     {{ strtoupper(substr($userName, 0, 1)) }}
                 </div>
-                <div style="display: flex; flex-direction: column; line-height: 1.2;">
-                    <span class="navbar__user-name" style="font-size: 0.85rem; font-weight: 600;">
+                <div class="navbar__user-details">
+                    <span class="navbar__user-name">
                         {{ $userName }}
                     </span>
-                    <span class="navbar__user-role" style="font-size: 0.7rem; text-transform: capitalize;">
+                    <span class="navbar__user-role">
                         {{ $userRole }}
                     </span>
                 </div>
