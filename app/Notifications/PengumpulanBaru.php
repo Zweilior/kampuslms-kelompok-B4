@@ -5,14 +5,18 @@ namespace App\Notifications;
 use App\Models\Assignment;
 use App\Models\Submission;
 use App\Models\User;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
 /**
  * Dikirim ke dosen pemilik course saat mahasiswa mengumpulkan
  * (atau mengumpulkan ulang) tugas.
  */
-class PengumpulanBaru extends Notification
+class PengumpulanBaru extends Notification implements ShouldQueue
 {
+    use Queueable;
+
     public Assignment $assignment;
     public User $student;
 
