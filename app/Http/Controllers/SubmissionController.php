@@ -7,8 +7,6 @@ use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\Grade;
 use App\Models\Submission;
-use App\Notifications\NilaiDiberikan;
-use App\Notifications\PengumpulanBaru;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
@@ -282,16 +280,8 @@ class SubmissionController extends Controller
             Storage::disk('local')->delete($oldFilePath);
         }
 
-        // Kirim notifikasi yang membedakan pengumpulan baru dan pengumpulan ulang.
-        $lecturer = $course->lecturer;
-        if ($lecturer) {
-            $lecturer->notify(new PengumpulanBaru(
-                $submission,
-                $assignment,
-                $request->user(),
-                updated: ! $created
-            ));
-        }
+        // Dispatch Event SubmissionCreated (Asinkron)
+        \App\Events\SubmissionCreated::dispatch($submission, ! $created);
 
         return redirect()
             ->route(

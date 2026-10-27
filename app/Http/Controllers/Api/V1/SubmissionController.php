@@ -9,7 +9,6 @@ use App\Http\Resources\SubmissionResource;
 use App\Models\Assignment;
 use App\Models\Grade;
 use App\Models\Submission;
-use App\Notifications\PengumpulanBaru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -170,10 +169,8 @@ class SubmissionController extends Controller
             Storage::delete($existing->file_path);
         }
 
-        // Beri tahu dosen pemilik course.
-        $assignment->course->lecturer?->notify(
-            new PengumpulanBaru($submission, $assignment, $user, updated: ! $created)
-        );
+        // Dispatch Event SubmissionCreated (Asinkron)
+        \App\Events\SubmissionCreated::dispatch($submission, ! $created);
 
         return (new SubmissionResource($submission))
             ->response()
