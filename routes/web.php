@@ -153,4 +153,5 @@ Route::middleware('auth')->prefix('notifications')->name('notifications.')->grou
     Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
     Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
     Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+    Route::get('/{id}/open', [NotificationController::class, 'open'])->name('open');
 });

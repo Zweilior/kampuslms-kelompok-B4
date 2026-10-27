@@ -175,9 +175,14 @@
                                     class="dosen-assignment-form__button dosen-assignment-form__button--primary {{ ! $isPastDue ? 'opacity-50 cursor-not-allowed' : '' }}"
                                     title="{{ ! $isPastDue ? 'Penilaian baru dapat dilakukan setelah tenggat' : '' }}">
                                 <span class="material-symbols-outlined" aria-hidden="true">{{ $submission->grade ? 'save' : 'grading' }}</span>
-                                {{ $submission->grade ? 'Simpan Perubahan' : 'Beri Nilai' }}
+                                {{ $submission->grade ? 'Simpan Perubahan & Kirim Notifikasi' : 'Beri Nilai & Kirim Notifikasi' }}
                             </button>
-                            @if (! $isPastDue)
+                            @if ($isPastDue)
+                                <p class="mt-1.5 flex items-center gap-1 text-xs text-on-surface-variant">
+                                    <span class="material-symbols-outlined text-sm text-primary" aria-hidden="true">notifications_active</span>
+                                    <span>Mahasiswa akan otomatis menerima notifikasi setelah nilai disimpan.</span>
+                                </p>
+                            @else
                                 <p class="mt-1 text-xs text-on-surface-variant">Penilaian dinonaktifkan hingga tenggat tugas berakhir.</p>
                             @endif
                         </form>

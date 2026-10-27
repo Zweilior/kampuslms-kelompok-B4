@@ -183,7 +183,7 @@ class SubmissionController extends Controller
 
         return redirect()
             ->route('dosen.courses.assignments.submissions.index', [$course, $assignment])
-            ->with('success', 'Nilai berhasil disimpan.');
+            ->with('success', 'Nilai berhasil disimpan dan notifikasi telah dikirim ke mahasiswa.');
     }
 
     private function authorizeDosenAssignment(Course $course, Assignment $assignment): void

@@ -69,7 +69,11 @@
                     <article class="dosen-course-row">
                         <div class="dosen-course-row__identity">
                             <span class="dosen-course-row__code">{{ $course->code }}</span>
-                            <h3>{{ $course->name }}</h3>
+                            <h3>
+                                <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}" class="hover:text-primary transition-colors">
+                                    {{ $course->name }}
+                                </a>
+                            </h3>
                             <span class="dosen-course-row__status dosen-course-row__status--active">
                                 <span aria-hidden="true"></span>Aktif
                             </span>
@@ -93,29 +97,37 @@
                             </div>
                         </div>
 
-                        <div class="dosen-course-row__menu" x-data="{ menuOpen: false }" @click.outside="menuOpen = false" @keydown.escape.window="menuOpen = false">
-                            <button type="button"
-                                    class="dosen-course-row__menu-trigger"
-                                    aria-label="Opsi {{ $course->name }}"
-                                    aria-haspopup="true"
-                                    :aria-expanded="menuOpen"
-                                    @click.stop="menuOpen = !menuOpen">
-                                <span class="material-symbols-outlined" aria-hidden="true">more_vert</span>
-                            </button>
-                            <div class="dosen-course-row__menu-popover"
-                                 x-cloak
-                                 x-show="menuOpen"
-                                 x-transition.origin.top.right
-                                 @click.stop>
-                                <a href="{{ route('dosen.courses.materials.index', ['course' => $course, 'focus' => 'materials']) }}">
-                                    <span class="material-symbols-outlined" aria-hidden="true">description</span>Lihat Materi
-                                </a>
-                                <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}">
-                                    <span class="material-symbols-outlined" aria-hidden="true">assignment</span>Tugas dan Nilai
-                                </a>
-                                <a href="{{ route('dosen.courses.grades.export', $course) }}">
-                                    <span class="material-symbols-outlined" aria-hidden="true">download</span>Unduh Semua Nilai CSV
-                                </a>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}"
+                               class="hidden sm:inline-flex items-center gap-1 rounded-xl bg-surface-container px-3 py-1.5 text-xs font-semibold text-on-surface hover:bg-surface-container-high hover:text-primary transition"
+                               title="Kelola Tugas dan Nilai">
+                                <span class="material-symbols-outlined text-sm">assignment</span>
+                                <span>Tugas & Nilai</span>
+                            </a>
+                            <div class="dosen-course-row__menu" x-data="{ menuOpen: false }" @click.outside="menuOpen = false" @keydown.escape.window="menuOpen = false">
+                                <button type="button"
+                                        class="dosen-course-row__menu-trigger"
+                                        aria-label="Opsi {{ $course->name }}"
+                                        aria-haspopup="true"
+                                        :aria-expanded="menuOpen"
+                                        @click.stop="menuOpen = !menuOpen">
+                                    <span class="material-symbols-outlined" aria-hidden="true">more_vert</span>
+                                </button>
+                                <div class="dosen-course-row__menu-popover"
+                                     x-cloak
+                                     x-show="menuOpen"
+                                     x-transition.origin.top.right
+                                     @click.stop>
+                                    <a href="{{ route('dosen.courses.materials.index', ['course' => $course, 'focus' => 'materials']) }}">
+                                        <span class="material-symbols-outlined" aria-hidden="true">description</span>Lihat Materi
+                                    </a>
+                                    <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}">
+                                        <span class="material-symbols-outlined" aria-hidden="true">assignment</span>Tugas dan Nilai
+                                    </a>
+                                    <a href="{{ route('dosen.courses.grades.export', $course) }}">
+                                        <span class="material-symbols-outlined" aria-hidden="true">download</span>Unduh Semua Nilai CSV
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </article>
@@ -133,7 +145,11 @@
                     <article class="dosen-course-row dosen-course-row--archived">
                         <div class="dosen-course-row__identity">
                             <span class="dosen-course-row__code">{{ $course->code }}</span>
-                            <h3>{{ $course->name }}</h3>
+                            <h3>
+                                <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}" class="hover:text-primary transition-colors">
+                                    {{ $course->name }}
+                                </a>
+                            </h3>
                             <span class="dosen-course-row__status dosen-course-row__status--archived">
                                 <span aria-hidden="true"></span>Arsip
                             </span>
@@ -157,29 +173,37 @@
                             </div>
                         </div>
 
-                        <div class="dosen-course-row__menu" x-data="{ menuOpen: false }" @click.outside="menuOpen = false" @keydown.escape.window="menuOpen = false">
-                            <button type="button"
-                                    class="dosen-course-row__menu-trigger"
-                                    aria-label="Opsi {{ $course->name }}"
-                                    aria-haspopup="true"
-                                    :aria-expanded="menuOpen"
-                                    @click.stop="menuOpen = !menuOpen">
-                                <span class="material-symbols-outlined" aria-hidden="true">more_vert</span>
-                            </button>
-                            <div class="dosen-course-row__menu-popover"
-                                 x-cloak
-                                 x-show="menuOpen"
-                                 x-transition.origin.top.right
-                                 @click.stop>
-                                <a href="{{ route('dosen.courses.materials.index', ['course' => $course, 'focus' => 'materials']) }}">
-                                    <span class="material-symbols-outlined" aria-hidden="true">description</span>Lihat Materi
-                                </a>
-                                <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}">
-                                    <span class="material-symbols-outlined" aria-hidden="true">assignment</span>Tugas dan Nilai
-                                </a>
-                                <a href="{{ route('dosen.courses.grades.export', $course) }}">
-                                    <span class="material-symbols-outlined" aria-hidden="true">download</span>Unduh Semua Nilai CSV
-                                </a>
+                        <div class="flex items-center gap-2">
+                            <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}"
+                               class="hidden sm:inline-flex items-center gap-1 rounded-xl bg-surface-container px-3 py-1.5 text-xs font-semibold text-on-surface hover:bg-surface-container-high hover:text-primary transition"
+                               title="Kelola Tugas dan Nilai">
+                                <span class="material-symbols-outlined text-sm">assignment</span>
+                                <span>Tugas & Nilai</span>
+                            </a>
+                            <div class="dosen-course-row__menu" x-data="{ menuOpen: false }" @click.outside="menuOpen = false" @keydown.escape.window="menuOpen = false">
+                                <button type="button"
+                                        class="dosen-course-row__menu-trigger"
+                                        aria-label="Opsi {{ $course->name }}"
+                                        aria-haspopup="true"
+                                        :aria-expanded="menuOpen"
+                                        @click.stop="menuOpen = !menuOpen">
+                                    <span class="material-symbols-outlined" aria-hidden="true">more_vert</span>
+                                </button>
+                                <div class="dosen-course-row__menu-popover"
+                                     x-cloak
+                                     x-show="menuOpen"
+                                     x-transition.origin.top.right
+                                     @click.stop>
+                                    <a href="{{ route('dosen.courses.materials.index', ['course' => $course, 'focus' => 'materials']) }}">
+                                        <span class="material-symbols-outlined" aria-hidden="true">description</span>Lihat Materi
+                                    </a>
+                                    <a href="{{ route('dosen.courses.assignments.index', ['course' => $course, 'focus' => 'assignments']) }}">
+                                        <span class="material-symbols-outlined" aria-hidden="true">assignment</span>Tugas dan Nilai
+                                    </a>
+                                    <a href="{{ route('dosen.courses.grades.export', $course) }}">
+                                        <span class="material-symbols-outlined" aria-hidden="true">download</span>Unduh Semua Nilai CSV
+                                    </a>
+                                </div>
                             </div>
                         </div>
                     </article>
