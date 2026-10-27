@@ -178,9 +178,10 @@ class SubmissionController extends Controller
         );
 
         $submission->loadMissing('student');
-        $submission->student?->notify(
-            new NilaiDiberikan($submission, $grade, updated: ! $grade->wasRecentlyCreated)
-        );
+        // Dispatch event SubmissionGraded alih-alih memanggil notify() langsung
+        if ($submission->student) {
+            \App\Events\SubmissionGraded::dispatch($grade, ! $grade->wasRecentlyCreated);
+        }
 
         return redirect()
             ->route('dosen.courses.assignments.submissions.index', [$course, $assignment])
