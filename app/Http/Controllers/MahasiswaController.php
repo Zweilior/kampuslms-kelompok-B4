@@ -251,14 +251,17 @@ class MahasiswaController extends Controller
         });
 
         $finalScore = CourseGradeCalculator::finalScore($assignments);
+        $finalLetterGrade = $finalScore !== null ? GradeScale::letterGradeForScore($finalScore) : null;
+
         if ($finalScore !== null) {
             FinalGrade::updateOrCreate(
                 ['course_id' => $course->id, 'user_id' => $studentId],
-                ['total_score' => $finalScore]
+                [
+                    'total_score' => $finalScore,
+                    'letter_grade' => $finalLetterGrade,
+                ]
             );
         }
-
-        $finalLetterGrade = $finalScore !== null ? GradeScale::letterGradeForScore($finalScore) : null;
         $totalRubricWeight = (float) $gradeComponents->sum('weight');
 
         return view('mahasiswa.grades.show', compact(

@@ -226,7 +226,7 @@
                         <template x-for="notification in notifications" :key="notification.id">
                             <article class="navbar__notification-item" :class="{ 'is-unread': !notification.is_read }">
                                 <a class="navbar__notification-content"
-                                    :href="notification.url || '{{ route('notifications.index') }}'">
+                                    :href="'{{ url('/notifications') }}/' + notification.id + '/open'">
                                     <span class="navbar__notification-message" x-text="notification.message || 'Notifikasi baru'"></span>
                                     <time class="navbar__notification-time" x-text="formatDate(notification.created_at)"></time>
                                 </a>

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Support\GradeScale;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,6 +17,15 @@ class FinalGrade extends Model
         'total_score',
         'letter_grade',
     ];
+
+    protected static function booted(): void
+    {
+        static::saving(function (FinalGrade $finalGrade) {
+            if ($finalGrade->total_score !== null && empty($finalGrade->letter_grade)) {
+                $finalGrade->letter_grade = GradeScale::letterGradeForScore((float) $finalGrade->total_score);
+            }
+        });
+    }
 
     protected function casts(): array
     {

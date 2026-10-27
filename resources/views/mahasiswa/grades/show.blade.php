@@ -65,8 +65,15 @@
                             </td>
                             <td>
                                 @if ($submission?->grade)
-                                    {{ number_format((float) $submission->grade->score, 2) }}
-                                    <span class="mahasiswa-page__table-subtext">dari {{ $assignment->max_score }}</span>
+                                    <div>
+                                        <span class="font-bold text-on-surface">{{ number_format((float) $submission->grade->score, 2) }}</span>
+                                        <span class="mahasiswa-page__table-subtext">dari {{ $assignment->max_score }}</span>
+                                    </div>
+                                    @if ($submission->grade->feedback)
+                                        <p class="mt-1 text-xs text-on-surface-variant italic truncate max-w-xs" title="{{ $submission->grade->feedback }}">
+                                            "{{ $submission->grade->feedback }}"
+                                        </p>
+                                    @endif
                                 @elseif ($submission)
                                     <span class="mahasiswa-page__pill">Belum dinilai</span>
                                 @else

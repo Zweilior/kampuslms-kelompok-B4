@@ -115,4 +115,37 @@ class NotificationWebTest extends TestCase
         $this->assertSame(0, $me->unreadNotifications()->count());
         $this->assertSame(1, $other->unreadNotifications()->count());
     }
+
+    public function test_user_can_open_notification_and_be_redirected_to_related_page(): void
+    {
+        $me = User::factory()->mahasiswa()->create();
+        $course = Course::factory()
+            ->for(User::factory()->dosen()->create(), 'lecturer')
+            ->create();
+        $assignment = Assignment::factory()->for($course)->create();
+
+        $me->notify(new TugasBaru($assignment));
+        $notification = $me->notifications()->first();
+
+        $this->assertNull($notification->read_at);
+
+        $response = $this->actingAs($me)->get(route('notifications.open', $notification->id));
+
+        $response->assertRedirect(route('mahasiswa.courses.assignments.index', $course->id));
+        $this->assertNotNull($notification->fresh()->read_at);
+    }
+
+    public function test_user_cannot_open_someone_elses_notification(): void
+    {
+        $me = User::factory()->mahasiswa()->create();
+        $victim = User::factory()->mahasiswa()->create();
+        $this->notify($victim);
+        $victimNotification = $victim->notifications()->first();
+
+        $this->actingAs($me)
+            ->get(route('notifications.open', $victimNotification->id))
+            ->assertNotFound();
+
+        $this->assertNull($victimNotification->fresh()->read_at);
+    }
 }

@@ -8,6 +8,7 @@ use App\Models\Course;
 use App\Models\FinalGrade;
 use App\Models\User;
 use App\Support\CourseGradeCalculator;
+use App\Support\GradeScale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -224,7 +225,10 @@ class CourseController extends Controller
             if ($score !== null) {
                 FinalGrade::updateOrCreate(
                     ['course_id' => $course->id, 'user_id' => $student->id],
-                    ['total_score' => $score]
+                    [
+                        'total_score' => $score,
+                        'letter_grade' => GradeScale::letterGradeForScore($score),
+                    ]
                 );
             }
         }

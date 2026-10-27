@@ -22,31 +22,45 @@ class NotificationSeeder extends Seeder
         $mahasiswa = User::where('email', 'mahasiswa@kampuslms.test')->first();
         $dosen = User::where('email', 'dosen@kampuslms.test')->first();
 
-        // Ambil sampel data assignment dan submission untuk relasi payload (jika ada)
-        $assignment = Assignment::first();
-        $submission = Submission::first();
+        // Ambil sampel data assignment dan submission yang relevan
+        $mCourse = $mahasiswa?->courses()->first();
+        $mAssignment = $mCourse?->assignments()->first() ?? Assignment::first();
+        $mSubmission = $mAssignment ? Submission::where('assignment_id', $mAssignment->id)->where('user_id', $mahasiswa?->id)->first() : null;
 
         if ($mahasiswa) {
             $mahasiswa->notifications()->delete();
 
-            $this->make($mahasiswa, 'TugasBaru', 'Tugas baru telah diterbitkan.', null);
-            $this->make($mahasiswa, 'NilaiDiberikan', 'Tugas Anda telah dinilai.', null, [
-                'assignment_id' => $assignment?->id,
-                'submission_id' => $submission?->id,
+            $this->make($mahasiswa, 'TugasBaru', 'Tugas baru telah diterbitkan.', null, [
+                'course_id' => $mCourse?->id ?? $mAssignment?->course_id,
+                'assignment_id' => $mAssignment?->id,
             ]);
-            $this->make($mahasiswa, 'PengingatTenggat', 'Tenggat tugas tinggal 2 hari lagi.', now()->subDay());
+            $this->make($mahasiswa, 'NilaiDiberikan', 'Tugas Anda telah dinilai.', null, [
+                'course_id' => $mCourse?->id ?? $mAssignment?->course_id,
+                'assignment_id' => $mAssignment?->id,
+                'submission_id' => $mSubmission?->id,
+            ]);
+            $this->make($mahasiswa, 'PengingatTenggat', 'Tenggat tugas tinggal 2 hari lagi.', now()->subDay(), [
+                'course_id' => $mCourse?->id ?? $mAssignment?->course_id,
+                'assignment_id' => $mAssignment?->id,
+            ]);
         }
 
         if ($dosen) {
+            $dosenCourse = $dosen->taughtCourses()->first();
+            $dosenAssignment = $dosenCourse?->assignments()->first() ?? Assignment::first();
+            $dosenSubmission = $dosenAssignment?->submissions()->first() ?? Submission::first();
+
             $dosen->notifications()->delete();
 
             $this->make($dosen, 'PengumpulanBaru', 'Ada pengumpulan tugas baru dari mahasiswa.', null, [
-                'assignment_id' => $assignment?->id,
-                'submission_id' => $submission?->id,
+                'course_id' => $dosenCourse?->id ?? $dosenAssignment?->course_id,
+                'assignment_id' => $dosenAssignment?->id,
+                'submission_id' => $dosenSubmission?->id,
             ]);
             $this->make($dosen, 'PengumpulanBaru', 'Ada pengumpulan tugas baru dari mahasiswa.', now()->subHours(3), [
-                'assignment_id' => $assignment?->id,
-                'submission_id' => $submission?->id,
+                'course_id' => $dosenCourse?->id ?? $dosenAssignment?->course_id,
+                'assignment_id' => $dosenAssignment?->id,
+                'submission_id' => $dosenSubmission?->id,
             ]);
         }
     }
