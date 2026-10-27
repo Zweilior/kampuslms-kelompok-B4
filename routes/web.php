@@ -12,6 +12,7 @@ use App\Http\Controllers\SubmissionController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\GradeComponentController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', fn () => view('welcome'));
 
@@ -145,4 +146,11 @@ Route::prefix('mahasiswa')->name('mahasiswa.')->middleware(['auth', 'role:mahasi
     Route::get('/courses/{course}/assignments/{assignment}/submissions', [MahasiswaController::class, 'submissions'])->name('courses.assignments.submissions.index');
     Route::get('/courses/{course}/assignments/{assignment}/submissions/create', [MahasiswaController::class, 'createSubmission'])->name('courses.assignments.submissions.create');
     Route::post('/courses/{course}/assignments/{assignment}/submissions', [SubmissionController::class, 'store'])->name('courses.assignments.submissions.store');
+});
+
+Route::middleware('auth')->prefix('notifications')->name('notifications.')->group(function () {
+    Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::get('/unread-count', [NotificationController::class, 'unreadCount'])->name('unread-count');
+    Route::post('/read-all', [NotificationController::class, 'markAllAsRead'])->name('read-all');
+    Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
 });
