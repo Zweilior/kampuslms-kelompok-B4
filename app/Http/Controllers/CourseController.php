@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoreCourseRequest;
 use App\Http\Requests\UpdateCourseRequest;
 use App\Models\Course;
+use App\Models\FinalGrade;
 use App\Models\User;
 use App\Support\CourseGradeCalculator;
 use Illuminate\Http\Request;
@@ -15,37 +16,23 @@ use Illuminate\Support\Facades\Storage;
 
 class CourseController extends Controller
 {
-    /**
-     * Cek apakah request datang dari route area admin (admin.courses.*).
-     */
     private function isAdminRoute(): bool
     {
         return request()->routeIs('admin.*');
     }
 
-    /**
-     * Prefix nama route sesuai area (admin.courses atau courses).
-     */
     private function routePrefix(): string
     {
         return $this->isAdminRoute() ? 'admin.courses' : 'courses';
     }
 
-    /**
-     * Menampilkan daftar mata kuliah.
-     * [POIN 4] Disaring di level query sesuai peran:
-     * - Admin: Melihat semua MK.
-     * - Dosen: Hanya MK yang diajar.
-     * - Mahasiswa: Hanya MK yang diikuti.
-     */
     public function index(Request $request)
     {
         Gate::authorize('viewAny', Course::class);
 
-        $user = $request->user(); // Ambil user yang sedang login
+        $user = $request->user();
         $query = Course::with('lecturer');
 
-        // --- FILTER BERDASARKAN PERAN (POIN 4) ---
         if ($user->role === 'dosen') {
             $query->where('lecturer_id', $user->id);
         } elseif ($user->role === 'mahasiswa') {
@@ -53,9 +40,7 @@ class CourseController extends Controller
                 $q->where('users.id', $user->id);
             });
         }
-        // Jika admin, tidak difilter (boleh lihat semua)
 
-        // Pencarian berdasarkan kode atau nama mata kuliah
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
@@ -66,7 +51,6 @@ class CourseController extends Controller
             });
         }
 
-        // Filter berdasarkan status
         if ($request->filled('status')) {
             $query->where('status', $request->input('status'));
         }
@@ -77,7 +61,6 @@ class CourseController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        // Data dosen untuk form tambah/edit (hanya admin yang butuh ini, tapi aman dibiarkan)
         $lecturers = User::where('role', 'dosen')
             ->orderBy('name')
             ->get();
@@ -85,9 +68,6 @@ class CourseController extends Controller
         return view($this->routePrefix().'.index', compact('courses', 'lecturers'));
     }
 
-    /**
-     * Menampilkan form tambah mata kuliah.
-     */
     public function create()
     {
         Gate::authorize('create', Course::class);
@@ -99,9 +79,6 @@ class CourseController extends Controller
         return view($this->isAdminRoute() ? 'admin.courses.create' : 'courses.create', compact('lecturers'));
     }
 
-    /**
-     * Menyimpan mata kuliah baru.
-     */
     public function store(StoreCourseRequest $request)
     {
         Gate::authorize('create', Course::class);
@@ -115,9 +92,6 @@ class CourseController extends Controller
             ->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
 
-    /**
-     * Menampilkan detail mata kuliah.
-     */
     public function show(Course $course)
     {
         Gate::authorize('view', $course);
@@ -162,9 +136,6 @@ class CourseController extends Controller
         return view('courses.show', compact('course', 'lecturers'));
     }
 
-    /**
-     * Daftar MK milik dosen yang sedang login.
-     */
     public function dosenIndex(Request $request)
     {
         Gate::authorize('viewAny', Course::class);
@@ -182,7 +153,8 @@ class CourseController extends Controller
     }
 
     /**
-     * Daftar nilai MK milik dosen yang sedang login.
+     * Daftar nilai MK milik dosen (Dashboard Rekap).
+     * Telah dioptimasi memanfaatkan relasi FinalGrade, tidak lagi menghitung berat.
      */
     public function dosenGradesIndex(Request $request)
     {
@@ -190,39 +162,18 @@ class CourseController extends Controller
 
         $courses = Course::where('lecturer_id', $request->user()->id)
             ->withCount('students')
-            ->with([
-                'students:id',
-                'assignments.gradeComponent',
-                'assignments.submissions.grade',
-            ])
+            ->with('finalGrades') // Cukup panggil FinalGrade, jauh lebih cepat!
             ->orderBy('name')
             ->get();
 
         $courses->each(function (Course $course): void {
-            $studentScores = $course->students
-                ->map(function (User $student) use ($course): ?float {
-                    $assignments = $course->assignments->map(function ($assignment) use ($student) {
-                        $studentAssignment = clone $assignment;
-                        $studentAssignment->setRelation(
-                            'submissions',
-                            $assignment->submissions
-                                ->where('user_id', $student->id)
-                                ->values()
-                        );
-
-                        return $studentAssignment;
-                    });
-
-                    return CourseGradeCalculator::finalScore($assignments);
-                })
-                ->filter(fn (?float $score): bool => $score !== null)
-                ->values();
+            $scores = $course->finalGrades->pluck('total_score');
 
             $course->setAttribute(
                 'monitoring_average',
-                $studentScores->isNotEmpty() ? round($studentScores->avg(), 2) : null
+                $scores->isNotEmpty() ? round($scores->avg(), 2) : null
             );
-            $course->setAttribute('monitoring_graded_students_count', $studentScores->count());
+            $course->setAttribute('monitoring_graded_students_count', $scores->count());
         });
 
         $activeCourses = $courses->where('status', 'active')->values();
@@ -235,8 +186,50 @@ class CourseController extends Controller
     }
 
     /**
-     * Detail MK untuk dosen pemilik.
+     * [BARU] Menampilkan halaman detail rekap per mata kuliah untuk dosen.
+     * Di sini kita melakukan kalkulasi final dan menyimpannya (upsert) ke tabel FinalGrade.
      */
+    public function dosenGradesShow(Course $course)
+    {
+        Gate::authorize('view', $course);
+
+        $course->load([
+            'students' => fn ($query) => $query->orderBy('nim_nip'),
+            'assignments.gradeComponent',
+            'assignments.submissions.grade'
+        ]);
+
+        foreach ($course->students as $student) {
+            $assignments = $course->assignments->map(function ($assignment) use ($student) {
+                $studentAssignment = clone $assignment;
+                $studentAssignment->setRelation(
+                    'submissions',
+                    $assignment->submissions->where('user_id', $student->id)->values()
+                );
+                return $studentAssignment;
+            });
+
+            $score = CourseGradeCalculator::finalScore($assignments);
+
+            if ($score !== null) {
+                FinalGrade::updateOrCreate(
+                    ['course_id' => $course->id, 'user_id' => $student->id],
+                    ['total_score' => $score]
+                );
+            }
+        }
+
+        // --- KESEPAKATAN VARIABEL VIEW DENGAN LAUDYA ---
+        // $course: Informasi Mata Kuliah
+        // $students: Daftar Mahasiswa Terurut (NIM)
+        // $finalGrades: Nilai akhir yang di-key berdasarkan ID mahasiswa (bisa diakses $finalGrades[$student->id]->total_score)
+        
+        $students = $course->students;
+        $finalGrades = $course->finalGrades()->get()->keyBy('user_id');
+
+        return view('dosen.grades.show', compact('course', 'students', 'finalGrades'));
+    }
+
     public function dosenShow(Course $course)
     {
         Gate::authorize('view', $course);
@@ -277,9 +270,6 @@ class CourseController extends Controller
             ->with('success', 'Mata kuliah berhasil diperbarui.');
     }
 
-    /**
-     * Menampilkan form edit mata kuliah.
-     */
     public function edit(Course $course)
     {
         Gate::authorize('update', $course);
@@ -291,9 +281,6 @@ class CourseController extends Controller
         return view($this->isAdminRoute() ? 'admin.courses.edit' : 'courses.edit', compact('course', 'lecturers'));
     }
 
-    /**
-     * Memperbarui mata kuliah.
-     */
     public function update(UpdateCourseRequest $request, Course $course)
     {
         Gate::authorize('update', $course);
@@ -307,15 +294,10 @@ class CourseController extends Controller
             ->with('success', 'Mata kuliah berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus mata kuliah.
-     */
     public function destroy(Course $course)
     {
         Gate::authorize('delete', $course);
 
-        // FK submissions tidak cascade, jadi tolak dengan pesan yang jelas
-        // (konsisten dengan keputusan Q6 pada penghapusan tugas).
         $hasSubmissions = Submission::whereHas(
             'assignment',
             fn ($q) => $q->where('course_id', $course->id)
@@ -325,12 +307,10 @@ class CourseController extends Controller
             return back()->with('error', 'Mata kuliah tidak dapat dihapus karena sudah memiliki pengumpulan tugas.');
         }
 
-        // Ambil path dulu: cascade di DB tidak memicu event model.
         $paths = $course->materials()->whereNotNull('file_path')->pluck('file_path');
 
         $course->delete();
 
-        // Hapus berkas hanya setelah baris database berhasil dihapus.
         Storage::disk('local')->delete($paths->all());
 
         return redirect()
