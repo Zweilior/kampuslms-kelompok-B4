@@ -8,6 +8,7 @@ use App\Models\Assignment;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use App\Events\AssignmentPublished;
 
 class AssignmentController extends Controller
 {
@@ -77,6 +78,10 @@ class AssignmentController extends Controller
             'created_by' => $user->id,
         ]);
 
+        if ($assignment->status === 'published') {
+            AssignmentPublished::dispatch($assignment);
+        }
+
         return (new AssignmentResource($assignment))
             ->response()
             ->setStatusCode(201);
@@ -131,7 +136,13 @@ class AssignmentController extends Controller
             ],
         ]);
 
+        $wasPublished = $assignment->status === 'published';
+
         $assignment->update($validated);
+
+        if (! $wasPublished && $assignment->status === 'published') {
+            AssignmentPublished::dispatch($assignment);
+        }
 
         return new AssignmentResource($assignment);
     }

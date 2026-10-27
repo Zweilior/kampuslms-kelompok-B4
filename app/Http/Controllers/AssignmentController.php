@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate; 
 use Illuminate\Validation\Rule;
+use App\Events\AssignmentPublished;
 
 class AssignmentController extends Controller
 {
@@ -96,6 +97,10 @@ class AssignmentController extends Controller
         $assignment->created_by = $creatorId;
         $assignment->save();
 
+        if ($assignment->status === 'published') {
+            AssignmentPublished::dispatch($assignment);
+        }
+
         return redirect()->route('admin.assignments.index')->with('success', 'Tugas berhasil ditambahkan.');
     }
 
@@ -115,9 +120,16 @@ class AssignmentController extends Controller
      */
     public function adminUpdate(Request $request, Assignment $assignment)
     {
-        Gate::authorize('update', $assignment); // BARU
+        Gate::authorize('update', $assignment);
+
+        $wasPublished = $assignment->status === 'published';
 
         $assignment->update($request->validate($this->adminAssignmentRules()));
+
+        if (! $wasPublished && $assignment->status === 'published') {
+            AssignmentPublished::dispatch($assignment);
+        }
+
         return redirect()->route('admin.assignments.index')->with('success', 'Tugas berhasil diperbarui.');
     }
 
@@ -197,10 +209,14 @@ class AssignmentController extends Controller
             'status' => ['required', 'in:draft,published'],
         ]);
 
-        $course->assignments()->create([
+        $assignment = $course->assignments()->create([
             ...$validated,
             'created_by' => auth()->id() ?? User::where('role', 'dosen')->value('id'),
         ]);
+
+        if ($assignment->status === 'published') {
+            AssignmentPublished::dispatch($assignment);
+        }
 
         return redirect()->route('dosen.courses.assignments.index', $course)
             ->with('success', 'Tugas berhasil dibuat.');
@@ -234,7 +250,13 @@ class AssignmentController extends Controller
             'status' => ['required', 'in:draft,published'],
         ]);
 
+        $wasPublished = $assignment->status === 'published';
+
         $assignment->update($validated);
+
+        if (! $wasPublished && $assignment->status === 'published') {
+            AssignmentPublished::dispatch($assignment);
+        }
 
         return redirect()->route('dosen.courses.assignments.index', $course)
             ->with('success', 'Tugas berhasil diperbarui.');
