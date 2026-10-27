@@ -41,6 +41,38 @@ Pastikan `.env` tidak mengubah disk default: `FILESYSTEM_DISK=local` (atau tidak
 ### Menjalankan Tes
 `php artisan test`
 
+### Menjalankan Queue Notifikasi
+
+KampusLMS menggunakan queue database untuk memproses notifikasi tugas secara asinkron. Pastikan `.env` berisi:
+
+```env
+QUEUE_CONNECTION=database
+```
+
+Tabel `jobs`, `job_batches`, dan `failed_jobs` sudah disediakan oleh migrasi bawaan Laravel. Tabel `notifications` juga sudah memiliki migrasi proyek. Jalankan migrasi setelah menyiapkan koneksi database:
+
+```bash
+php artisan migrate
+```
+
+Jalankan worker di terminal terpisah selama aplikasi digunakan:
+
+```bash
+php artisan queue:work
+```
+
+Jika worker tidak berjalan, tugas tetap tersimpan dan aplikasi tetap merespons, tetapi job notifikasi hanya menumpuk di tabel `jobs` dan belum diproses. Karena itu, pastikan terminal worker tetap terbuka. Periksa job yang gagal dengan:
+
+```bash
+php artisan queue:failed
+```
+
+Untuk mencoba ulang semua job yang gagal:
+
+```bash
+php artisan queue:retry all
+```
+
 
 ### Jobdesk
 |Anggota | Tugasnya |
