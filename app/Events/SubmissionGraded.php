@@ -1,0 +1,17 @@
+<?php
+
+namespace App\Events;
+
+use App\Models\Grade;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
+
+class SubmissionGraded
+{
+    use Dispatchable, SerializesModels;
+
+    public function __construct(
+        public Grade $grade,
+        public bool $updated = false
+    ) {}
+}
