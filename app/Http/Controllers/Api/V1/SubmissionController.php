@@ -9,7 +9,6 @@ use App\Http\Resources\SubmissionResource;
 use App\Models\Assignment;
 use App\Models\Grade;
 use App\Models\Submission;
-use App\Notifications\NilaiDiberikan;
 use App\Notifications\PengumpulanBaru;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -75,10 +74,10 @@ class SubmissionController extends Controller
 
         $created = $grade->wasRecentlyCreated;
 
-        // Beri tahu mahasiswa pemilik submission.
-        $submission->student?->notify(
-            new NilaiDiberikan($submission, $grade, updated: ! $created)
-        );
+        // Dispatch event SubmissionGraded alih-alih memanggil notify() langsung.
+        if ($submission->student) {
+            \App\Events\SubmissionGraded::dispatch($grade, ! $created);
+        }
 
         $grade->load('grader');
 
