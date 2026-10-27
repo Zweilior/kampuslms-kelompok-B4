@@ -152,28 +152,42 @@ class CourseController extends Controller
         return view('dosen.courses.index', compact('activeCourses', 'archivedCourses'));
     }
 
-    /**
-     * Daftar nilai MK milik dosen (Dashboard Rekap).
-     * Telah dioptimasi memanfaatkan relasi FinalGrade, tidak lagi menghitung berat.
-     */
     public function dosenGradesIndex(Request $request)
     {
         Gate::authorize('viewAny', Course::class);
 
         $courses = Course::where('lecturer_id', $request->user()->id)
             ->withCount('students')
-            ->with('finalGrades') // Cukup panggil FinalGrade, jauh lebih cepat!
+            ->with([
+                'students:id',
+                'assignments.gradeComponent',
+                'assignments.submissions.grade',
+            ])
             ->orderBy('name')
             ->get();
 
         $courses->each(function (Course $course): void {
-            $scores = $course->finalGrades->pluck('total_score');
+            $studentScores = $course->students
+                ->map(function (User $student) use ($course): ?float {
+                    $assignments = $course->assignments->map(function ($assignment) use ($student) {
+                        $studentAssignment = clone $assignment;
+                        $studentAssignment->setRelation(
+                            'submissions',
+                            $assignment->submissions->where('user_id', $student->id)->values()
+                        );
+                        return $studentAssignment;
+                    });
+
+                    return CourseGradeCalculator::finalScore($assignments);
+                })
+                ->filter(fn (?float $score): bool => $score !== null)
+                ->values();
 
             $course->setAttribute(
                 'monitoring_average',
-                $scores->isNotEmpty() ? round($scores->avg(), 2) : null
+                $studentScores->isNotEmpty() ? round($studentScores->avg(), 2) : null
             );
-            $course->setAttribute('monitoring_graded_students_count', $scores->count());
+            $course->setAttribute('monitoring_graded_students_count', $studentScores->count());
         });
 
         $activeCourses = $courses->where('status', 'active')->values();
@@ -185,10 +199,6 @@ class CourseController extends Controller
         ));
     }
 
-    /**
-     * [BARU] Menampilkan halaman detail rekap per mata kuliah untuk dosen.
-     * Di sini kita melakukan kalkulasi final dan menyimpannya (upsert) ke tabel FinalGrade.
-     */
     public function dosenGradesShow(Course $course)
     {
         Gate::authorize('view', $course);
@@ -219,11 +229,6 @@ class CourseController extends Controller
             }
         }
 
-        // --- KESEPAKATAN VARIABEL VIEW DENGAN LAUDYA ---
-        // $course: Informasi Mata Kuliah
-        // $students: Daftar Mahasiswa Terurut (NIM)
-        // $finalGrades: Nilai akhir yang di-key berdasarkan ID mahasiswa (bisa diakses $finalGrades[$student->id]->total_score)
-        
         $students = $course->students;
         $finalGrades = $course->finalGrades()->get()->keyBy('user_id');
 

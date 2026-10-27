@@ -75,10 +75,6 @@ class MahasiswaController extends Controller
         ));
     }
 
-    /**
-     * Halaman Dashboard Rekap Nilai Mahasiswa (Index)
-     * Menggunakan relasi FinalGrade agar tidak menghitung manual seluruh MK.
-     */
     public function monitoringGrades(Request $request)
     {
         $validated = $request->validate([
@@ -88,14 +84,23 @@ class MahasiswaController extends Controller
         $studentId = auth()->id();
         $status = $validated['status'] ?? null;
         
-        // Cukup load relasi finalGrades milik mahasiswa yang sedang login
+        $gradeAssignments = fn ($query) => $query
+            ->where('status', 'published')
+            ->with([
+                'gradeComponent',
+                'submissions' => fn ($submissionQuery) => $submissionQuery
+                    ->where('user_id', $studentId)
+                    ->with('grade')
+                    ->latest(),
+            ]);
+
         $courses = auth()->user()->courses()
-            ->with(['finalGrades' => fn ($query) => $query->where('user_id', $studentId)])
+            ->with(['assignments' => $gradeAssignments])
             ->orderBy('courses.name')
             ->get();
             
         $courses->each(function (Course $course) {
-            $score = $course->finalGrades->first()?->total_score;
+            $score = CourseGradeCalculator::finalScore($course->assignments);
             
             $course->setAttribute('monitoring_final_score', $score);
             $course->setAttribute(
@@ -213,10 +218,6 @@ class MahasiswaController extends Controller
         ));
     }
 
-    /**
-     * Halaman Detail Rekap Nilai per MK (Mahasiswa)
-     * Melakukan kalkulasi dan menyimpan hasilnya ke tabel FinalGrade
-     */
     public function grades(Course $course)
     {
         Gate::authorize('view', $course);
@@ -249,7 +250,6 @@ class MahasiswaController extends Controller
             );
         });
 
-        // Hitung nilai dan simpan (upsert) ke tabel FinalGrade
         $finalScore = CourseGradeCalculator::finalScore($assignments);
         if ($finalScore !== null) {
             FinalGrade::updateOrCreate(
