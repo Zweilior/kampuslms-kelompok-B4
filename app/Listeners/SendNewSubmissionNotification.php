@@ -19,16 +19,15 @@ class SendNewSubmissionNotification implements ShouldQueue
     {
         $submission = $event->submission;
         $submission->loadMissing(['assignment.course.lecturer', 'student']);
-        
+
+        // Penerima: dosen pemilik mata kuliah dari tugas yang dikumpulkan.
         $lecturer = $submission->assignment?->course?->lecturer;
 
         if ($lecturer) {
-            // Sesuaikan parameter PengumpulanBaru dengan yang ada di sistemmu.
-            // Jika parameternya ($submission, $assignment, $user, $updated)
             $lecturer->notify(new PengumpulanBaru(
-                $submission, 
-                $submission->assignment, 
-                $submission->student, 
+                $submission,
+                $submission->assignment,
+                $submission->student,
                 $event->updated
             ));
         }
