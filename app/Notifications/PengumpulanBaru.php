@@ -8,14 +8,15 @@ use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
-/**
- * Dikirim ke dosen pemilik course saat mahasiswa mengumpulkan
- * (atau mengumpulkan ulang) tugas.
- */
 class PengumpulanBaru extends Notification implements ShouldQueue
 {
     use Queueable;
+
+    public int $tries = 3;
+    public array $backoff = [10, 30, 60];
 
     public Assignment $assignment;
     public User $student;
@@ -42,7 +43,16 @@ class PengumpulanBaru extends Notification implements ShouldQueue
         return [
             'message' => "{$this->student->name} {$verb} tugas \"{$this->assignment->title}\".",
             'assignment_id' => $this->assignment->id,
+            'course_id' => $this->assignment->course_id,
             'submission_id' => $this->submission->id,
         ];
+    }
+
+    public function failed(Throwable $exception): void
+    {
+        Log::error('Gagal menyimpan notifikasi nilai.', [   // PengumpulanBaru: 'pengumpulan baru'
+            'submission_id' => $this->submission->id,
+            'error' => $exception->getMessage(),
+        ]);
     }
 }
