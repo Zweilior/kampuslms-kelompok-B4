@@ -2,12 +2,6 @@
    USERS / INDEX.CSS — Daftar User
    ============================================ */
 
-.users-index {
-    max-width: 1200px;
-    margin: 0 auto;
-    animation: fadeUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
 /* ---------- Header ---------- */
 .users-index__header {
     display: flex;
@@ -216,27 +210,6 @@
     border-bottom: none;
 }
 
-.users-table__id {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-muted);
-}
-
-.users-table__name {
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.users-table__email {
-    font-family: 'Inter', sans-serif;
-    color: var(--text-secondary);
-}
-
-.users-table__muted {
-    color: var(--text-muted);
-}
-
 /* ---------- Role Badge ---------- */
 .role-badge {
     display: inline-flex;
@@ -274,80 +247,6 @@
     color: #4a5a8a;
 }
 
-/* ---------- Actions ---------- */
-.users-table__actions {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-}
-
-.action-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3125rem;
-    padding: 0.375rem 0.625rem;
-    border-radius: var(--radius-md);
-    font-size: 0.75rem;
-    font-weight: 600;
-    text-decoration: none;
-    border: 1px solid transparent;
-    background-color: transparent;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.action-btn .material-symbols-outlined {
-    font-size: 0.9375rem;
-}
-
-.action-btn--view {
-    color: var(--primary);
-    background-color: rgba(139, 174, 102, 0.1);
-    border-color: rgba(139, 174, 102, 0.2);
-}
-
-.action-btn--view:hover {
-    background-color: rgba(139, 174, 102, 0.2);
-    border-color: rgba(139, 174, 102, 0.4);
-}
-
-.action-btn--edit {
-    color: #a6791f;
-    background-color: rgba(201, 151, 63, 0.1);
-    border-color: rgba(201, 151, 63, 0.2);
-}
-
-.action-btn--edit:hover {
-    background-color: rgba(201, 151, 63, 0.2);
-    border-color: rgba(201, 151, 63, 0.4);
-}
-
-.action-btn--delete {
-    color: #b14545;
-    background-color: rgba(177, 69, 69, 0.08);
-    border-color: rgba(177, 69, 69, 0.2);
-}
-
-.action-btn--delete:hover {
-    background-color: rgba(177, 69, 69, 0.18);
-    border-color: rgba(177, 69, 69, 0.4);
-}
-
-/* ---------- Empty State ---------- */
-.users-table__empty {
-    text-align: center;
-    padding: 3rem 1.25rem;
-    color: var(--text-muted);
-}
-
-.users-table__empty .material-symbols-outlined {
-    font-size: 2.5rem;
-    color: var(--primary-light);
-    display: block;
-    margin: 0 auto 0.75rem;
-}
-
 /* ---------- Animasi ---------- */
 @keyframes fadeUp {
     from {
@@ -366,13 +265,10 @@
     .users-index__header { align-items: flex-start; }
     .users-table th,
     .users-table td { padding: 0.75rem 0.875rem; }
-    .action-btn span:not(.material-symbols-outlined) { display: none; }
 }
 
 /* ---------- Dark Mode ---------- */
 @media (prefers-color-scheme: dark) {
     .role-badge--admin { color: #e0b558; }
     .role-badge--mahasiswa { color: #8ba0d8; }
-    .action-btn--edit { color: #e0b558; }
-    .action-btn--delete { color: #e08585; }
 }

@@ -6,83 +6,48 @@
 .dosen-enrollments,
 .dosen-assignment-list,
 .mahasiswa-rubric {
-    width: min(100%, 76rem);
-    margin-inline: auto;
-    padding: 0 0 3rem;
+    @apply w-[min(100%,76rem)] mx-auto pt-0 pb-12 px-0;
 }
 
 .lms-page-header {
-    position: relative;
-    display: flex;
-    min-height: 8rem;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1.25rem;
-    overflow: hidden;
-    margin: 0 0 1.5rem;
-    padding: clamp(1.25rem, 3vw, 1.75rem);
-    border: 1px solid rgba(255, 255, 255, 0.24);
-    border-radius: 1.15rem;
-    background: linear-gradient(145deg, #8eaa72, #3d5f2d 76%);
-    box-shadow: 0 10px 28px rgba(25, 35, 22, 0.12);
-    color: #fff;
+    @apply relative flex min-h-32 items-center justify-between gap-5 overflow-hidden mt-0 mb-6 mx-0;
+    @apply p-[clamp(1.25rem,3vw,1.75rem)] border border-[rgba(255,255,255,0.24)] rounded-[1.15rem];
+    @apply bg-[linear-gradient(145deg,#8eaa72,#3d5f2d_76%)] shadow-[0_10px_28px_rgba(25,35,22,0.12)] text-white;
 }
 
 .lms-page-header__copy {
-    min-width: 0;
-    flex: 1 1 auto;
+    @apply min-w-0 flex-auto;
 }
 
 .dosen-courses__header.lms-page-header {
-    max-width: none;
+    @apply max-w-none;
 }
 
 .lms-page-header::before {
-    position: absolute;
-    inset: 0;
-    background-image: radial-gradient(rgba(255, 255, 255, 0.8) 0.7px, transparent 0.7px);
-    background-size: 17px 17px;
-    content: "";
-    opacity: 0.18;
-    pointer-events: none;
+    @apply absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.8)_0.7px,transparent_0.7px)];
+    @apply bg-size-[17px_17px] content-[''] opacity-18 pointer-events-none;
     mask-image: linear-gradient(to bottom, black, transparent 90%);
 }
 
 .lms-page-header::after {
-    position: absolute;
-    right: -2rem;
-    bottom: -7rem;
-    width: 16rem;
-    aspect-ratio: 1;
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 50%;
-    box-shadow: 0 0 0 1.6rem rgba(255, 255, 255, 0.04), 0 0 0 3.3rem rgba(255, 255, 255, 0.035);
-    content: "";
-    pointer-events: none;
+    @apply absolute -right-8 -bottom-28 w-64 aspect-[1] border border-[rgba(255,255,255,0.18)] rounded-[50%];
+    @apply shadow-[0_0_0_1.6rem_rgba(255,255,255,0.04),0_0_0_3.3rem_rgba(255,255,255,0.035)] content-[''];
+    @apply pointer-events-none;
 }
 
 .lms-page-header > * {
-    position: relative;
-    z-index: 1;
+    @apply relative z-1;
 }
 
 .lms-page-header h1,
 .lms-page-header .mahasiswa-page__title {
-    margin: 0.3rem 0 0;
-    color: #fff;
-    font-size: clamp(1.35rem, 3vw, 1.8rem);
-    font-weight: 700;
-    letter-spacing: -0.025em;
-    line-height: 1.25;
+    @apply mt-[0.3rem] mb-0 mx-0 text-white text-[length:clamp(1.35rem,3vw,1.8rem)] font-bold;
+    @apply tracking-[-0.025em] leading-[1.25];
 }
 
 .lms-page-header p,
 .lms-page-header .mahasiswa-page__description {
-    max-width: 48rem;
-    margin: 0.4rem 0 0;
-    color: rgba(255, 255, 255, 0.84);
-    font-size: 0.84rem;
-    line-height: 1.55;
+    @apply max-w-[48rem] mt-[0.4rem] mb-0 mx-0 text-[rgba(255,255,255,0.84)] text-[0.84rem] leading-[1.55];
 }
 
 .lms-page-header .mahasiswa-page__eyebrow,
@@ -90,144 +55,108 @@
 .lms-page-header .dosen-assignment-form__eyebrow,
 .lms-page-header .dosen-rubric__eyebrow,
 .lms-page-header .dosen-enrollments__eyebrow {
-    color: rgba(255, 255, 255, 0.78);
+    @apply text-[rgba(255,255,255,0.78)];
 }
 
 .lms-page-header .mahasiswa-page__eyebrow::before,
 .lms-page-header .dosen-rubric__eyebrow > span:nth-child(2),
 .lms-page-header .dosen-enrollments__eyebrow > span:nth-child(2) {
-    background: rgba(255, 255, 255, 0.72);
+    @apply bg-[rgba(255,255,255,0.72)];
 }
 
 .lms-page-header .dosen-courses__eyebrow > span:nth-child(2),
 .lms-page-header .dosen-assignment-form__dot {
-    background: rgba(255, 255, 255, 0.72);
+    @apply bg-[rgba(255,255,255,0.72)];
 }
 
 .lms-page-header .dosen-courses__eyebrow > span:first-child,
 .lms-page-header .dosen-assignment-form__eyebrow > span:first-child,
 .lms-page-header .dosen-rubric__eyebrow > span:first-child,
 .lms-page-header .dosen-enrollments__eyebrow > span:first-child {
-    color: #fff;
+    @apply text-white;
 }
 
 .lms-page-header .mahasiswa-page__back {
-    border-color: rgba(255, 255, 255, 0.8);
-    background: rgba(255, 255, 255, 0.96);
-    color: #36552c;
+    @apply border-[rgba(255,255,255,0.8)] bg-[rgba(255,255,255,0.96)] text-[#36552c];
 }
 
 .lms-page-header .mahasiswa-page__back:hover {
-    background: #fff;
-    color: #27451e;
+    @apply bg-white text-[#27451e];
 }
 
 .lms-page-header .dosen-assignment__create {
-    flex: 0 0 auto;
-    border-color: rgba(255, 255, 255, 0.8);
-    background: rgba(255, 255, 255, 0.96);
-    color: #36552c;
+    @apply flex-none border-[rgba(255,255,255,0.8)] bg-[rgba(255,255,255,0.96)] text-[#36552c];
 }
 
 .lms-page-header .dosen-assignment__create:hover {
-    background: #fff;
+    @apply bg-white;
 }
 
 .lms-page-header .dosen-assignment-form__icon {
-    border-color: rgba(255, 255, 255, 0.28);
-    background: rgba(255, 255, 255, 0.16);
-    color: #fff;
+    @apply border-[rgba(255,255,255,0.28)] bg-[rgba(255,255,255,0.16)] text-white;
 }
 
 .lms-page-header .mahasiswa-page__icon-box {
-    flex: 0 0 auto;
-    border-color: rgba(255, 255, 255, 0.28);
-    background: rgba(255, 255, 255, 0.16);
-    color: #fff;
+    @apply flex-none border-[rgba(255,255,255,0.28)] bg-[rgba(255,255,255,0.16)] text-white;
 }
 
 .lms-page-header .mahasiswa-page__pill,
 .lms-page-header .mahasiswa-rubric__course-code {
-    border-color: rgba(255, 255, 255, 0.3);
-    background: rgba(255, 255, 255, 0.16);
-    color: #fff;
+    @apply border-[rgba(255,255,255,0.3)] bg-[rgba(255,255,255,0.16)] text-white;
 }
 
 .lms-page-header > a.mahasiswa-rubric__back {
-    flex-basis: 100%;
+    @apply basis-full text-[rgba(255,255,255,0.88)];
     order: -1;
-    color: rgba(255, 255, 255, 0.88);
 }
 
 .lms-page-header > a:first-child:not(.dosen-assignment__create) {
-    flex: 0 0 auto;
-}
-
-.lms-page-header > a.lms-page-back {
-    flex-basis: 100%;
-    order: -1;
-    color: rgba(255, 255, 255, 0.88);
+    @apply flex-none;
 }
 
 .lms-data-table {
-    width: 100%;
-    border-collapse: collapse;
-    color: var(--text-primary);
-    text-align: left;
+    @apply w-full border-collapse text-[color:var(--text-primary)] text-left;
 }
 
 .lms-data-table thead {
-    background: var(--bg-hover);
+    @apply bg-[color:var(--bg-hover)];
 }
 
 .lms-data-table th {
-    padding: 0.8rem 1rem;
-    border-bottom: 1px solid var(--border-hairline);
-    color: var(--text-muted);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.055em;
-    text-align: left;
-    text-transform: uppercase;
+    @apply py-[0.8rem] px-4 border-b border-b-[color:var(--border-hairline)] text-[color:var(--text-muted)];
+    @apply text-[0.7rem] font-bold tracking-[0.055em] text-left uppercase;
 }
 
 .lms-data-table td {
-    padding: 0.85rem 1rem;
-    border-bottom: 1px solid var(--border-hairline);
-    color: var(--text-secondary);
-    font-size: 0.8125rem;
-    line-height: 1.5;
+    @apply py-[0.85rem] px-4 border-b border-b-[color:var(--border-hairline)];
+    @apply text-[color:var(--text-secondary)] text-[0.8125rem] leading-[1.5];
 }
 
 .lms-data-table tbody tr:last-child td {
-    border-bottom: 0;
+    @apply border-b-0;
 }
 
 .lms-data-table tbody tr:hover {
-    background: var(--bg-hover);
+    @apply bg-[color:var(--bg-hover)];
 }
 
 .dosen-rubric__table.lms-data-table td {
-    padding: 0;
+    @apply p-0;
 }
 
 .dosen-course-detail-page {
-    width: min(100%, 76rem);
-    margin-inline: auto;
-    padding-bottom: 3rem;
+    @apply w-[min(100%,76rem)] mx-auto pb-12;
 }
 
 .dosen-course-edit,
 .dosen-assignment-form,
 .dosen-material-form {
-    padding-top: 0;
+    @apply pt-0;
 }
 
 .dosen-assignment-form__title,
 .dosen-course-edit__header h1 {
-    font-size: clamp(1.35rem, 3vw, 1.8rem);
-    letter-spacing: -0.025em;
-    line-height: 1.25;
+    @apply text-[length:clamp(1.35rem,3vw,1.8rem)] tracking-[-0.025em] leading-[1.25];
 }
 
 @media (max-width: 760px) {
@@ -239,47 +168,37 @@
     .dosen-enrollments,
     .dosen-assignment-list,
     .mahasiswa-rubric {
-        width: min(100%, 76rem);
-        padding-bottom: 2.25rem;
+        @apply w-[min(100%,76rem)] pb-9;
     }
 
     .dosen-course-detail-page {
-        width: 100%;
+        @apply w-full;
     }
 
     .lms-page-header {
-        min-height: 0;
-        align-items: flex-start;
-        flex-wrap: wrap;
-        gap: 0.85rem;
-        margin-bottom: 1.25rem;
-        padding: 1.1rem;
-    }
-
-    .lms-page-header > a.lms-page-back {
-        flex-basis: 100%;
+        @apply min-h-0 items-start flex-wrap gap-[0.85rem] mb-5 p-[1.1rem];
     }
 
     .lms-page-header .mahasiswa-page__header-copy {
-        flex: 1 1 14rem;
+        @apply flex-[1_1_14rem];
     }
 
     .lms-page-header__copy {
-        flex-basis: 100%;
+        @apply basis-full;
     }
 
     .lms-data-table th,
     .lms-data-table td {
-        padding: 0.7rem 0.75rem;
+        @apply py-[0.7rem] px-3;
     }
 }
 
 @media (max-width: 480px) {
     .lms-page-header {
-        border-radius: 0.95rem;
+        @apply rounded-[0.95rem];
     }
 
     .lms-data-table {
-        min-width: 34rem;
+        @apply min-w-136;
     }
 }
