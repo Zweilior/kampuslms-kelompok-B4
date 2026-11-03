@@ -53,10 +53,10 @@ dosenGradesIndex, dan render), bukan di database.
 
 | # | Halaman | Temuan | Bukti | Status |
 |---|---------|--------|-------|--------|
-| 1 | Daftar tugas (dosen) | N+1: `select * from courses where id = ?` berjalan 4 kali, sebanyak jumlah tugas. Penyebab: `@can('update'/'delete', $assignment)` di view memicu `AssignmentPolicy` membaca `$assignment->course` per tugas. | Duplikat 3 dari 9 query; 4x query `courses` | `[ISI]` |
+| 1 | Daftar tugas (dosen) | N+1: `select * from courses where id = ?` berjalan 4 kali, sebanyak jumlah tugas. Penyebab: `@can('update'/'delete', $assignment)` di view memicu `AssignmentPolicy` membaca `$assignment->course` per tugas. | Duplikat 3 dari 9 query; 4x query `courses` | Diperbaiki dengan eager loading `course` |
 | 2 | Rekap nilai (admin) | `Grade::count()` menduplikasi hitungan `paginate()`; dua `count(*)` yang sama persis. | 2x `select count(*) from grades` | `[ISI]` |
 | 3 | Dashboard admin | **Bukan N+1** (false positive). Dua query `count(*) ... where role = ?` memakai nilai role berbeda. Bisa digabung menjadi satu query `groupBy`. | Duplikat 1 | `[ISI]` |
-| 4 | Rekap nilai (admin) | `order by graded_at` memindai seluruh tabel; kolom `graded_at` tanpa index. | Tabel di bawah | `[ISI]` |
+| 4 | Rekap nilai (admin) | `order by graded_at` memindai seluruh tabel; kolom `graded_at` tanpa index. | Tabel di bawah | Migration index dibuat; EXPLAIN sesudah `[ISI]` |
 | 5 | Rekap nilai (dosen) | Beban ada di memori dan waktu, bukan jumlah query. | 42.2 ms, 1.24 MB, 8 query | `[ISI]` |
 | 6 | Halaman mahasiswa | Tidak ditemukan N+1. | Duplikat 0 di semua halaman mahasiswa | Tidak perlu perbaikan |
 
@@ -78,17 +78,25 @@ Catatan: `EXPLAIN` pada `grades.submission_id` juga menunjukkan `ALL`, tetapi **
 
 ## 5. Perbaikan yang dilakukan
 
-`[ISI]` Ringkas tiap perbaikan: file yang diubah, apa yang diubah, dan dampaknya pada angka di tabel bagian 2.
+Perbaikan yang dilakukan:
+
+- `CourseEnrollmentController::dosenIndex` memaginasi mahasiswa terdaftar dan mahasiswa yang tersedia, masing-masing dengan page name terpisah agar tidak saling menggeser.
+- `SubmissionController::dosenIndex` memaginasi pengumpulan dan mahasiswa yang belum mengumpulkan. Ekspor pengumpulan memakai lazy iteration agar tidak memuat seluruh data ke memori.
+- Daftar tugas/materi per mata kuliah dan komponen nilai tetap memakai `get()` karena jumlah normalnya belasan baris dan tampilan tidak membutuhkan navigasi halaman. Daftar mata kuliah mahasiswa/dosen juga tetap tidak dipaginasi karena dikelompokkan aktif/arsip dan jumlahnya kecil per pengguna.
+- `AssignmentController::dosenIndex` eager load `course` untuk mencegah N+1 dari policy di Blade.
+- Migration baru menambahkan index `grades.graded_at`; hasil EXPLAIN sesudah pengukuran akhir ditempel di bagian 4.
+- Kolom angka sesudah pada bagian 2 masih diisi setelah seluruh PR ter-merge dan dataset baseline diimpor ulang.
 
 ## 6. Cache
 
-Bagian yang di-cache: `[ISI]` (kandidat: statistik dashboard admin dan dosen).
+Bagian yang di-cache: statistik dashboard admin dan dosen dengan `Cache::remember()`.
 
 | Data | Masa berlaku | Dibersihkan saat | Akibat jika basi |
 |------|-------------:|------------------|------------------|
-| `[ISI]` | `[ISI]` | `[ISI]` | `[ISI]` |
+| Statistik jumlah user dan mata kuliah admin | 10 menit | Model `User` atau `Course` tersimpan/dihapus | Angka dashboard dapat tertinggal maksimal 10 menit |
+| Jumlah mata kuliah, tugas terbuka, dan submission belum dinilai milik dosen | 1 menit | Model `Course`, `Assignment`, `Submission`, atau `Grade` tersimpan/dihapus | Angka sementara dapat tertinggal maksimal 1 menit jika invalidasi tidak terjadi |
 
-Bagian yang sengaja **tidak** di-cache dan alasannya: `[ISI]` (kandidat: nilai mahasiswa dan status pengumpulan, karena data basi merugikan pengguna; jumlah notifikasi belum dibaca).
+Bagian yang sengaja **tidak** di-cache: daftar tugas yang perlu dinilai, nilai mahasiswa, rekap nilai, status pengumpulan, dan jumlah notifikasi belum dibaca. Data tersebut harus mencerminkan keadaan terbaru karena data basi dapat menyebabkan pengguna mengambil keputusan yang salah atau melewatkan tindakan penting.
 
 ## 7. Ringkasan sesudah optimisasi
 

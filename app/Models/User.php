@@ -8,11 +8,22 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+
+    protected static function booted(): void
+    {
+        $clearCache = function (): void {
+            Cache::forget('dashboard:admin:stats');
+        };
+
+        static::saved($clearCache);
+        static::deleted($clearCache);
+    }
 
     protected $fillable = [
         'name',

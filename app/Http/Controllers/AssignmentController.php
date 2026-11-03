@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\AssignmentPublished;
 use App\Models\Assignment;
 use App\Models\Course;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate; 
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
-use App\Events\AssignmentPublished;
 
 class AssignmentController extends Controller
 {
@@ -84,12 +84,12 @@ class AssignmentController extends Controller
 
         // 2. Ambil course tujuan untuk otorisasi
         $course = Course::findOrFail($validated['course_id']);
-        
+
         // 3. Cek hak akses
         Gate::authorize('create', [Assignment::class, $course]); // BARU
 
         $creatorId = Auth::id() ?? User::where('role', 'admin')->value('id');
-        if (!$creatorId) {
+        if (! $creatorId) {
             return back()->withErrors(['created_by' => 'Akun admin tidak ditemukan.'])->withInput();
         }
 
@@ -112,6 +112,7 @@ class AssignmentController extends Controller
         Gate::authorize('update', $assignment); // BARU
 
         $courses = Course::query()->orderBy('name')->get(['id', 'name']);
+
         return view('admin.assignments.form', compact('assignment', 'courses'));
     }
 
@@ -147,6 +148,7 @@ class AssignmentController extends Controller
         }
 
         $assignment->delete();
+
         return redirect()->route('admin.assignments.index')->with('success', 'Tugas berhasil dihapus.');
     }
 
@@ -172,10 +174,11 @@ class AssignmentController extends Controller
         Gate::authorize('viewAny', [Assignment::class, $course]); // BARU (Menggantikan ensureLecturerOwnsCourse)
 
         $assignments = $course->assignments()
+            ->with('course')
             ->withCount('submissions')
             ->orderByDesc('created_at')
             ->get();
-        
+
         $studentCount = $course->students()->count();
 
         return view('dosen.assignments.index', compact('course', 'assignments', 'studentCount'));
@@ -287,6 +290,7 @@ class AssignmentController extends Controller
     public function create(Course $course)
     {
         Gate::authorize('create', [Assignment::class, $course]); // BARU
+
         return view('assignments.create', compact('course'));
     }
 
@@ -319,6 +323,7 @@ class AssignmentController extends Controller
     public function show(Course $course, Assignment $assignment)
     {
         Gate::authorize('view', $assignment); // BARU
+
         return view('assignments.show', compact('course', 'assignment'));
     }
 
@@ -328,6 +333,7 @@ class AssignmentController extends Controller
     public function edit(Course $course, Assignment $assignment)
     {
         Gate::authorize('update', $assignment); // BARU
+
         return view('assignments.edit', compact('course', 'assignment'));
     }
 
@@ -363,7 +369,7 @@ class AssignmentController extends Controller
     public function destroy(Course $course, Assignment $assignment)
     {
         Gate::authorize('delete', $assignment); // BARU
-        
+
         $assignment->delete();
 
         return redirect()

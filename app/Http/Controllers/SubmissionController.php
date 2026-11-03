@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SubmissionCreated;
+use App\Events\SubmissionGraded;
 use App\Http\Requests\StoreSubmissionRequest;
 use App\Models\Assignment;
 use App\Models\Course;
@@ -33,13 +35,16 @@ class SubmissionController extends Controller
             'ungraded' => $assignment->submissions()->whereDoesntHave('grade')->count(),
             'late' => $assignment->submissions()->where('is_late', true)->count(), // BARU
         ];
-        $submissions = $this->dosenSubmissionsQuery($assignment, $status)->get();
+        $submissions = $this->dosenSubmissionsQuery($assignment, $status)
+            ->paginate(15, ['submissions.*'], 'submissions_page')
+            ->withQueryString();
 
         // BARU: mahasiswa terdaftar yang belum mengumpulkan tugas ini
         $notSubmitted = $course->students()
             ->whereDoesntHave('submissions', fn ($q) => $q->where('assignment_id', $assignment->id))
             ->orderBy('nim_nip')
-            ->get();
+            ->paginate(15, ['users.*'], 'not_submitted_page')
+            ->withQueryString();
 
         return view('dosen.assignments.show', compact(
             'course',
@@ -57,7 +62,7 @@ class SubmissionController extends Controller
         $validated = $request->validate([
             'status' => ['nullable', Rule::in(['all', 'graded', 'ungraded'])],
         ]);
-        $submissions = $this->dosenSubmissionsQuery($assignment, $validated['status'] ?? 'all')->get();
+        $submissions = $this->dosenSubmissionsQuery($assignment, $validated['status'] ?? 'all')->lazy(500);
         $filename = sprintf(
             'nilai-%s-%s.csv',
             Str::slug($assignment->title) ?: 'tugas',
@@ -113,7 +118,7 @@ class SubmissionController extends Controller
             ->with(['student', 'grade', 'assignment'])
             ->orderBy('students.nim_nip')
             ->orderBy('assignments.title')
-            ->get();
+            ->lazy(500);
 
         return response()->streamDownload(function () use ($submissions): void {
             $output = fopen('php://output', 'w');
@@ -178,7 +183,7 @@ class SubmissionController extends Controller
         $submission->loadMissing('student');
         // Dispatch event SubmissionGraded alih-alih memanggil notify() langsung
         if ($submission->student) {
-            \App\Events\SubmissionGraded::dispatch($grade, ! $grade->wasRecentlyCreated);
+            SubmissionGraded::dispatch($grade, ! $grade->wasRecentlyCreated);
         }
 
         return redirect()
@@ -281,7 +286,7 @@ class SubmissionController extends Controller
         }
 
         // Dispatch Event SubmissionCreated (Asinkron)
-        \App\Events\SubmissionCreated::dispatch($submission, ! $created);
+        SubmissionCreated::dispatch($submission, ! $created);
 
         return redirect()
             ->route(

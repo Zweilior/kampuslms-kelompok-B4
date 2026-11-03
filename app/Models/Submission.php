@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Support\FileSize;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use App\Support\FileSize;
-use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class Submission extends Model
@@ -32,6 +33,18 @@ class Submission extends Model
 
     protected static function booted(): void
     {
+        $clearDashboardCache = function (Submission $submission): void {
+            $lecturerId = Course::query()
+                ->whereKey(Assignment::whereKey($submission->assignment_id)->value('course_id'))
+                ->value('lecturer_id');
+
+            if ($lecturerId) {
+                Cache::forget("dashboard:dosen:{$lecturerId}:stats");
+            }
+        };
+
+        static::saved($clearDashboardCache);
+        static::deleted($clearDashboardCache);
         static::deleting(function (Submission $submission) {
             if ($submission->file_path) {
                 Storage::disk('local')->delete($submission->file_path);

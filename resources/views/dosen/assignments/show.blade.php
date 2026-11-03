@@ -6,7 +6,7 @@
             ->get();
         $totalEnrolled = $course->students()->count();
         $submittedCount = $submissionCounts['all'] ?? $assignment->submissions()->count();
-        $unsubmittedCount = $notSubmitted->count();
+        $unsubmittedCount = $notSubmitted->total();
         $lateCount = $submissionCounts['late'] ?? $assignment->submissions()->where('is_late', true)->count();
         $isPastDue = $assignment->due_at->lte(now());
     @endphp
@@ -196,6 +196,7 @@
                 </div>
             @endforelse
         </section>
+        {{ $submissions->links() }}
 
         {{-- Bagian Mahasiswa Belum Mengumpulkan --}}
         <section class="mt-space-lg rounded-2xl border border-outline/10 bg-surface-container-low p-space-md shadow-sm" aria-label="Daftar mahasiswa belum mengumpulkan">
@@ -203,7 +204,7 @@
                 <div class="flex items-center gap-space-xs">
                     <span class="material-symbols-outlined text-on-surface-variant" aria-hidden="true">person_off</span>
                     <h2 class="font-headline-sm text-base font-semibold text-on-surface sm:text-lg">
-                        Belum Mengumpulkan ({{ $notSubmitted->count() }})
+                        Belum Mengumpulkan ({{ $notSubmitted->total() }})
                     </h2>
                 </div>
             </div>
@@ -238,6 +239,7 @@
                         </tbody>
                     </table>
                 </div>
+                {{ $notSubmitted->links() }}
             @endif
         </section>
     </div>

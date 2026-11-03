@@ -7,10 +7,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Support\Facades\Cache;
 
 class Assignment extends Model
 {
     use HasFactory;
+
+    protected static function booted(): void
+    {
+        $clearCache = function (Assignment $assignment): void {
+            $lecturerId = Course::whereKey($assignment->course_id)->value('lecturer_id');
+
+            if ($lecturerId) {
+                Cache::forget("dashboard:dosen:{$lecturerId}:stats");
+            }
+        };
+
+        static::saved($clearCache);
+        static::deleted($clearCache);
+    }
 
     protected $fillable = [
         'course_id',
