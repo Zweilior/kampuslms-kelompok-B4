@@ -202,7 +202,9 @@ class SubmissionController extends Controller
         return $assignment->submissions()
             ->join('users as students', 'submissions.user_id', '=', 'students.id')
             ->select('submissions.*')
-            ->with(['student', 'grade'])
+            // Optimasi: tambahkan grade.grader agar tidak terjadi N+1 saat view
+            // butuh menampilkan siapa yang menilai
+            ->with(['student', 'grade.grader'])
             ->when($status === 'graded', fn (Builder $query) => $query->whereHas('grade'))
             ->when($status === 'ungraded', fn (Builder $query) => $query->whereDoesntHave('grade'))
             ->orderBy('students.nim_nip')
