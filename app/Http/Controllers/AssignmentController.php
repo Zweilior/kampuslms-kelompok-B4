@@ -174,16 +174,19 @@ class AssignmentController extends Controller
         Gate::authorize('viewAny', [Assignment::class, $course]); // BARU (Menggantikan ensureLecturerOwnsCourse)
 
         $assignments = $course->assignments()
-            ->with('course')
             ->withCount('submissions')
             ->orderByDesc('created_at')
-            ->get();
+            ->get()
+            ->each(function (Assignment $assignment) use ($course) {
+                // Mencegah N+1 pada AssignmentPolicy saat dipanggil oleh @can() di view
+                $assignment->setRelation('course', $course);
+            });
 
         $studentCount = $course->students()->count();
 
         return view('dosen.assignments.index', compact('course', 'assignments', 'studentCount'));
     }
-
+    
     public function dosenCreate(Course $course)
     {
         Gate::authorize('create', [Assignment::class, $course]); // BARU
