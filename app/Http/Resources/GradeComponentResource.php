@@ -16,7 +16,10 @@ class GradeComponentResource extends JsonResource
             'weight' => $this->weight,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'assignments_count' => $this->assignments()->count(),
+            'assignments_count' => $this->when(
+                isset($this->assignments_count),
+                fn () => (int) $this->assignments_count
+            ),
         ];
     }
 }

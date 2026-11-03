@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use App\Events\AssignmentPublished;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\AssignmentResource;
 use App\Models\Assignment;
 use App\Models\Course;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use App\Events\AssignmentPublished;
 
 class AssignmentController extends Controller
 {
@@ -95,11 +95,12 @@ class AssignmentController extends Controller
     public function update(Request $request, Assignment $assignment)
     {
         $user = $request->user();
+        $assignment->loadMissing('course');
 
         // Pastikan hanya dosen pemilik course yang boleh mengubah.
-        if ($assignment->course->lecturer_id !== auth()->id()) {
-        return response()->json(['message' => 'Forbidden. Anda bukan pemilik tugas ini.'], 403);
-    }
+        if ($assignment->course->lecturer_id !== $user->id) {
+            return response()->json(['message' => 'Forbidden. Anda bukan pemilik tugas ini.'], 403);
+        }
 
         $validated = $request->validate([
             'title' => [
@@ -155,6 +156,7 @@ class AssignmentController extends Controller
     public function destroy(Request $request, Assignment $assignment)
     {
         $user = $request->user();
+        $assignment->loadMissing('course');
 
         // Pastikan hanya dosen pemilik course yang boleh menghapus.
         if (

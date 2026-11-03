@@ -56,6 +56,7 @@ class GradeComponentController extends Controller
             'name' => $validated['name'],
             'weight' => $validated['weight'],
         ]);
+        $gradeComponent->loadCount('assignments');
 
         return (new GradeComponentResource($gradeComponent))
             ->response()
@@ -74,7 +75,7 @@ class GradeComponentController extends Controller
         // Authorization check
         if ($user->role === 'mahasiswa') {
             // Mahasiswa hanya bisa lihat course yang diikuti
-            if (!$course->students->contains($user->id)) {
+            if (! $course->students()->whereKey($user->id)->exists()) {
                 return $this->forbidden();
             }
         } elseif ($user->role === 'dosen') {
@@ -85,6 +86,7 @@ class GradeComponentController extends Controller
         }
 
         $gradeComponents = $course->gradeComponents()
+            ->withCount('assignments')
             ->latest()
             ->paginate(15);
 
@@ -99,11 +101,12 @@ class GradeComponentController extends Controller
     public function show(GradeComponent $gradeComponent)
     {
         $user = request()->user();
+        $gradeComponent->loadMissing('course');
         $course = $gradeComponent->course;
 
         // Authorization check
         if ($user->role === 'mahasiswa') {
-            if (!$course->students->contains($user->id)) {
+            if (! $course->students()->whereKey($user->id)->exists()) {
                 return $this->forbidden();
             }
         } elseif ($user->role === 'dosen') {
@@ -111,6 +114,8 @@ class GradeComponentController extends Controller
                 return $this->forbidden();
             }
         }
+
+        $gradeComponent->loadCount('assignments');
 
         return new GradeComponentResource($gradeComponent);
     }
@@ -123,6 +128,7 @@ class GradeComponentController extends Controller
     public function update(Request $request, GradeComponent $gradeComponent)
     {
         $user = $request->user();
+        $gradeComponent->loadMissing('course');
 
         // Pastikan hanya dosen pemilik course yang boleh mengubah.
         if (
@@ -149,6 +155,7 @@ class GradeComponentController extends Controller
         ]);
 
         $gradeComponent->update($validated);
+        $gradeComponent->loadCount('assignments');
 
         return new GradeComponentResource($gradeComponent);
     }
@@ -161,6 +168,7 @@ class GradeComponentController extends Controller
     public function destroy(Request $request, GradeComponent $gradeComponent)
     {
         $user = $request->user();
+        $gradeComponent->loadMissing('course');
 
         // Pastikan hanya dosen pemilik course yang boleh menghapus.
         if (
