@@ -86,6 +86,7 @@ Perbaikan yang dilakukan:
 - `AssignmentController::dosenIndex` eager load `course` untuk mencegah N+1 dari policy di Blade.
 - Migration baru menambahkan index `grades.graded_at`; hasil EXPLAIN sesudah pengukuran akhir ditempel di bagian 4.
 - Kolom angka sesudah pada bagian 2 masih diisi setelah seluruh PR ter-merge dan dataset baseline diimpor ulang.
+- Audit API V1 memastikan endpoint daftar memakai `paginate(15)`. Akses relasi `course` dan `students` pada endpoint assignment/grade component menggunakan eager loading atau query relasi eksplisit agar tidak memicu `preventLazyLoading`; `GradeComponentResource` menerima `assignments_count` dari query controller.
 
 ## 6. Cache
 
