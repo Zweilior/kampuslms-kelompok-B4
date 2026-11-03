@@ -124,7 +124,13 @@ class MeasurePerformance extends Command
         }
 
         if ($this->option('detail') && $results) {
-            $this->showDetail($results[0]);
+            $targets = collect($results)->filter(fn ($x) => $x['dups'] > 0)->keyBy('label');
+            $slowest = collect($results)->sortByDesc('ms')->first();
+            $targets[$slowest['label']] = $slowest;
+
+            foreach ($targets as $x) {
+                $this->showDetail($x);
+            }
         }
 
         return self::SUCCESS;
