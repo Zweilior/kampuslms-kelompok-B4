@@ -1,3 +1,8 @@
+@php
+    $materials = $course->getRelation('materials');
+    $assignments = $course->getRelation('assignments');
+@endphp
+
 <x-layout :title="'Kelola Mata Kuliah - ' . $course->name">
     <main id="admin-course-detail" class="admin-course-detail">
         <header class="admin-course-detail__hero">
@@ -106,14 +111,14 @@
                         <span class="material-symbols-outlined" aria-hidden="true">library_books</span>
                         Materi
                     </h2>
-                    <p>{{ $course->materials->count() }} materi · diurutkan berdasarkan judul</p>
+                    <p>{{ $materials->count() }} materi · diurutkan berdasarkan judul</p>
                 </div>
                 <a href="{{ route('admin.materials.create', ['course_id' => $course->id]) }}" class="admin-course-detail__button admin-course-detail__button--primary">
                     <span class="material-symbols-outlined" aria-hidden="true">add</span>
                     Tambah Materi
                 </a>
             </div>
-            @if ($course->materials->isNotEmpty())
+            @if ($materials->isNotEmpty())
                 <div class="admin-course-detail__table-wrap">
                     <table class="admin-course-detail__table">
                         <thead>
@@ -126,7 +131,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($course->materials as $material)
+                            @foreach ($materials as $material)
                                 <tr>
                                     <td class="admin-course-detail__number">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
                                     <td class="admin-course-detail__student-name">{{ $material->title }}</td>
@@ -164,14 +169,14 @@
                         <span class="material-symbols-outlined" aria-hidden="true">assignment</span>
                         Tugas
                     </h2>
-                    <p>{{ $course->assignments->count() }} tugas · diurutkan berdasarkan judul</p>
+                    <p>{{ $assignments->count() }} tugas · diurutkan berdasarkan judul</p>
                 </div>
                 <a href="{{ route('admin.assignments.create', ['course_id' => $course->id]) }}" class="admin-course-detail__button admin-course-detail__button--primary">
                     <span class="material-symbols-outlined" aria-hidden="true">add</span>
                     Buat Tugas
                 </a>
             </div>
-            @if ($course->assignments->isNotEmpty())
+            @if ($assignments->isNotEmpty())
                 <div class="admin-course-detail__table-wrap">
                     <table class="admin-course-detail__table">
                         <thead>
@@ -184,7 +189,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($course->assignments as $assignment)
+                            @foreach ($assignments as $assignment)
                                 <tr>
                                     <td class="admin-course-detail__number">{{ str_pad($loop->iteration, 2, '0', STR_PAD_LEFT) }}</td>
                                     <td class="admin-course-detail__student-name">{{ $assignment->title }}</td>

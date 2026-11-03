@@ -124,7 +124,7 @@
 
         @if ($notifications->hasPages())
             <div class="mt-8 flex justify-center">
-                {{ $notifications->links() }}
+                {{ $notifications->links('vendor.pagination.custom-pagination') }}
             </div>
         @endif
     </div>

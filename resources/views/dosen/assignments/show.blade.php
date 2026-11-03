@@ -196,7 +196,7 @@
                 </div>
             @endforelse
         </section>
-        {{ $submissions->links() }}
+        {{ $submissions->links('vendor.pagination.custom-pagination') }}
 
         {{-- Bagian Mahasiswa Belum Mengumpulkan --}}
         <section class="mt-space-lg rounded-2xl border border-outline/10 bg-surface-container-low p-space-md shadow-sm" aria-label="Daftar mahasiswa belum mengumpulkan">
@@ -239,7 +239,7 @@
                         </tbody>
                     </table>
                 </div>
-                {{ $notSubmitted->links() }}
+                {{ $notSubmitted->links('vendor.pagination.custom-pagination') }}
             @endif
         </section>
     </div>
