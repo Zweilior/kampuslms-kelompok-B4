@@ -1,13 +1,13 @@
 .dosen-dashboard__header {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    @apply relative;
+    @apply flex;
+    @apply items-center;
+    @apply justify-between;
     gap: 1.5rem;
     min-height: 9.6rem;
     margin-bottom: 1.1rem;
     padding: 2rem 1.75rem;
-    overflow: hidden;
+    @apply overflow-hidden;
     border-radius: 1.15rem;
     background: linear-gradient(110deg, #244c16 0%, #638f3d 100%);
     color: #fff;
@@ -15,7 +15,7 @@
 }
 
 .dosen-dashboard__header::after {
-    position: absolute;
+    @apply absolute;
     z-index: -1;
     top: 50%;
     right: 12%;
@@ -29,14 +29,14 @@
 }
 
 .dosen-dashboard__header-copy {
-    min-width: 0;
+    @apply min-w-0;
 }
 
 .dosen-dashboard__title {
     margin: 0;
     color: #fff;
     font-size: 1.8rem;
-    font-weight: 700;
+    @apply font-bold;
     line-height: 1.2;
 }
 
@@ -49,10 +49,10 @@
 }
 
 .dosen-dashboard__action {
-    display: inline-flex;
+    @apply inline-flex;
     flex: 0 0 auto;
-    align-items: center;
-    justify-content: center;
+    @apply items-center;
+    @apply justify-center;
     gap: 0.5rem;
     min-height: 2.75rem;
     padding: 0.65rem 1rem;
@@ -61,8 +61,8 @@
     background: #fff;
     color: #315c20;
     font-size: 0.82rem;
-    font-weight: 600;
-    text-decoration: none;
+    @apply font-semibold;
+    @apply no-underline;
     transition:
         background-color 180ms ease,
         border-color 180ms ease,
@@ -84,8 +84,8 @@
 
 @media (max-width: 640px) {
     .dosen-dashboard__header {
-        align-items: flex-start;
-        flex-direction: column;
+        @apply items-start;
+        @apply flex-col;
         padding: 1.5rem;
     }
 

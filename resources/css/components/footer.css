@@ -2,7 +2,7 @@
     position: relative;
     isolation: isolate;
     width: 100%;
-    margin-top: clamp(2rem, 4vw, 3rem);
+    margin-top: 0;
     overflow: hidden;
     color: #52634a;
     border: 1px solid rgba(61, 107, 31, 0.18);
@@ -238,7 +238,7 @@ a.eduspace-footer__action:hover {
 }
 
 .about-page .eduspace-footer {
-    margin-top: 0.75rem;
+    margin-top: 0;
     backdrop-filter: blur(14px);
 }
 

@@ -99,3 +99,24 @@
         transition: none;
     }
 }
+
+@media (prefers-color-scheme: dark) {
+    a.admin-dashboard__action {
+        border-color: rgba(222, 244, 208, 0.72) !important;
+        background: #17220f !important;
+        color: #c9ee9f !important;
+        box-shadow: 0 0 0 1px rgba(173, 210, 134, 0.18);
+    }
+
+    a.admin-dashboard__action:hover {
+        border-color: #e4f8d5 !important;
+        background: #253b1b !important;
+        color: #e4f8d5 !important;
+    }
+
+    a.admin-dashboard__action:focus,
+    a.admin-dashboard__action:focus-visible {
+        outline: none !important;
+        box-shadow: none;
+    }
+}
