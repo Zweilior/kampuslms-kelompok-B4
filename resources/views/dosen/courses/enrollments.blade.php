@@ -55,7 +55,7 @@
                         Daftarkan
                     </button>
                 </form>
-                {{ $availableStudents->links() }}
+                {{ $availableStudents->links('vendor.pagination.custom-pagination') }}
             @else
                 <p class="dosen-enrollments__empty-option">Semua mahasiswa sudah terdaftar atau belum ada akun mahasiswa.</p>
             @endif
@@ -94,7 +94,7 @@
                         </article>
                     @endforeach
                 </div>
-                {{ $students->links() }}
+                {{ $students->links('vendor.pagination.custom-pagination') }}
             @else
                 <div class="dosen-enrollments__empty">
                     <span class="material-symbols-outlined" aria-hidden="true">group_off</span>

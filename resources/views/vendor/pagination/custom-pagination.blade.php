@@ -11,6 +11,7 @@
                 </span>
             @else
                 <a href="{{ $paginator->previousPageUrl() }}"
+                    rel="prev"
                     class="custom-pagination__previous px-5 py-2 rounded-full text-body-sm font-label-md transition-all shadow-sm">
                     Previous
                 </a>
@@ -31,13 +32,16 @@
                         @if ($page == $paginator->currentPage())
                             {{-- Halaman Aktif (Lingkaran Putih/Surface dengan Shadow) --}}
                             <span
+                                aria-current="page"
+                                aria-label="Current page, {{ $page }}"
                                 class="custom-pagination__page-active w-9 h-9 flex items-center justify-center rounded-full font-bold text-body-sm shadow-md select-none">
                                 {{ $page }}
                             </span>
                         @else
                             {{-- Halaman Tidak Aktif --}}
                             <a href="{{ $url }}"
-                                class="custom-pagination__page w-9 h-9 flex items-center justify-center rounded-full font-label-md text-body-sm transition-all">
+                            aria-label="Go to page {{ $page }}"
+                            class="custom-pagination__page w-9 h-9 flex items-center justify-center rounded-full font-label-md text-body-sm transition-all">
                                 {{ $page }}
                             </a>
                         @endif
@@ -48,6 +52,7 @@
             {{-- Tombol Next (Warna Primary sama seperti tombol 'Tambah Mata Kuliah') --}}
             @if ($paginator->hasMorePages())
                 <a href="{{ $paginator->nextPageUrl() }}"
+                    rel="next"
                     class="custom-pagination__next px-5 py-2 rounded-full font-label-md text-body-sm transition-all">
                     Next
                 </a>
