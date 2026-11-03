@@ -3,7 +3,6 @@
 @import "./components/footer.css";
 @import "./components/notifications.css";
 @import "./auth/logout.css";
-@import "./dashboard.css";
 @import "./mahasiswa/index.css";
 @import "./admin/user/index.css";
 @import "./admin/user/create.css";
@@ -32,4 +31,60 @@
         "Instrument Sans", ui-sans-serif, system-ui, sans-serif,
         "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol",
         "Noto Color Emoji";
+
+    --color-surface: #f7f8f5;
+    --color-surface-dim: #eef1e8;
+    --color-surface-bright: #ffffff;
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #ffffff;
+    --color-surface-container: #f2f4ee;
+    --color-surface-container-high: #eef1e8;
+    --color-surface-container-highest: #e8ede2;
+    --color-surface-variant: #eef1e8;
+
+    --color-on-surface: #1a2416;
+    --color-on-surface-variant: #5d6b56;
+    --color-inverse-surface: #1a2416;
+    --color-inverse-on-surface: #f7f8f5;
+
+    --color-outline: #8a9a83;
+    --color-outline-variant: #c4d0bc;
+
+    --color-primary: #3d6b1f;
+    --color-on-primary: #ffffff;
+    --color-primary-container: #8bae66;
+    --color-on-primary-container: #ffffff;
+    --color-primary-fixed: #c9ee9f;
+    --color-primary-fixed-dim: #8bae66;
+
+    --color-secondary: #628141;
+    --color-on-secondary: #ffffff;
+    --color-secondary-container: #d4e6bc;
+    --color-on-secondary-container: #2a4d15;
+
+    --color-tertiary: #c9973f;
+    --color-on-tertiary: #ffffff;
+    --color-tertiary-container: #f6e0b5;
+    --color-on-tertiary-container: #453819;
+
+    --color-error: #a3405d;
+    --color-on-error: #ffffff;
+
+    --color-background: #f7f8f5;
+    --color-on-background: #1a2416;
+
+    --color-success: #628141;
+    --color-warning: #c9973f;
+
+    --spacing-space-2xs: 0.25rem;
+    --spacing-space-xs: 0.5rem;
+    --spacing-space-sm: 0.75rem;
+    --spacing-space-md: 1rem;
+    --spacing-space-lg: 1.5rem;
+    --spacing-space-xl: 2rem;
+    --spacing-space-2xl: 3rem;
+    --spacing-bento-gap-mobile: 0.75rem;
+    --spacing-bento-gap-desktop: 1.25rem;
+    --spacing-page-margin-mobile: 1rem;
+    --spacing-page-margin-desktop: 2rem;
 }

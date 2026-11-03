@@ -1,124 +1,94 @@
 .dosen-assignment__actions {
     @apply flex;
     @apply items-center;
-    gap: 0.5rem;
+    @apply gap-2;
     @apply whitespace-nowrap;
 }
 
 .dosen-assignment__btn {
     @apply inline-flex;
     @apply items-center;
-    gap: 0.375rem;
-    padding: 0.3rem 0.625rem;
-    border: 1px solid transparent;
-    border-radius: var(--radius-md, 0.5rem);
+    @apply gap-1.5 py-[0.3rem] px-2.5 border border-transparent rounded-[var(--radius-md,0.5rem)];
+    @apply text-[0.6875rem] leading-[1.25rem];
     @apply bg-transparent;
     font-family: inherit;
-    font-size: 0.6875rem;
     @apply font-semibold;
-    line-height: 1.25rem;
     @apply no-underline;
     @apply cursor-pointer;
     transition: all 0.2s ease;
 }
 
 .dosen-assignment__btn .material-symbols-outlined {
-    font-size: 0.875rem;
+    @apply text-[0.875rem];
 }
 
 .dosen-assignment__btn--grade {
-    color: #c4a1ff;
-    border-color: rgba(196, 161, 255, 0.38);
-    background: rgba(196, 161, 255, 0.09);
+    @apply text-[#c4a1ff] border-[rgba(196,161,255,0.38)] bg-[rgba(196,161,255,0.09)];
 }
 
 .dosen-assignment__btn--grade:hover {
-    background: rgba(196, 161, 255, 0.18);
-    border-color: rgba(196, 161, 255, 0.58);
+    @apply bg-[rgba(196,161,255,0.18)] border-[rgba(196,161,255,0.58)];
 }
 
 .dosen-assignment__btn--edit {
-    color: #9ec5fe;
-    border-color: rgba(158, 197, 254, 0.35);
-    background: rgba(158, 197, 254, 0.08);
+    @apply text-[#9ec5fe] border-[rgba(158,197,254,0.35)] bg-[rgba(158,197,254,0.08)];
 }
 
 .dosen-assignment__btn--edit:hover {
-    background: rgba(158, 197, 254, 0.16);
-    border-color: rgba(158, 197, 254, 0.55);
+    @apply bg-[rgba(158,197,254,0.16)] border-[rgba(158,197,254,0.55)];
 }
 
 .dosen-assignment__btn--danger {
-    color: #ff8a8a;
-    border-color: rgba(255, 138, 138, 0.35);
-    background: rgba(255, 138, 138, 0.08);
+    @apply text-[#ff8a8a] border-[rgba(255,138,138,0.35)] bg-[rgba(255,138,138,0.08)];
 }
 
 .dosen-assignment__btn--danger:hover {
-    background: rgba(255, 138, 138, 0.16);
-    border-color: rgba(255, 138, 138, 0.55);
+    @apply bg-[rgba(255,138,138,0.16)] border-[rgba(255,138,138,0.55)];
 }
 
 .dosen-assignment__create {
     @apply inline-flex;
-    min-height: 2.75rem;
+    @apply min-h-11 gap-2 py-2.5 px-4 border border-transparent rounded-xl bg-[color:var(--primary)];
+    @apply text-[color:var(--text-on-primary)] text-[0.8125rem] shadow-(--shadow-sm);
     @apply items-center;
     @apply justify-center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
-    border: 1px solid transparent;
-    border-radius: 0.75rem;
-    background: var(--primary);
-    color: var(--text-on-primary);
-    font-size: 0.8125rem;
     @apply font-semibold;
     @apply no-underline;
-    box-shadow: var(--shadow-sm);
     transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .dosen-assignment__create:hover {
-    background: var(--primary-dark);
-    box-shadow: var(--shadow-md);
+    @apply bg-[color:var(--primary-dark)] shadow-(--shadow-md);
     transform: translateY(-1px);
 }
 
 .dosen-assignment__create .material-symbols-outlined {
-    font-size: 1.125rem;
+    @apply text-[1.125rem];
 }
 
 @media (prefers-color-scheme: light) {
     .dosen-assignment__btn--grade {
-        color: #7e22ce;
-        border-color: rgba(126, 34, 206, 0.3);
-        background: rgba(126, 34, 206, 0.06);
+        @apply text-[#7e22ce] border-[rgba(126,34,206,0.3)] bg-[rgba(126,34,206,0.06)];
     }
 
     .dosen-assignment__btn--grade:hover {
-        background: rgba(126, 34, 206, 0.12);
-        border-color: rgba(126, 34, 206, 0.5);
+        @apply bg-[rgba(126,34,206,0.12)] border-[rgba(126,34,206,0.5)];
     }
 
     .dosen-assignment__btn--edit {
-        color: #3b82f6;
-        border-color: rgba(59, 130, 246, 0.3);
-        background: rgba(59, 130, 246, 0.06);
+        @apply text-[#3b82f6] border-[rgba(59,130,246,0.3)] bg-[rgba(59,130,246,0.06)];
     }
 
     .dosen-assignment__btn--edit:hover {
-        background: rgba(59, 130, 246, 0.12);
-        border-color: rgba(59, 130, 246, 0.5);
+        @apply bg-[rgba(59,130,246,0.12)] border-[rgba(59,130,246,0.5)];
     }
 
     .dosen-assignment__btn--danger {
-        color: #dc2626;
-        border-color: rgba(220, 38, 38, 0.3);
-        background: rgba(220, 38, 38, 0.06);
+        @apply text-[#dc2626] border-[rgba(220,38,38,0.3)] bg-[rgba(220,38,38,0.06)];
     }
 
     .dosen-assignment__btn--danger:hover {
-        background: rgba(220, 38, 38, 0.12);
-        border-color: rgba(220, 38, 38, 0.5);
+        @apply bg-[rgba(220,38,38,0.12)] border-[rgba(220,38,38,0.5)];
     }
 }
 
@@ -129,99 +99,71 @@
 }
 
 .dosen-assignment-form {
-    width: min(100% - 2rem, 48rem);
-    margin: 0 auto;
-    padding: 2rem 0 3rem;
+    @apply w-[min(100%_-_2rem,48rem)] my-0 mx-auto pt-8 pb-12 px-0;
 }
 
 .dosen-assignment-form__back {
     @apply inline-flex;
     @apply items-center;
-    gap: 0.375rem;
-    margin-bottom: 1.5rem;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+    @apply gap-1.5 mb-6 text-[color:var(--text-secondary)] text-[0.875rem];
     @apply font-medium;
     @apply no-underline;
     transition: color 0.2s ease;
 }
 
 .dosen-assignment-form__back:hover {
-    color: var(--primary);
+    @apply text-[color:var(--primary)];
 }
 
 .dosen-assignment-form__back .material-symbols-outlined {
-    font-size: 1.125rem;
+    @apply text-[1.125rem];
 }
 
 .dosen-assignment-form__header {
     @apply flex;
     @apply items-start;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    @apply gap-4 mb-6;
 }
 
 .dosen-assignment-form__icon {
     @apply grid;
-    width: 3rem;
-    height: 3rem;
-    flex: 0 0 3rem;
-    place-items: center;
-    border-radius: 1rem;
-    background: var(--color-surface-container-high);
-    color: var(--primary);
-    font-size: 1.5rem;
+    @apply w-12 h-12 flex-[0_0_3rem] place-items-center rounded-2xl;
+    @apply bg-[color:var(--color-surface-container-high)] text-[color:var(--primary)] text-[1.5rem];
 }
 
 .dosen-assignment-form__eyebrow {
     @apply flex;
     @apply items-center;
     @apply flex-wrap;
-    gap: 0.5rem;
-    margin-bottom: 0.375rem;
-    color: var(--text-muted);
-    font-size: 0.75rem;
+    @apply gap-2 mb-1.5 text-[color:var(--text-muted)] text-[0.75rem];
     @apply font-semibold;
 }
 
 .dosen-assignment-form__eyebrow > span:first-child {
-    color: var(--primary);
+    @apply text-[color:var(--primary)];
 }
 
 .dosen-assignment-form__dot {
-    width: 0.25rem;
-    height: 0.25rem;
-    border-radius: 50%;
-    background: var(--text-muted);
+    @apply w-1 h-1 rounded-[50%] bg-[color:var(--text-muted)];
 }
 
 .dosen-assignment-form__title {
-    margin: 0;
-    color: var(--text-primary);
-    font-size: 1.75rem;
+    @apply m-0 text-[color:var(--text-primary)] text-[1.75rem] tracking-[-0.03em] leading-[1.2];
     @apply font-bold;
-    letter-spacing: -0.03em;
-    line-height: 1.2;
 }
 
 .dosen-assignment-form__description {
-    margin: 0.375rem 0 0;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
+    @apply mt-1.5 mb-0 mx-0 text-[color:var(--text-secondary)] text-[0.875rem];
 }
 
 .dosen-assignment-form__card {
-    padding: 1.75rem;
-    border: 1px solid var(--border-hairline);
-    border-radius: 1.25rem;
-    background: var(--color-surface-container-low);
-    box-shadow: var(--shadow-md);
+    @apply p-7 border border-[color:var(--border-hairline)] rounded-[1.25rem];
+    @apply bg-[color:var(--color-surface-container-low)] shadow-(--shadow-md);
 }
 
 .dosen-assignment-form__fields {
     @apply grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 1.25rem 1rem;
+    @apply grid-cols-[repeat(2,minmax(0,1fr))] gap-y-5 gap-x-4;
 }
 
 .dosen-assignment-form__field {
@@ -229,19 +171,17 @@
 }
 
 .dosen-assignment-form__field--full {
-    grid-column: 1 / -1;
+    @apply col-span-full;
 }
 
 .dosen-assignment-form__field > label {
     @apply block;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
-    font-size: 0.8125rem;
+    @apply mb-2 text-[color:var(--text-primary)] text-[0.8125rem];
     @apply font-semibold;
 }
 
 .dosen-assignment-form__field > label > span {
-    color: #c2413b;
+    @apply text-[#c2413b];
 }
 
 .dosen-assignment-form__field input,
@@ -249,15 +189,9 @@
 .dosen-assignment-form__field select {
     @apply block;
     @apply w-full;
-    min-height: 2.875rem;
-    padding: 0.75rem 0.875rem;
-    border: 1px solid var(--border-hairline);
-    border-radius: 0.75rem;
+    @apply min-h-11.5 py-3 px-3.5 border border-[color:var(--border-hairline)] rounded-xl;
+    @apply bg-[color:var(--bg-base)] text-[color:var(--text-primary)] text-[0.875rem] leading-[1.5];
     @apply outline-none;
-    background-color: var(--bg-base);
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    line-height: 1.5;
     transition:
         border-color 0.2s ease,
         box-shadow 0.2s ease,
@@ -267,19 +201,18 @@
 .dosen-assignment-form__field input:hover,
 .dosen-assignment-form__field textarea:hover,
 .dosen-assignment-form__field select:hover {
-    border-color: var(--border-hover);
+    @apply border-[color:var(--border-hover)];
 }
 
 .dosen-assignment-form__field input:focus,
 .dosen-assignment-form__field textarea:focus,
 .dosen-assignment-form__field select:focus {
-    border-color: var(--primary-light);
-    background-color: var(--color-surface-container-low);
+    @apply border-[color:var(--primary-light)] bg-[color:var(--color-surface-container-low)];
     box-shadow: 0 0 0 3px var(--glow-sage);
 }
 
 .dosen-assignment-form__field textarea {
-    min-height: 8rem;
+    @apply min-h-32;
     @apply resize-y;
 }
 
@@ -288,10 +221,8 @@
 }
 
 .dosen-assignment-form__field input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-    padding: 0.25rem;
-    border-radius: 0.375rem;
+    @apply p-1 rounded-md opacity-70;
     @apply cursor-pointer;
-    opacity: 0.7;
 }
 
 .dosen-assignment-form__select-wrap,
@@ -300,93 +231,65 @@
 }
 
 .dosen-assignment-form__select-wrap select {
-    appearance: none;
-    padding-right: 2.75rem;
+    @apply appearance-none pr-11;
     @apply cursor-pointer;
 }
 
 .dosen-assignment-form__select-wrap > span {
     @apply absolute;
-    top: 50%;
-    right: 0.875rem;
-    color: var(--text-secondary);
-    font-size: 1.25rem;
-    pointer-events: none;
+    @apply top-1/2 right-3.5 text-[color:var(--text-secondary)] text-[1.25rem] pointer-events-none;
     transform: translateY(-50%);
 }
 
 .dosen-assignment-form__number-wrap input {
-    padding-right: 4rem;
+    @apply pr-16;
 }
 
 .dosen-assignment-form__number-wrap > span {
     @apply absolute;
-    top: 50%;
-    right: 0.875rem;
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    pointer-events: none;
+    @apply top-1/2 right-3.5 text-[color:var(--text-muted)] text-[0.75rem] pointer-events-none;
     transform: translateY(-50%);
 }
 
 .dosen-assignment-form__hint {
-    margin: 0.375rem 0 0;
-    color: var(--text-muted);
-    font-size: 0.75rem;
+    @apply mt-1.5 mb-0 mx-0 text-[color:var(--text-muted)] text-[0.75rem];
 }
 
 .dosen-assignment-form__field-error {
-    margin: 0.375rem 0 0;
-    color: #c2413b;
-    font-size: 0.75rem;
+    @apply mt-1.5 mb-0 mx-0 text-[#c2413b] text-[0.75rem];
 }
 
 .dosen-assignment-form__errors {
     @apply flex;
     @apply items-start;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    padding: 1rem;
-    border: 1px solid rgba(194, 65, 59, 0.2);
-    border-radius: 0.875rem;
-    background: rgba(194, 65, 59, 0.07);
-    color: #a8322d;
-    font-size: 0.8125rem;
+    @apply gap-3 mb-4 p-4 border border-[rgba(194,65,59,0.2)] rounded-[0.875rem] bg-[rgba(194,65,59,0.07)];
+    @apply text-[#a8322d] text-[0.8125rem];
 }
 
 .dosen-assignment-form__errors > .material-symbols-outlined {
-    font-size: 1.25rem;
+    @apply text-[1.25rem];
 }
 
 .dosen-assignment-form__errors-title {
-    margin: 0;
+    @apply m-0;
     @apply font-semibold;
 }
 
 .dosen-assignment-form__errors ul {
-    margin: 0.375rem 0 0;
-    padding-left: 1.125rem;
+    @apply mt-1.5 mb-0 mx-0 pl-4.5;
 }
 
 .dosen-assignment-form__footer {
     @apply flex;
     @apply justify-end;
-    gap: 0.75rem;
-    margin-top: 1.75rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--border-hairline);
+    @apply gap-3 mt-7 pt-5 border-t border-t-[color:var(--border-hairline)];
 }
 
 .dosen-assignment-form__button {
     @apply inline-flex;
-    min-height: 2.75rem;
+    @apply min-h-11 gap-2 py-2.5 px-4 border border-transparent rounded-xl text-[0.8125rem];
     @apply items-center;
     @apply justify-center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
-    border: 1px solid transparent;
-    border-radius: 0.75rem;
-    font-size: 0.8125rem;
     @apply font-semibold;
     @apply no-underline;
     @apply cursor-pointer;
@@ -402,51 +305,46 @@
 }
 
 .dosen-assignment-form__button .material-symbols-outlined {
-    font-size: 1.125rem;
+    @apply text-[1.125rem];
 }
 
 .dosen-assignment-form__button--primary {
-    background: var(--primary);
-    color: var(--text-on-primary);
+    @apply bg-[color:var(--primary)] text-[color:var(--text-on-primary)];
 }
 
 .dosen-assignment-form__button--primary:hover {
-    background: var(--primary-dark);
+    @apply bg-[color:var(--primary-dark)];
 }
 
 .dosen-assignment-form__button--secondary {
-    border-color: var(--border-hairline);
-    background: var(--color-surface-container);
-    color: var(--text-secondary);
+    @apply border-[color:var(--border-hairline)] bg-[color:var(--color-surface-container)];
+    @apply text-[color:var(--text-secondary)];
 }
 
 .dosen-assignment-form__button--secondary:hover {
-    border-color: var(--border-hover);
-    background: var(--color-surface-container-high);
-    color: var(--text-primary);
+    @apply border-[color:var(--border-hover)] bg-[color:var(--color-surface-container-high)];
+    @apply text-[color:var(--text-primary)];
 }
 
 @media (max-width: 640px) {
     .dosen-assignment-form {
-        width: min(100% - 1.5rem, 48rem);
-        padding-top: 1.25rem;
+        @apply w-[min(100%_-_1.5rem,48rem)] pt-5;
     }
 
     .dosen-assignment-form__card {
-        padding: 1.125rem;
+        @apply p-4.5;
     }
 
     .dosen-assignment-form__fields {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+        @apply grid-cols-[1fr] gap-4;
     }
 
     .dosen-assignment-form__field--full {
-        grid-column: auto;
+        @apply col-auto;
     }
 
     .dosen-assignment-form__title {
-        font-size: 1.5rem;
+        @apply text-[1.5rem];
     }
 
     .dosen-assignment-form__footer {
@@ -465,96 +363,69 @@
 }
 
 .dosen-grades {
-    width: min(100% - 2rem, 70rem);
-    margin: 0 auto;
-    padding: 2rem 0 3rem;
+    @apply w-[min(100%_-_2rem,70rem)] my-0 mx-auto pt-8 pb-12 px-0;
 }
 
 .dosen-grades__header {
     @apply flex;
     @apply items-end;
     @apply justify-between;
-    gap: 1.25rem;
-    margin-bottom: 1.5rem;
+    @apply gap-5 mb-6;
 }
 
 .dosen-grades__count {
     @apply inline-flex;
-    flex: 0 0 auto;
+    @apply flex-none gap-2 py-2.5 px-3.5 border border-[color:var(--border-hairline)] rounded-full;
+    @apply bg-[color:var(--color-surface-container-low)] text-[color:var(--text-secondary)] text-[0.8125rem];
     @apply items-center;
-    gap: 0.5rem;
-    padding: 0.625rem 0.875rem;
-    border: 1px solid var(--border-hairline);
-    border-radius: 9999px;
-    background: var(--color-surface-container-low);
-    color: var(--text-secondary);
-    font-size: 0.8125rem;
     @apply font-semibold;
 }
 
 .dosen-grades__count .material-symbols-outlined {
-    color: var(--primary);
-    font-size: 1.125rem;
+    @apply text-[color:var(--primary)] text-[1.125rem];
 }
 
 .dosen-grades__notice {
     @apply flex;
     @apply items-start;
-    gap: 0.625rem;
-    margin-bottom: 1rem;
-    padding: 0.875rem 1rem;
-    border: 1px solid var(--border-hairline);
-    border-radius: 0.875rem;
-    font-size: 0.8125rem;
+    @apply gap-2.5 mb-4 py-3.5 px-4 border border-[color:var(--border-hairline)] rounded-[0.875rem];
+    @apply text-[0.8125rem];
 }
 
 .dosen-grades__notice > .material-symbols-outlined {
-    flex: 0 0 auto;
-    font-size: 1.125rem;
+    @apply flex-none text-[1.125rem];
 }
 
 .dosen-grades__notice--success {
-    background: rgba(61, 107, 31, 0.08);
-    color: var(--primary-dark);
+    @apply bg-[rgba(61,107,31,0.08)] text-[color:var(--primary-dark)];
 }
 
 .dosen-grades__notice--info {
-    background: var(--color-surface-container);
-    color: var(--text-secondary);
+    @apply bg-[color:var(--color-surface-container)] text-[color:var(--text-secondary)];
 }
 
 .dosen-grades__list {
     @apply grid;
-    gap: 1rem;
+    @apply gap-4;
 }
 
 .dosen-grade-card {
     @apply overflow-hidden;
-    border: 1px solid var(--border-hairline);
-    border-radius: 1.125rem;
-    background: var(--color-surface-container-low);
-    box-shadow: var(--shadow-sm);
+    @apply border border-[color:var(--border-hairline)] rounded-[1.125rem];
+    @apply bg-[color:var(--color-surface-container-low)] shadow-(--shadow-sm);
 }
 
 .dosen-grade-card__student {
     @apply flex;
     @apply items-center;
-    gap: 0.75rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--border-hairline);
-    background: var(--color-surface-container);
+    @apply gap-3 py-4 px-5 border-b border-b-[color:var(--border-hairline)];
+    @apply bg-[color:var(--color-surface-container)];
 }
 
 .dosen-grade-card__avatar {
     @apply grid;
-    width: 2.625rem;
-    height: 2.625rem;
-    flex: 0 0 2.625rem;
-    place-items: center;
-    border-radius: 0.875rem;
-    background: var(--color-surface-container-high);
-    color: var(--primary);
-    font-size: 1rem;
+    @apply w-10.5 h-10.5 flex-[0_0_2.625rem] place-items-center rounded-[0.875rem];
+    @apply bg-[color:var(--color-surface-container-high)] text-[color:var(--primary)] text-[1rem];
     @apply font-bold;
 }
 
@@ -563,49 +434,36 @@
 }
 
 .dosen-grade-card__student-info h2 {
-    margin: 0;
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    font-weight: 650;
+    @apply m-0 text-[color:var(--text-primary)] text-[0.875rem] font-[650];
 }
 
 .dosen-grade-card__student-info p {
-    margin: 0.125rem 0 0;
-    color: var(--text-muted);
-    font-size: 0.75rem;
+    @apply mt-0.5 mb-0 mx-0 text-[color:var(--text-muted)] text-[0.75rem];
 }
 
 .dosen-grade-card__status {
     @apply inline-flex;
     @apply items-center;
-    gap: 0.25rem;
-    margin-left: auto;
-    padding: 0.35rem 0.625rem;
-    border-radius: 9999px;
-    font-size: 0.6875rem;
+    @apply gap-1 ml-auto py-[0.35rem] px-2.5 rounded-full text-[0.6875rem];
     @apply font-semibold;
     @apply whitespace-nowrap;
 }
 
 .dosen-grade-card__status .material-symbols-outlined {
-    font-size: 0.9375rem;
+    @apply text-[0.9375rem];
 }
 
 .dosen-grade-card__status--graded {
-    background: rgba(61, 107, 31, 0.1);
-    color: var(--primary-dark);
+    @apply bg-[rgba(61,107,31,0.1)] text-[color:var(--primary-dark)];
 }
 
 .dosen-grade-card__status--pending {
-    background: rgba(126, 34, 206, 0.08);
-    color: #7e22ce;
+    @apply bg-[rgba(126,34,206,0.08)] text-[#7e22ce];
 }
 
 .dosen-grade-card__body {
     @apply grid;
-    grid-template-columns: minmax(12rem, 0.85fr) minmax(0, 1.5fr);
-    gap: 1.5rem;
-    padding: 1.25rem;
+    @apply grid-cols-[minmax(12rem,0.85fr)_minmax(0,1.5fr)] gap-6 p-5;
 }
 
 .dosen-grade-card__submission {
@@ -614,134 +472,99 @@
 
 .dosen-grade-card__label {
     @apply block;
-    margin-bottom: 0.5rem;
-    color: var(--text-muted);
-    font-size: 0.6875rem;
+    @apply mb-2 text-[color:var(--text-muted)] text-[0.6875rem] tracking-[0.06em];
     @apply font-bold;
-    letter-spacing: 0.06em;
     @apply uppercase;
 }
 
 .dosen-grade-card__file {
     @apply flex;
     @apply items-center;
-    gap: 0.5rem;
-    width: fit-content;
-    max-width: 100%;
-    color: var(--primary);
-    font-size: 0.8125rem;
+    @apply gap-2 w-fit max-w-full text-[color:var(--primary)] text-[0.8125rem];
     @apply font-semibold;
     @apply no-underline;
 }
 
 .dosen-grade-card__file:hover {
-    text-decoration: underline;
+    @apply underline;
 }
 
 .dosen-grade-card__file > span:nth-child(2) {
     @apply overflow-hidden;
-    text-overflow: ellipsis;
+    @apply text-ellipsis;
     @apply whitespace-nowrap;
 }
 
 .dosen-grade-card__file .material-symbols-outlined {
-    flex: 0 0 auto;
-    font-size: 1.125rem;
+    @apply flex-none text-[1.125rem];
 }
 
 .dosen-grade-card__file .dosen-grade-card__open {
-    color: var(--text-muted);
-    font-size: 0.9375rem;
+    @apply text-[color:var(--text-muted)] text-[0.9375rem];
 }
 
 .dosen-grade-card__meta {
-    margin: 0.5rem 0 0;
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    line-height: 1.5;
+    @apply mt-2 mb-0 mx-0 text-[color:var(--text-secondary)] text-[0.75rem] leading-[1.5];
 }
 
 .dosen-grade-card__late {
-    display: inline-block;
-    margin-left: 0.25rem;
-    padding: 0.125rem 0.4rem;
-    border-radius: 9999px;
-    background: rgba(194, 65, 59, 0.09);
-    color: #a8322d;
-    font-size: 0.6875rem;
+    @apply inline-block ml-1 py-0.5 px-[0.4rem] rounded-full bg-[rgba(194,65,59,0.09)] text-[#a8322d];
+    @apply text-[0.6875rem];
     @apply font-semibold;
 }
 
 .dosen-grade-card__note {
-    margin: 0.75rem 0 0;
-    padding: 0.625rem 0.75rem;
-    border-left: 2px solid var(--primary-light);
+    @apply mt-3 mb-0 mx-0 py-2.5 px-3 border-l-2 border-l-[color:var(--primary-light)];
+    @apply bg-[color:var(--bg-base)] text-[color:var(--text-secondary)] text-[0.75rem] leading-[1.6];
     border-radius: 0 0.5rem 0.5rem 0;
-    background: var(--bg-base);
-    color: var(--text-secondary);
-    font-size: 0.75rem;
-    line-height: 1.6;
     overflow-wrap: anywhere;
 }
 
 .dosen-grade-card__form {
     @apply grid;
-    gap: 0.875rem;
+    @apply gap-3.5;
     align-content: start;
 }
 
 .dosen-grade-card__form-fields {
     @apply grid;
-    grid-template-columns: minmax(7rem, 0.35fr) minmax(0, 1fr);
-    gap: 0.875rem;
+    @apply grid-cols-[minmax(7rem,0.35fr)_minmax(0,1fr)] gap-3.5;
 }
 
 .dosen-grade-card__form .dosen-assignment-form__field > label span {
-    color: var(--text-muted);
-    font-size: 0.6875rem;
-    font-weight: 400;
+    @apply text-[color:var(--text-muted)] text-[0.6875rem] font-normal;
 }
 
 .dosen-grade-card__form .dosen-assignment-form__field textarea {
-    min-height: 5.25rem;
+    @apply min-h-21;
 }
 
 .dosen-grade-card__form > button {
-    justify-self: start;
+    @apply justify-self-start;
 }
 
 .dosen-grades__empty {
     @apply grid;
-    justify-items: center;
-    padding: 3rem 1.5rem;
-    border: 1px dashed var(--border-hover);
-    border-radius: 1rem;
-    background: var(--color-surface-container-low);
+    @apply justify-items-center py-12 px-6 border border-dashed border-[color:var(--border-hover)] rounded-2xl;
+    @apply bg-[color:var(--color-surface-container-low)];
     @apply text-center;
 }
 
 .dosen-grades__empty > .material-symbols-outlined {
-    color: var(--text-muted);
-    font-size: 2.25rem;
+    @apply text-[color:var(--text-muted)] text-[2.25rem];
 }
 
 .dosen-grades__empty h2 {
-    margin: 0.625rem 0 0;
-    color: var(--text-primary);
-    font-size: 1rem;
-    font-weight: 650;
+    @apply mt-2.5 mb-0 mx-0 text-[color:var(--text-primary)] text-[1rem] font-[650];
 }
 
 .dosen-grades__empty p {
-    margin: 0.25rem 0 0;
-    color: var(--text-secondary);
-    font-size: 0.8125rem;
+    @apply mt-1 mb-0 mx-0 text-[color:var(--text-secondary)] text-[0.8125rem];
 }
 
 @media (max-width: 768px) {
     .dosen-grades {
-        width: min(100% - 1.5rem, 70rem);
-        padding-top: 1.25rem;
+        @apply w-[min(100%_-_1.5rem,70rem)] pt-5;
     }
 
     .dosen-grades__header {
@@ -750,41 +573,40 @@
     }
 
     .dosen-grade-card__body {
-        grid-template-columns: 1fr;
-        gap: 1rem;
+        @apply grid-cols-[1fr] gap-4;
     }
 
     .dosen-grade-card__form-fields {
-        grid-template-columns: 1fr;
+        @apply grid-cols-[1fr];
     }
 }
 
 @media (max-width: 480px) {
     .dosen-grade-card__student {
         @apply flex-wrap;
-        padding: 0.875rem;
+        @apply p-3.5;
     }
 
     .dosen-grade-card__status {
-        margin-left: 3.375rem;
+        @apply ml-13.5;
     }
 
     .dosen-grade-card__body {
-        padding: 0.875rem;
+        @apply p-3.5;
     }
 }
 
 @media (prefers-color-scheme: dark) {
     .dosen-grades__notice--success,
     .dosen-grade-card__status--graded {
-        color: #b4d99a;
+        @apply text-[#b4d99a];
     }
 
     .dosen-grade-card__status--pending {
-        color: #d8b4fe;
+        @apply text-[#d8b4fe];
     }
 
     .dosen-grade-card__late {
-        color: #ffaaa4;
+        @apply text-[#ffaaa4];
     }
 }

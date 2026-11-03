@@ -10,7 +10,6 @@ export default defineConfig({
                 'resources/css/about.css',
                 'resources/css/auth/login.css',
                 'resources/css/layout.css',
-                'resources/css/dashboard.css',
                 'resources/js/app.js',
             ],
             refresh: true,

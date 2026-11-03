@@ -533,15 +533,12 @@ button {
 .users-container .users-index__title,
 .users-container .users-index__subtitle,
 .users-container .users-index__card-title,
-.users-container .users-table td,
-.users-container .users-table__name,
-.users-container .users-table__email {
+.users-container .users-table td {
     color: var(--text-primary) !important;
 }
 
 .users-container .users-index__subtitle,
-.users-container .users-table td,
-.users-container .users-table__email {
+.users-container .users-table td {
     color: var(--text-secondary) !important;
 }
 
@@ -673,100 +670,6 @@ button {
 /* ============================================
    ADMIN COURSE LIST
    ============================================ */
-
-.admin-course-list {
-    color: var(--text-primary);
-}
-
-.admin-course-list__title {
-    color: var(--text-primary);
-}
-
-.admin-course-list__add {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--primary);
-    color: var(--text-on-primary);
-    font-size: 0.875rem;
-    font-weight: 600;
-    text-decoration: none;
-    box-shadow: var(--shadow-sm);
-}
-
-.admin-course-list__add:hover {
-    background: var(--primary-dark);
-    transform: translateY(-1px);
-}
-
-.admin-course-list__table-wrap {
-    overflow-x: auto;
-    border: 1px solid var(--border-hairline);
-    border-radius: var(--radius-lg);
-    background: var(--bg-elevated);
-    box-shadow: var(--shadow-md);
-}
-
-.admin-course-list__table {
-    width: 100%;
-    border-collapse: collapse;
-    color: var(--text-primary);
-}
-
-.admin-course-list__table thead {
-    background: var(--bg-hover);
-}
-
-.admin-course-list__table th {
-    color: var(--text-secondary);
-    font-size: 0.6875rem;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-}
-
-.admin-course-list__table th,
-.admin-course-list__table td {
-    border-bottom: 1px solid var(--border-hairline);
-    white-space: nowrap;
-}
-
-.admin-course-list__table tbody tr:last-child td {
-    border-bottom: 0;
-}
-
-.admin-course-list__table tbody tr {
-    transition: background-color 180ms ease;
-}
-
-.admin-course-list__table tbody tr:hover {
-    background: var(--bg-hover);
-}
-
-.admin-course-list__action {
-    color: var(--primary);
-    font-size: 0.8125rem;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.admin-course-list__action:hover {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-
-.admin-course-list__action--danger {
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: #b54747;
-    cursor: pointer;
-    font: inherit;
-}
-
-.admin-course-list__table thead th,
-.admin-course-list__table tbody td {
-    text-align: center;
-}
 
 /* ============================================
    ADMIN COURSES (Manajemen Mata Kuliah)
@@ -1259,10 +1162,6 @@ button {
     }
 }
 
-.animate-pulse-soft {
-    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
 /* ============================================
    DARK MODE
    ============================================ */
@@ -1304,8 +1203,7 @@ button {
         background-color: var(--bg-base);
     }
 
-    .bg-surface,
-    .bg-background {
+    .bg-surface {
         background-color: var(--bg-base) !important;
     }
 
@@ -1319,10 +1217,6 @@ button {
 
     .bg-surface-container-high {
         background-color: var(--color-surface-container-high) !important;
-    }
-
-    .bg-surface-container-highest {
-        background-color: var(--color-surface-container-highest) !important;
     }
 
     .hover\:bg-surface-container:hover {
@@ -1370,7 +1264,6 @@ button {
         background-color: var(--bg-hover) !important;
     }
 
-    .text-gray-400,
     .text-gray-500 {
         color: var(--text-muted) !important;
     }
@@ -1380,19 +1273,12 @@ button {
         color: var(--text-secondary) !important;
     }
 
-    .text-gray-800,
     .text-gray-900 {
         color: var(--text-primary) !important;
     }
 
-    .border-gray-200,
-    .border-gray-300,
-    .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+    .border-gray-300 {
         border-color: var(--border-hairline) !important;
-    }
-
-    .admin-course-list__action--danger {
-        color: #ff8585;
     }
 
     /* Users management dark mode */
@@ -1419,7 +1305,6 @@ button {
     }
 
     .users-container .users-table td,
-    .users-container .users-table__email,
     .users-container .users-index__subtitle,
     .users-container .modal-form-group label,
     .users-container .detail-label {
