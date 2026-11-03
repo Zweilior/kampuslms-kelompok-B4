@@ -28,6 +28,21 @@ class DosenCourseEnrollmentTest extends TestCase
             ->assertSee('1 mahasiswa');
     }
 
+    public function test_enrollment_lists_are_paginated(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        User::factory()->mahasiswa()->count(16)->create();
+
+        $response = $this->actingAs($lecturer)
+            ->get(route('dosen.courses.enrollments.index', $course))
+            ->assertOk()
+            ->assertSee('available_students_page=2');
+
+        $this->assertSame(15, $response->viewData('availableStudents')->count());
+        $this->assertSame(16, $response->viewData('availableStudents')->total());
+    }
+
     public function test_owner_can_enroll_a_student_and_duplicate_enrollment_is_safe(): void
     {
         $lecturer = User::factory()->dosen()->create();

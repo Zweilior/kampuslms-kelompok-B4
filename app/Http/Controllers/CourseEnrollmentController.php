@@ -57,12 +57,14 @@ class CourseEnrollmentController extends Controller
         $students = $course->students()
             ->where('users.role', 'mahasiswa')
             ->orderBy('users.name')
-            ->get();
+            ->paginate(15, ['users.*'], 'students_page')
+            ->withQueryString();
         $availableStudents = User::query()
             ->where('role', 'mahasiswa')
             ->whereDoesntHave('courses', fn ($query) => $query->where('courses.id', $course->id))
             ->orderBy('name')
-            ->get();
+            ->paginate(15, ['users.*'], 'available_students_page')
+            ->withQueryString();
 
         return view('dosen.courses.enrollments', compact(
             'course',

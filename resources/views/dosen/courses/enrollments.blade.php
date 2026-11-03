@@ -55,6 +55,7 @@
                         Daftarkan
                     </button>
                 </form>
+                {{ $availableStudents->links() }}
             @else
                 <p class="dosen-enrollments__empty-option">Semua mahasiswa sudah terdaftar atau belum ada akun mahasiswa.</p>
             @endif
@@ -66,7 +67,7 @@
                     <h2 id="enrolled-students-title">Daftar Peserta</h2>
                     <p>Mahasiswa yang dapat mengakses materi, tugas, dan nilai kelas.</p>
                 </div>
-                <span class="dosen-enrollments__count">{{ $students->count() }} mahasiswa</span>
+                <span class="dosen-enrollments__count">{{ $students->total() }} mahasiswa</span>
             </div>
 
             @if ($students->isNotEmpty())
@@ -93,6 +94,7 @@
                         </article>
                     @endforeach
                 </div>
+                {{ $students->links() }}
             @else
                 <div class="dosen-enrollments__empty">
                     <span class="material-symbols-outlined" aria-hidden="true">group_off</span>

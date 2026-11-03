@@ -58,6 +58,22 @@ class DosenDashboardTest extends TestCase
             ->assertViewHas('ungradedSubmissions', 2);
     }
 
+    public function test_dashboard_submission_count_cache_is_cleared_when_a_submission_is_created(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $assignment = Assignment::factory()->for($course)->past()->create();
+
+        $this->actingAs($lecturer)
+            ->get(route('dosen.dashboard'))
+            ->assertViewHas('ungradedSubmissions', 0);
+
+        Submission::factory()->for($assignment)->create();
+
+        $this->get(route('dosen.dashboard'))
+            ->assertViewHas('ungradedSubmissions', 1);
+    }
+
     public function test_course_menu_shows_only_courses_taught_by_the_logged_in_lecturer(): void
     {
         $lecturer = User::factory()->dosen()->create();
