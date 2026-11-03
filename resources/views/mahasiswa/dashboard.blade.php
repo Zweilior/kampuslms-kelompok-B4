@@ -19,7 +19,7 @@
                     <span class="mahasiswa-page__icon-box"><span class="material-symbols-outlined" aria-hidden="true">menu_book</span></span>
                     Mata kuliah aktif
                 </div>
-                <div class="mahasiswa-page__stat-value"><strong>{{ $courses->count() }}</strong><span>Kelas</span></div>
+                <div class="mahasiswa-page__stat-value"><strong>{{ $coursesCount ?? $courses->count() }}</strong><span>Kelas</span></div>
             </a>
             <article class="mahasiswa-page__card mahasiswa-page__stat-card">
                 <div class="mahasiswa-page__stat-label">

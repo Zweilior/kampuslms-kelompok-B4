@@ -168,5 +168,11 @@
                 </tbody>
             </table>
         </section>
+
+        @if (method_exists($submissions, 'hasPages') && $submissions->hasPages())
+            <div class="mt-6 flex justify-center">
+                {{ $submissions->links('vendor.pagination.custom-pagination') }}
+            </div>
+        @endif
     </div>
 @endsection
