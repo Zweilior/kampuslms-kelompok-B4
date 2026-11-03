@@ -1,24 +1,24 @@
 .dosen-assignment__actions {
-    display: flex;
-    align-items: center;
+    @apply flex;
+    @apply items-center;
     gap: 0.5rem;
-    white-space: nowrap;
+    @apply whitespace-nowrap;
 }
 
 .dosen-assignment__btn {
-    display: inline-flex;
-    align-items: center;
+    @apply inline-flex;
+    @apply items-center;
     gap: 0.375rem;
     padding: 0.3rem 0.625rem;
     border: 1px solid transparent;
     border-radius: var(--radius-md, 0.5rem);
-    background: transparent;
+    @apply bg-transparent;
     font-family: inherit;
     font-size: 0.6875rem;
-    font-weight: 600;
+    @apply font-semibold;
     line-height: 1.25rem;
-    text-decoration: none;
-    cursor: pointer;
+    @apply no-underline;
+    @apply cursor-pointer;
     transition: all 0.2s ease;
 }
 
@@ -60,10 +60,10 @@
 }
 
 .dosen-assignment__create {
-    display: inline-flex;
+    @apply inline-flex;
     min-height: 2.75rem;
-    align-items: center;
-    justify-content: center;
+    @apply items-center;
+    @apply justify-center;
     gap: 0.5rem;
     padding: 0.625rem 1rem;
     border: 1px solid transparent;
@@ -71,8 +71,8 @@
     background: var(--primary);
     color: var(--text-on-primary);
     font-size: 0.8125rem;
-    font-weight: 600;
-    text-decoration: none;
+    @apply font-semibold;
+    @apply no-underline;
     box-shadow: var(--shadow-sm);
     transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
@@ -124,7 +124,7 @@
 
 @media (max-width: 768px) {
     .dosen-assignment__actions {
-        flex-wrap: wrap;
+        @apply flex-wrap;
     }
 }
 
@@ -135,14 +135,14 @@
 }
 
 .dosen-assignment-form__back {
-    display: inline-flex;
-    align-items: center;
+    @apply inline-flex;
+    @apply items-center;
     gap: 0.375rem;
     margin-bottom: 1.5rem;
     color: var(--text-secondary);
     font-size: 0.875rem;
-    font-weight: 500;
-    text-decoration: none;
+    @apply font-medium;
+    @apply no-underline;
     transition: color 0.2s ease;
 }
 
@@ -155,14 +155,14 @@
 }
 
 .dosen-assignment-form__header {
-    display: flex;
-    align-items: flex-start;
+    @apply flex;
+    @apply items-start;
     gap: 1rem;
     margin-bottom: 1.5rem;
 }
 
 .dosen-assignment-form__icon {
-    display: grid;
+    @apply grid;
     width: 3rem;
     height: 3rem;
     flex: 0 0 3rem;
@@ -174,14 +174,14 @@
 }
 
 .dosen-assignment-form__eyebrow {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    @apply flex;
+    @apply items-center;
+    @apply flex-wrap;
     gap: 0.5rem;
     margin-bottom: 0.375rem;
     color: var(--text-muted);
     font-size: 0.75rem;
-    font-weight: 600;
+    @apply font-semibold;
 }
 
 .dosen-assignment-form__eyebrow > span:first-child {
@@ -199,7 +199,7 @@
     margin: 0;
     color: var(--text-primary);
     font-size: 1.75rem;
-    font-weight: 700;
+    @apply font-bold;
     letter-spacing: -0.03em;
     line-height: 1.2;
 }
@@ -219,13 +219,13 @@
 }
 
 .dosen-assignment-form__fields {
-    display: grid;
+    @apply grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.25rem 1rem;
 }
 
 .dosen-assignment-form__field {
-    min-width: 0;
+    @apply min-w-0;
 }
 
 .dosen-assignment-form__field--full {
@@ -233,11 +233,11 @@
 }
 
 .dosen-assignment-form__field > label {
-    display: block;
+    @apply block;
     margin-bottom: 0.5rem;
     color: var(--text-primary);
     font-size: 0.8125rem;
-    font-weight: 600;
+    @apply font-semibold;
 }
 
 .dosen-assignment-form__field > label > span {
@@ -247,13 +247,13 @@
 .dosen-assignment-form__field input,
 .dosen-assignment-form__field textarea,
 .dosen-assignment-form__field select {
-    display: block;
-    width: 100%;
+    @apply block;
+    @apply w-full;
     min-height: 2.875rem;
     padding: 0.75rem 0.875rem;
     border: 1px solid var(--border-hairline);
     border-radius: 0.75rem;
-    outline: none;
+    @apply outline-none;
     background-color: var(--bg-base);
     color: var(--text-primary);
     font-size: 0.875rem;
@@ -280,7 +280,7 @@
 
 .dosen-assignment-form__field textarea {
     min-height: 8rem;
-    resize: vertical;
+    @apply resize-y;
 }
 
 .dosen-assignment-form__field input[type="datetime-local"] {
@@ -290,23 +290,23 @@
 .dosen-assignment-form__field input[type="datetime-local"]::-webkit-calendar-picker-indicator {
     padding: 0.25rem;
     border-radius: 0.375rem;
-    cursor: pointer;
+    @apply cursor-pointer;
     opacity: 0.7;
 }
 
 .dosen-assignment-form__select-wrap,
 .dosen-assignment-form__number-wrap {
-    position: relative;
+    @apply relative;
 }
 
 .dosen-assignment-form__select-wrap select {
     appearance: none;
     padding-right: 2.75rem;
-    cursor: pointer;
+    @apply cursor-pointer;
 }
 
 .dosen-assignment-form__select-wrap > span {
-    position: absolute;
+    @apply absolute;
     top: 50%;
     right: 0.875rem;
     color: var(--text-secondary);
@@ -320,7 +320,7 @@
 }
 
 .dosen-assignment-form__number-wrap > span {
-    position: absolute;
+    @apply absolute;
     top: 50%;
     right: 0.875rem;
     color: var(--text-muted);
@@ -342,8 +342,8 @@
 }
 
 .dosen-assignment-form__errors {
-    display: flex;
-    align-items: flex-start;
+    @apply flex;
+    @apply items-start;
     gap: 0.75rem;
     margin-bottom: 1rem;
     padding: 1rem;
@@ -360,7 +360,7 @@
 
 .dosen-assignment-form__errors-title {
     margin: 0;
-    font-weight: 600;
+    @apply font-semibold;
 }
 
 .dosen-assignment-form__errors ul {
@@ -369,8 +369,8 @@
 }
 
 .dosen-assignment-form__footer {
-    display: flex;
-    justify-content: flex-end;
+    @apply flex;
+    @apply justify-end;
     gap: 0.75rem;
     margin-top: 1.75rem;
     padding-top: 1.25rem;
@@ -378,18 +378,18 @@
 }
 
 .dosen-assignment-form__button {
-    display: inline-flex;
+    @apply inline-flex;
     min-height: 2.75rem;
-    align-items: center;
-    justify-content: center;
+    @apply items-center;
+    @apply justify-center;
     gap: 0.5rem;
     padding: 0.625rem 1rem;
     border: 1px solid transparent;
     border-radius: 0.75rem;
     font-size: 0.8125rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
+    @apply font-semibold;
+    @apply no-underline;
+    @apply cursor-pointer;
     transition:
         background-color 0.2s ease,
         border-color 0.2s ease,
@@ -450,11 +450,11 @@
     }
 
     .dosen-assignment-form__footer {
-        flex-direction: column-reverse;
+        @apply flex-col-reverse;
     }
 
     .dosen-assignment-form__button {
-        width: 100%;
+        @apply w-full;
     }
 }
 
@@ -471,17 +471,17 @@
 }
 
 .dosen-grades__header {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
+    @apply flex;
+    @apply items-end;
+    @apply justify-between;
     gap: 1.25rem;
     margin-bottom: 1.5rem;
 }
 
 .dosen-grades__count {
-    display: inline-flex;
+    @apply inline-flex;
     flex: 0 0 auto;
-    align-items: center;
+    @apply items-center;
     gap: 0.5rem;
     padding: 0.625rem 0.875rem;
     border: 1px solid var(--border-hairline);
@@ -489,7 +489,7 @@
     background: var(--color-surface-container-low);
     color: var(--text-secondary);
     font-size: 0.8125rem;
-    font-weight: 600;
+    @apply font-semibold;
 }
 
 .dosen-grades__count .material-symbols-outlined {
@@ -498,8 +498,8 @@
 }
 
 .dosen-grades__notice {
-    display: flex;
-    align-items: flex-start;
+    @apply flex;
+    @apply items-start;
     gap: 0.625rem;
     margin-bottom: 1rem;
     padding: 0.875rem 1rem;
@@ -524,12 +524,12 @@
 }
 
 .dosen-grades__list {
-    display: grid;
+    @apply grid;
     gap: 1rem;
 }
 
 .dosen-grade-card {
-    overflow: hidden;
+    @apply overflow-hidden;
     border: 1px solid var(--border-hairline);
     border-radius: 1.125rem;
     background: var(--color-surface-container-low);
@@ -537,8 +537,8 @@
 }
 
 .dosen-grade-card__student {
-    display: flex;
-    align-items: center;
+    @apply flex;
+    @apply items-center;
     gap: 0.75rem;
     padding: 1rem 1.25rem;
     border-bottom: 1px solid var(--border-hairline);
@@ -546,7 +546,7 @@
 }
 
 .dosen-grade-card__avatar {
-    display: grid;
+    @apply grid;
     width: 2.625rem;
     height: 2.625rem;
     flex: 0 0 2.625rem;
@@ -555,11 +555,11 @@
     background: var(--color-surface-container-high);
     color: var(--primary);
     font-size: 1rem;
-    font-weight: 700;
+    @apply font-bold;
 }
 
 .dosen-grade-card__student-info {
-    min-width: 0;
+    @apply min-w-0;
 }
 
 .dosen-grade-card__student-info h2 {
@@ -576,15 +576,15 @@
 }
 
 .dosen-grade-card__status {
-    display: inline-flex;
-    align-items: center;
+    @apply inline-flex;
+    @apply items-center;
     gap: 0.25rem;
     margin-left: auto;
     padding: 0.35rem 0.625rem;
     border-radius: 9999px;
     font-size: 0.6875rem;
-    font-weight: 600;
-    white-space: nowrap;
+    @apply font-semibold;
+    @apply whitespace-nowrap;
 }
 
 .dosen-grade-card__status .material-symbols-outlined {
@@ -602,36 +602,36 @@
 }
 
 .dosen-grade-card__body {
-    display: grid;
+    @apply grid;
     grid-template-columns: minmax(12rem, 0.85fr) minmax(0, 1.5fr);
     gap: 1.5rem;
     padding: 1.25rem;
 }
 
 .dosen-grade-card__submission {
-    min-width: 0;
+    @apply min-w-0;
 }
 
 .dosen-grade-card__label {
-    display: block;
+    @apply block;
     margin-bottom: 0.5rem;
     color: var(--text-muted);
     font-size: 0.6875rem;
-    font-weight: 700;
+    @apply font-bold;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
+    @apply uppercase;
 }
 
 .dosen-grade-card__file {
-    display: flex;
-    align-items: center;
+    @apply flex;
+    @apply items-center;
     gap: 0.5rem;
     width: fit-content;
     max-width: 100%;
     color: var(--primary);
     font-size: 0.8125rem;
-    font-weight: 600;
-    text-decoration: none;
+    @apply font-semibold;
+    @apply no-underline;
 }
 
 .dosen-grade-card__file:hover {
@@ -639,9 +639,9 @@
 }
 
 .dosen-grade-card__file > span:nth-child(2) {
-    overflow: hidden;
+    @apply overflow-hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
+    @apply whitespace-nowrap;
 }
 
 .dosen-grade-card__file .material-symbols-outlined {
@@ -669,7 +669,7 @@
     background: rgba(194, 65, 59, 0.09);
     color: #a8322d;
     font-size: 0.6875rem;
-    font-weight: 600;
+    @apply font-semibold;
 }
 
 .dosen-grade-card__note {
@@ -685,13 +685,13 @@
 }
 
 .dosen-grade-card__form {
-    display: grid;
+    @apply grid;
     gap: 0.875rem;
     align-content: start;
 }
 
 .dosen-grade-card__form-fields {
-    display: grid;
+    @apply grid;
     grid-template-columns: minmax(7rem, 0.35fr) minmax(0, 1fr);
     gap: 0.875rem;
 }
@@ -711,13 +711,13 @@
 }
 
 .dosen-grades__empty {
-    display: grid;
+    @apply grid;
     justify-items: center;
     padding: 3rem 1.5rem;
     border: 1px dashed var(--border-hover);
     border-radius: 1rem;
     background: var(--color-surface-container-low);
-    text-align: center;
+    @apply text-center;
 }
 
 .dosen-grades__empty > .material-symbols-outlined {
@@ -745,8 +745,8 @@
     }
 
     .dosen-grades__header {
-        align-items: flex-start;
-        flex-direction: column;
+        @apply items-start;
+        @apply flex-col;
     }
 
     .dosen-grade-card__body {
@@ -761,7 +761,7 @@
 
 @media (max-width: 480px) {
     .dosen-grade-card__student {
-        flex-wrap: wrap;
+        @apply flex-wrap;
         padding: 0.875rem;
     }
 

@@ -1,11 +1,11 @@
 <x-layout title="Dashboard Admin - KampusLMS" active-nav="dashboard">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <header class="admin-dashboard__header">
-            <div class="admin-dashboard__header-copy">
-                <h1 class="admin-dashboard__title">Halo, {{ auth()->user()->name }}</h1>
-                <p class="admin-dashboard__description">Pantau pengguna dan mata kuliah yang tersimpan di EduSpace.</p>
+        <header class="admin-dashboard__header relative flex items-center justify-between gap-6 overflow-hidden">
+            <div class="admin-dashboard__header-copy min-w-0">
+                <h1 class="admin-dashboard__title m-0 text-[1.8rem] font-bold leading-[1.2] text-white">Halo, {{ auth()->user()->name }}</h1>
+                <p class="admin-dashboard__description m-0 mt-2 max-w-[42rem] text-[0.9rem] leading-[1.65] text-white/80">Pantau pengguna dan mata kuliah yang tersimpan di EduSpace.</p>
             </div>
-            <a href="{{ route('admin.users.index') }}" class="admin-dashboard__action">
+            <a href="{{ route('admin.users.index') }}" class="admin-dashboard__action inline-flex min-h-11 shrink-0 items-center justify-center gap-2 rounded-xl border border-white/90 bg-white px-4 py-2.5 text-[0.82rem] font-semibold text-[#315c20] no-underline transition duration-200 hover:-translate-y-px hover:border-[#edf5e8] hover:bg-[#edf5e8] hover:text-[#244c16] dark:border-[#c9ee9f] dark:bg-[#17220f] dark:text-[#c9ee9f] dark:hover:border-[#e4f8d5] dark:hover:bg-[#253b1b] dark:hover:text-[#e4f8d5]">
                 <span class="material-symbols-outlined" aria-hidden="true">group</span>
                 Kelola pengguna
             </a>

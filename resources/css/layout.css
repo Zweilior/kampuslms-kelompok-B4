@@ -412,6 +412,7 @@ button {
     isolation: isolate;
     width: 100%;
     padding: 2rem;
+    padding-bottom: 2rem;
 }
 
 .main-content::before,
@@ -480,6 +481,7 @@ button {
 
     .main-content {
         padding: 1.5rem;
+        padding-bottom: 1rem;
     }
 
     .main-content--with-navbar {
@@ -501,6 +503,7 @@ button {
 
     .main-content {
         padding: 1rem;
+        padding-bottom: 1rem;
     }
 
     .main-content--with-navbar {
@@ -1319,6 +1322,18 @@ button {
     }
 
     .bg-surface-container-highest {
+        background-color: var(--color-surface-container-highest) !important;
+    }
+
+    .hover\:bg-surface-container:hover {
+        background-color: var(--color-surface-container) !important;
+    }
+
+    .hover\:bg-surface-container-high:hover {
+        background-color: var(--color-surface-container-high) !important;
+    }
+
+    .hover\:bg-surface-container-highest:hover {
         background-color: var(--color-surface-container-highest) !important;
     }
 
