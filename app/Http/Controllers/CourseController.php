@@ -161,23 +161,34 @@ class CourseController extends Controller
             ->withCount('students')
             ->with([
                 'students:id',
-                'assignments.gradeComponent',
-                'assignments.submissions.grade',
+                'assignments:id,course_id,grade_component_id,max_score',
+                'assignments.gradeComponent:id,weight',
+                'assignments.submissions:id,assignment_id,user_id',
+                'assignments.submissions.grade:id,submission_id,score',
             ])
             ->orderBy('name')
             ->get();
 
         $courses->each(function (Course $course): void {
+            // Kelompokkan submission per mahasiswa satu kali, bukan disaring ulang
+            // untuk setiap pasangan mahasiswa x tugas.
+            $submissionsByAssignment = $course->assignments->mapWithKeys(
+                fn ($assignment) => [$assignment->id => $assignment->submissions->groupBy('user_id')]
+            );
+
             $studentScores = $course->students
-                ->map(function (User $student) use ($course): ?float {
-                    $assignments = $course->assignments->map(function ($assignment) use ($student) {
-                        $studentAssignment = clone $assignment;
-                        $studentAssignment->setRelation(
-                            'submissions',
-                            $assignment->submissions->where('user_id', $student->id)->values()
-                        );
-                        return $studentAssignment;
-                    });
+                ->map(function (User $student) use ($course, $submissionsByAssignment): ?float {
+                    $assignments = $course->assignments->map(
+                        function ($assignment) use ($student, $submissionsByAssignment) {
+                            $studentAssignment = clone $assignment;
+                            $studentAssignment->setRelation(
+                                'submissions',
+                                $submissionsByAssignment[$assignment->id]->get($student->id, collect())
+                            );
+
+                            return $studentAssignment;
+                        }
+                    );
 
                     return CourseGradeCalculator::finalScore($assignments);
                 })
