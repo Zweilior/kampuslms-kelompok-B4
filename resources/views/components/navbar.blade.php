@@ -116,12 +116,44 @@
                     count: 0,
                     notifications: [],
                     poller: null,
+                    isFetching: false,
+                    pollInterval: 30000,
+                    visibilityHandler: null,
                     init() {
-                        this.fetchNotifications();
-                        this.poller = setInterval(() => this.fetchNotifications(), 30000);
+                        if (!document.hidden) {
+                            this.fetchNotifications();
+                            this.startPolling();
+                        }
+
+                        this.visibilityHandler = () => {
+                            if (document.hidden) {
+                                this.stopPolling();
+                            } else {
+                                this.fetchNotifications();
+                                this.startPolling();
+                            }
+                        };
+                        document.addEventListener('visibilitychange', this.visibilityHandler);
                     },
                     destroy() {
-                        clearInterval(this.poller);
+                        this.stopPolling();
+                        if (this.visibilityHandler) {
+                            document.removeEventListener('visibilitychange', this.visibilityHandler);
+                        }
+                    },
+                    startPolling() {
+                        this.stopPolling();
+                        this.poller = setInterval(() => {
+                            if (!document.hidden) {
+                                this.fetchNotifications();
+                            }
+                        }, this.pollInterval);
+                    },
+                    stopPolling() {
+                        if (this.poller) {
+                            clearInterval(this.poller);
+                            this.poller = null;
+                        }
                     },
                     formatDate(value) {
                         if (!value) {
@@ -134,6 +166,11 @@
                         });
                     },
                     async fetchNotifications() {
+                        if (document.hidden || this.isFetching) {
+                            return;
+                        }
+
+                        this.isFetching = true;
                         try {
                             const response = await fetch('{{ route('notifications.unread-count') }}', {
                                 headers: { Accept: 'application/json' },
@@ -152,6 +189,8 @@
                             this.notifications = payload.latest.slice(0, 5);
                         } catch (error) {
                             console.error('Unable to load notifications from the database.', error);
+                        } finally {
+                            this.isFetching = false;
                         }
                     },
                     async markAsRead(notification) {

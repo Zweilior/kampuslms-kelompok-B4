@@ -4,7 +4,10 @@
     <div class="mahasiswa-page mahasiswa-page--submission-create">
         @php
             $isLate = now()->gt($assignment->due_at);
-            $existingSubmission = $assignment->submissions()->where('user_id', auth()->id())->first();
+            $existingSubmission = $existingSubmission
+                ?? ($assignment->relationLoaded('submissions')
+                    ? $assignment->submissions->where('user_id', auth()->id())->first()
+                    : $assignment->submissions()->where('user_id', auth()->id())->first());
         @endphp
 
         <a href="{{ route('mahasiswa.courses.assignments.index', $course->id) }}" class="mahasiswa-page__submission-back">

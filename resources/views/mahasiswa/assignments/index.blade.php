@@ -9,7 +9,7 @@
                     Kembali ke kelas
                 </a>
                 <h1 class="mahasiswa-page__title">Daftar tugas</h1>
-                <p class="mahasiswa-page__description">{{ $course->name }} · {{ $assignments->count() }} tugas tersedia</p>
+                <p class="mahasiswa-page__description">{{ $course->name }} · {{ $course->assignments_count ?? (method_exists($assignments, 'total') ? $assignments->total() : $assignments->count()) }} tugas tersedia</p>
             </div>
             <span class="mahasiswa-page__icon-box"><span class="material-symbols-outlined">assignment</span></span>
         </header>
@@ -74,5 +74,11 @@
                 </div>
             @endforelse
         </section>
+
+        @if (method_exists($assignments, 'hasPages') && $assignments->hasPages())
+            <div class="mt-6 flex justify-center">
+                {{ $assignments->links('vendor.pagination.custom-pagination') }}
+            </div>
+        @endif
     </div>
 @endsection

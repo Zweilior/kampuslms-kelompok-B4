@@ -9,7 +9,7 @@
                     Kembali ke kelas
                 </a>
                 <h1 class="mahasiswa-page__title">Materi perkuliahan</h1>
-                <p class="mahasiswa-page__description">{{ $course->name }} · {{ $materials->count() }} materi tersedia</p>
+                <p class="mahasiswa-page__description">{{ $course->name }} · {{ $course->materials_count ?? (method_exists($materials, 'total') ? $materials->total() : $materials->count()) }} materi tersedia</p>
             </div>
             <span class="mahasiswa-page__icon-box"><span class="material-symbols-outlined">auto_stories</span></span>
         </header>
@@ -51,5 +51,11 @@
                 </div>
             @endforelse
         </section>
+
+        @if (method_exists($materials, 'hasPages') && $materials->hasPages())
+            <div class="mt-6 flex justify-center">
+                {{ $materials->links('vendor.pagination.custom-pagination') }}
+            </div>
+        @endif
     </div>
 @endsection

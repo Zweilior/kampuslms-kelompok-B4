@@ -64,7 +64,7 @@
                         <span class="mahasiswa-rubric__component-icon material-symbols-outlined" aria-hidden="true">checklist</span>
                         <div class="mahasiswa-rubric__component-copy">
                             <h3>{{ $component->name }}</h3>
-                            <span>{{ $component->assignments->count() }} tugas dipublikasikan</span>
+                            <span>{{ $component->assignments_count ?? $component->assignments->count() }} tugas dipublikasikan</span>
                         </div>
                         <span class="mahasiswa-rubric__weight">
                             {{ number_format((float) $component->weight, 2) }}<small>% bobot</small>

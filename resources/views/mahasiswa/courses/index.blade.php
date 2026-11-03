@@ -106,6 +106,12 @@
                         <p>Mata kuliah aktif yang kamu ikuti akan muncul di sini.</p>
                     </div>
                 @endforelse
+
+                @if (method_exists($activeCourses, 'hasPages') && $activeCourses->hasPages())
+                    <div class="mt-6 flex justify-center">
+                        {{ $activeCourses->links('vendor.pagination.custom-pagination') }}
+                    </div>
+                @endif
             </div>
 
             <div class="dosen-course-list" x-show="selected === 'archived'" id="mahasiswa-archived-course-list">
@@ -144,6 +150,12 @@
                         <p>Mata kuliah yang telah diarsipkan akan muncul di sini.</p>
                     </div>
                 @endforelse
+
+                @if (method_exists($archivedCourses, 'hasPages') && $archivedCourses->hasPages())
+                    <div class="mt-6 flex justify-center">
+                        {{ $archivedCourses->links('vendor.pagination.custom-pagination') }}
+                    </div>
+                @endif
             </div>
         </section>
     </main>

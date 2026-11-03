@@ -187,7 +187,7 @@
                         <div class="developer-info__hero developer-card--{{ $developer['tone'] }}">
                             <div class="developer-info__portrait">
                                 @if (!empty($developer['photo']))
-                                    <img src="{{ asset($developer['photo']) }}" alt="Foto {{ $developer['name'] }}">
+                                    <img src="{{ asset($developer['photo']) }}" alt="Foto {{ $developer['name'] }}" loading="lazy">
                                 @else
                                     <span>{{ $developer['initials'] }}</span>
                                 @endif
