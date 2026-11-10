@@ -14,7 +14,7 @@ use App\Http\Controllers\GradeComponentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NotificationController;
 
-Route::get('/', fn () => view('welcome'));
+Route::get('/', fn () => redirect()->route('login'));
 
 Route::get('/tentang', fn () => view('tentang'))->name('tentang');
 
