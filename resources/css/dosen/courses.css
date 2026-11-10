@@ -381,6 +381,10 @@
     @apply outline-none;
 }
 
+.dosen-enrollments__select-group select option {
+    @apply py-[0.25rem];
+}
+
 .dosen-enrollments__select-group select:focus {
     @apply border-[color:var(--primary-light)];
     box-shadow: 0 0 0 3px var(--glow-sage);

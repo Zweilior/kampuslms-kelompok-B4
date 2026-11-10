@@ -57,14 +57,12 @@ class CourseEnrollmentController extends Controller
         $students = $course->students()
             ->where('users.role', 'mahasiswa')
             ->orderBy('users.name')
-            ->paginate(15, ['users.*'], 'students_page')
-            ->withQueryString();
+            ->get(['users.*']);
         $availableStudents = User::query()
             ->where('role', 'mahasiswa')
             ->whereDoesntHave('courses', fn ($query) => $query->where('courses.id', $course->id))
             ->orderBy('name')
-            ->paginate(15, ['users.*'], 'available_students_page')
-            ->withQueryString();
+            ->get();
 
         return view('dosen.courses.enrollments', compact(
             'course',
@@ -78,18 +76,21 @@ class CourseEnrollmentController extends Controller
         Gate::authorize('manageEnrollment', $course);
 
         $validated = $request->validate([
-            'student_id' => [
+            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids.*' => [
                 'required',
                 Rule::exists('users', 'id')->where('role', 'mahasiswa'),
             ],
         ], [
-            'student_id.required' => 'Pilih mahasiswa yang akan didaftarkan.',
-            'student_id.exists' => 'Mahasiswa yang dipilih tidak valid.',
+            'student_ids.required' => 'Pilih setidaknya satu mahasiswa yang akan didaftarkan.',
+            'student_ids.min' => 'Pilih setidaknya satu mahasiswa yang akan didaftarkan.',
+            'student_ids.*.exists' => 'Mahasiswa yang dipilih tidak valid.',
         ]);
 
-        $course->students()->syncWithoutDetaching([
-            $validated['student_id'] => ['enrolled_at' => now()],
-        ]);
+        $enrollments = collect($validated['student_ids'])
+            ->mapWithKeys(fn ($studentId) => [$studentId => ['enrolled_at' => now()]])
+            ->all();
+        $course->students()->syncWithoutDetaching($enrollments);
 
         return redirect()
             ->route('dosen.courses.enrollments.index', $course)
