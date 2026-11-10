@@ -112,4 +112,16 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Demo Account Password
+    |--------------------------------------------------------------------------
+    |
+    | Digunakan oleh DatabaseSeeder untuk mengisi password akun demo secara 
+    | dinamis tanpa melakukan hardcode di dalam file seeder.
+    |
+    */
+    
+    'demo_password' => env('DEMO_PASSWORD', 'password'),
+
 ];
