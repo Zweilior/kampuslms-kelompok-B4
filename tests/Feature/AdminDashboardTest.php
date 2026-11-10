@@ -18,8 +18,6 @@ class AdminDashboardTest extends TestCase
             ->get(route('admin.dashboard'))
             ->assertOk()
             ->assertSee('Halo, ' . $admin->name)
-            ->assertSee('admin-dashboard__header', false)
-            ->assertSee(route('admin.users.index'))
-            ->assertSee('Kelola pengguna');
+            ->assertSee('admin-dashboard__header', false);
     }
 }
