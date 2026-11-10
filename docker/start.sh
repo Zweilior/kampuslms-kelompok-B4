@@ -13,7 +13,7 @@ if [ -z "${APP_KEY:-}" ]; then
 fi
 
 # 2. Volume Railway dipasang kosong di awal. Pastikan folder yang dibutuhkan ada.
-#    (Kepemilikan file diatur di langkah terakhir, lihat langkah 6.)
+#    (Kepemilikan file diatur sesudah migrasi, lihat langkah 5.)
 mkdir -p storage/app/private storage/framework/cache storage/framework/sessions storage/framework/views storage/logs
 
 # 3. Cache dibuat saat start (bukan saat build) karena variabel environment
@@ -37,18 +37,11 @@ until php artisan migrate --force; do
     sleep 3
 done
 
-# 5. Seed hanya jika diminta (deploy pertama). Setelah berhasil, ubah RUN_SEED
-#    menjadi false atau hapus variabelnya.
-if [ "${RUN_SEED:-false}" = "true" ]; then
-    echo "[start] RUN_SEED=true, menjalankan seeder."
-    php artisan db:seed --force
-fi
-
-# 6. Serahkan kepemilikan ke www-data SETELAH semua perintah artisan di atas.
+# 5. Serahkan kepemilikan ke www-data SETELAH semua perintah artisan di atas.
 #    Skrip ini berjalan sebagai root: kalau artisan sempat menulis log atau cache,
 #    filenya milik root dan Apache/worker (www-data) tidak bisa menulis lagi.
 #    Ini juga yang membuat Volume Railway (dipasang sebagai root) bisa ditulis upload.
 chown -R www-data:www-data storage bootstrap/cache
 
-# 7. Serahkan ke Supervisor (menjadi proses utama container).
+# 6. Serahkan ke Supervisor (menjadi proses utama container).
 exec /usr/bin/supervisord -c /etc/supervisor/supervisord.conf
