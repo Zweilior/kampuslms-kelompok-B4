@@ -93,4 +93,4 @@ EXPOSE 8080
 # =============================================================================
 # Startup
 # =============================================================================
-CMD ["sh", "-c", "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force && php artisan db:seed --force && php -S 0.0.0.0:${PORT:-8080} -t public"]
+CMD ["sh", "-c", "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate:fresh --seed --force && exec php -S 0.0.0.0:${PORT:-8080} -t public"]
