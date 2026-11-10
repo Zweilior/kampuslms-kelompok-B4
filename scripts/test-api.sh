@@ -1,98 +1,88 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# Konfigurasi URL dan Token (Ganti dengan token yang valid dari database/seeder Anda)
-BASE_URL="http://127.0.0.1:8000/api/v1"
-TOKEN_MAHASISWA="2|EbynceEL9ypq4CqztlT6Ib0pb4dDBMyCO7DQEBNIaace7a07"
-TOKEN_DOSEN_A="3|6X8gbjenHTcGbOmQk78GHGdgImeuMi912MSXXWjPa8e1ac8b"
-TOKEN_DOSEN_B="4|bzCY7E3PAMekVoxjAifWZSn7rY9QwyC0s8iT3ZPm716dc763"
+# Uji endpoint API KampusLMS.
+# BASE_URL harus berisi URL lengkap sampai /api/v1, misalnya:
+#   https://kampuslms.example.com/api/v1
+# Token dan ID data uji wajib diberikan melalui environment.
 
-# Variabel ID Data untuk pengujian kepemilikan
-ID_KURSUS=1
-ID_TUGAS_DOSEN_A=1 # Tugas yang dibuat oleh Dosen A
-ID_TUGAS_DOSEN_B=13 # Tugas yang dibuat oleh Dosen B
-ID_SUBMISSION=1    # Pengumpulan tugas dari mahasiswa
+set -u
 
-# Fungsi pembantu untuk melakukan request curl dan mencetak status HTTP
-run_test() {
-    local method=$1
-    local endpoint=$2
-    local token=$3
-    local expected=$4
-    local description=$5
+require_env() {
+    local name="$1"
 
-    # Menyiapkan header otorisasi jika token diberikan
-    local auth_header=""
-    if [ "$token" != "none" ]; then
-        auth_header="-H \"Authorization: Bearer $token\""
+    if [[ -z "${!name:-}" ]]; then
+        printf 'Variabel environment %s wajib diisi.\n' "$name" >&2
+        exit 2
     fi
-
-    # Eksekusi curl, ambil HTTP status code saja
-    local command="curl -s -o /dev/null -w \"%{http_code}\" -X $method \"$BASE_URL$endpoint\" -H \"Accept: application/json\" $auth_header"
-    local status_code=$(eval $command)
-
-    echo "--- $description ---"
-    echo "Endpoint : $method $endpoint"
-    if [ "$status_code" == "$expected" ]; then
-        echo "Hasil    : BERHASIL (Mendapat HTTP $status_code sesuai harapan)"
-    else
-        echo "Hasil    : GAGAL (Harapan: $expected, Mendapat: $status_code)"
-    fi
-    echo ""
 }
 
-echo "=========================================================="
-echo " PENGUJIAN OTORISASI API KAMPUSLMS (BUILD NO 7 - PROMPT C)"
-echo "=========================================================="
-echo ""
+for name in BASE_URL TOKEN_MAHASISWA TOKEN_DOSEN_A TOKEN_DOSEN_B \
+    ID_TUGAS_DOSEN_A ID_TUGAS_DOSEN_B ID_SUBMISSION; do
+    require_env "$name"
+done
 
-# ---------------------------------------------------------
-# ENDPOINT: POST /assignments (Membuat Tugas)
-# ---------------------------------------------------------
-echo ">> MENGUJI ENDPOINT: POST /assignments"
-# 1. Tanpa token sama sekali → harus 401
-run_test "POST" "/assignments" "none" "401" "1. Tanpa token (Unauthenticated)"
+BASE_URL="${BASE_URL%/}"
+FAILURES=0
 
-# 2. Token mahasiswa mengakses endpoint dosen → harus 403
-run_test "POST" "/assignments" "$TOKEN_MAHASISWA" "403" "2. Token Mahasiswa membuat tugas (Forbidden)"
+run_test() {
+    local method="$1"
+    local endpoint="$2"
+    local token="$3"
+    local expected="$4"
+    local description="$5"
+    local status_code
+    local -a curl_args=(
+        --silent
+        --show-error
+        --output /dev/null
+        --write-out '%{http_code}'
+        --max-time 20
+        --request "$method"
+        --header 'Accept: application/json'
+    )
 
-# 4. Token yang benar (Dosen) dengan hak yang benar → harus 201 (Created) / 200 (OK)
-# Catatan: Karena curl di sini kosong tanpa body, bisa jadi error validasi (422). 
-# Untuk tes murni otorisasi, anggap saja asumsi mendapat 422 jika lolos otorisasi, atau 201 jika data lengkap.
-# Di sini kita ekspektasikan 422 (Unprocessable Entity) karena lolos otorisasi tapi form kosong, atau 201 jika Anda menyesuaikan body.
-run_test "POST" "/assignments" "$TOKEN_DOSEN_A" "422" "4. Token Dosen A membuat tugas (Lolos Otorisasi, Form Kosong/422)"
+    if [[ "$token" != "none" ]]; then
+        curl_args+=(--header "Authorization: Bearer $token")
+    fi
 
+    if ! status_code="$(curl "${curl_args[@]}" "$BASE_URL$endpoint")"; then
+        status_code="000"
+    fi
 
-# ---------------------------------------------------------
-# ENDPOINT: PUT /assignments/{assignment} (Update Tugas)
-# ---------------------------------------------------------
-echo ">> MENGUJI ENDPOINT: PUT /assignments/{assignment}"
-# 1. Tanpa token sama sekali → harus 401
-run_test "PUT" "/assignments/$ID_TUGAS_DOSEN_A" "none" "401" "1. Tanpa token (Unauthenticated)"
+    printf '%s\n' "--- $description ---"
+    printf 'Endpoint : %s %s\n' "$method" "$endpoint"
+    if [[ "$status_code" == "$expected" ]]; then
+        printf 'Hasil    : BERHASIL (HTTP %s)\n\n' "$status_code"
+    else
+        printf 'Hasil    : GAGAL (harapan HTTP %s, mendapat %s)\n\n' "$expected" "$status_code"
+        FAILURES=$((FAILURES + 1))
+    fi
+}
 
-# 2. Token mahasiswa mengakses endpoint dosen → harus 403
-run_test "PUT" "/assignments/$ID_TUGAS_DOSEN_A" "$TOKEN_MAHASISWA" "403" "2. Token Mahasiswa mengedit tugas (Forbidden)"
+printf '%s\n' '=========================================================='
+printf '%s\n' ' PENGUJIAN API KAMPUSLMS'
+printf '%s\n\n' '=========================================================='
 
-# 3. Token dosen A mengakses data milik dosen B → harus 403
-run_test "PUT" "/assignments/$ID_TUGAS_DOSEN_B" "$TOKEN_DOSEN_A" "403" "3. Dosen A mengedit tugas milik Dosen B (Forbidden)"
+printf '%s\n' '>> POST /assignments'
+run_test POST '/assignments' none 401 'Tanpa token (unauthenticated)'
+run_test POST '/assignments' "$TOKEN_MAHASISWA" 403 'Mahasiswa mencoba membuat tugas'
+run_test POST '/assignments' "$TOKEN_DOSEN_A" 422 'Dosen membuat tugas dengan form kosong'
 
-# 4. Token yang benar dengan hak yang benar (Dosen A edit tugas Dosen A) → harus 200
-run_test "PUT" "/submissions/$ID_SUBMISSION/grade" "$TOKEN_DOSEN_A" "422" "4. Dosen A menilai tugas miliknya sendiri (Lolos Otorisasi, Form Kosong/422)"
+printf '%s\n' '>> PUT /assignments/{assignment}'
+run_test PUT "/assignments/$ID_TUGAS_DOSEN_A" none 401 'Tanpa token (unauthenticated)'
+run_test PUT "/assignments/$ID_TUGAS_DOSEN_A" "$TOKEN_MAHASISWA" 403 'Mahasiswa mencoba mengubah tugas'
+run_test PUT "/assignments/$ID_TUGAS_DOSEN_B" "$TOKEN_DOSEN_A" 403 'Dosen A mencoba mengubah tugas Dosen B'
+run_test PUT "/assignments/$ID_TUGAS_DOSEN_A" "$TOKEN_DOSEN_A" 422 'Dosen A mengubah tugas miliknya dengan form kosong'
 
-# ---------------------------------------------------------
-# ENDPOINT: PUT /submissions/{submission}/grade (Menilai Tugas)
-# ---------------------------------------------------------
-echo ">> MENGUJI ENDPOINT: PUT /submissions/{submission}/grade"
-# 1. Tanpa token sama sekali → harus 401
-run_test "PUT" "/submissions/$ID_SUBMISSION/grade" "none" "401" "1. Tanpa token (Unauthenticated)"
+printf '%s\n' '>> PUT /submissions/{submission}/grade'
+run_test PUT "/submissions/$ID_SUBMISSION/grade" none 401 'Tanpa token (unauthenticated)'
+run_test PUT "/submissions/$ID_SUBMISSION/grade" "$TOKEN_MAHASISWA" 403 'Mahasiswa mencoba menilai submission'
+run_test PUT "/submissions/$ID_SUBMISSION/grade" "$TOKEN_DOSEN_B" 403 'Dosen B mencoba menilai submission milik Dosen A'
+run_test PUT "/submissions/$ID_SUBMISSION/grade" "$TOKEN_DOSEN_A" 422 'Dosen A menilai submission miliknya dengan form kosong'
 
-# 2. Token mahasiswa mengakses endpoint dosen → harus 403
-run_test "PUT" "/submissions/$ID_SUBMISSION/grade" "$TOKEN_MAHASISWA" "403" "2. Token Mahasiswa menilai tugas (Forbidden)"
+if (( FAILURES > 0 )); then
+    printf 'Pengujian selesai dengan %s kegagalan.\n' "$FAILURES" >&2
+    exit 1
+fi
 
-# 3. Token dosen B menilai submission pada tugas milik dosen A → harus 403
-# Asumsi $ID_SUBMISSION terkait dengan $ID_TUGAS_DOSEN_A
-run_test "PUT" "/submissions/$ID_SUBMISSION/grade" "$TOKEN_DOSEN_B" "403" "3. Dosen B menilai tugas milik Dosen A (Forbidden)"
-
-# 4. Token yang benar (Dosen A menilai submission tugasnya) → harus 200
-run_test "PUT" "/submissions/$ID_SUBMISSION/grade" "$TOKEN_DOSEN_A" "422" "4. Dosen A menilai tugas miliknya sendiri (Authorized)"
-
-echo "Pengujian selesai."
+printf '%s\n' 'Semua pengujian API berhasil.'
