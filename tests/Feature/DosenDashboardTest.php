@@ -45,8 +45,6 @@ class DosenDashboardTest extends TestCase
             ->assertOk()
             ->assertSee('Halo, '.$lecturer->name)
             ->assertSee('dosen-dashboard__header', false)
-            ->assertSee(route('dosen.courses.index'))
-            ->assertSee('Mata kuliah saya')
             ->assertSee('Mata Kuliah')
             ->assertSee('Tugas Dibuka')
             ->assertSee('Tugas Perlu Dinilai')

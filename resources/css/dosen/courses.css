@@ -336,6 +336,11 @@
     @apply overflow-hidden;
 }
 
+.dosen-enrollments__panel--enroll {
+    @apply relative overflow-visible;
+    z-index: 2;
+}
+
 .dosen-enrollments__panel-heading {
     @apply flex;
     @apply items-center;
@@ -374,20 +379,52 @@
     @apply mb-[0.4rem] text-[color:var(--text-primary)] text-[0.78rem] font-[650];
 }
 
-.dosen-enrollments__select-group select {
-    @apply w-full;
-    @apply min-h-11 py-[0.6rem] px-3 border border-[color:var(--border-hairline)] rounded-[0.7rem];
-    @apply bg-[color:var(--bg-base)] text-[color:var(--text-primary)] [font:inherit] text-[0.85rem];
+.dosen-enrollments__multi-select {
+    @apply relative;
+}
+
+.dosen-enrollments__multi-select-trigger {
+    @apply flex w-full min-h-11 items-center justify-between gap-3;
+    @apply py-[0.6rem] px-3 border border-[color:var(--border-hairline)] rounded-[0.7rem];
+    @apply bg-[color:var(--bg-base)] text-left text-[color:var(--text-primary)] [font:inherit] text-[0.85rem];
     @apply outline-none;
 }
 
-.dosen-enrollments__select-group select option {
-    @apply py-[0.25rem];
-}
-
-.dosen-enrollments__select-group select:focus {
+.dosen-enrollments__multi-select-trigger:focus,
+.dosen-enrollments__multi-select-trigger--open {
     @apply border-[color:var(--primary-light)];
     box-shadow: 0 0 0 3px var(--glow-sage);
+}
+
+.dosen-enrollments__multi-select-trigger .material-symbols-outlined {
+    @apply flex-none text-[1.2rem];
+}
+
+.dosen-enrollments__multi-select-summary {
+    @apply overflow-hidden text-ellipsis whitespace-nowrap;
+}
+
+.dosen-enrollments__multi-select-summary--placeholder {
+    @apply text-[color:var(--text-secondary)];
+}
+
+.dosen-enrollments__multi-select-options {
+    @apply absolute z-10 mt-2 max-h-[15rem] w-full overflow-y-auto;
+    @apply py-1 border border-[color:var(--border-hairline)] rounded-[0.7rem];
+    @apply bg-[color:var(--bg-base)] shadow-[0_8px_24px_rgba(38,65,28,0.14)];
+}
+
+.dosen-enrollments__student-option {
+    @apply flex cursor-pointer items-center gap-2;
+    @apply py-[0.55rem] px-3 text-[color:var(--text-primary)] text-[0.85rem];
+}
+
+.dosen-enrollments__student-option:hover {
+    @apply bg-[rgba(139,174,102,0.12)];
+}
+
+.dosen-enrollments__student-option input {
+    @apply h-4 w-4 accent-[color:var(--primary-dark)];
 }
 
 .dosen-enrollments__error {

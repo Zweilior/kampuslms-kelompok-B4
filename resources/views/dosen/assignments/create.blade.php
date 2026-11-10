@@ -1,5 +1,5 @@
 <x-layout title="Buat Tugas - Dosen" active-nav="courses">
-    <div class="dosen-assignment-form">
+    <main class="dosen-assignment-form">
         <a href="{{ route('dosen.courses.assignments.index', $course) }}" class="dosen-assignment-form__back">
             <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
             Kembali ke daftar tugas
@@ -7,7 +7,7 @@
 
         <header class="dosen-assignment-form__header lms-page-header">
             <span class="dosen-assignment-form__icon material-symbols-outlined" aria-hidden="true">assignment_add</span>
-            <div>
+            <div class="lms-page-header__copy">
                 <div class="dosen-assignment-form__eyebrow">
                     <span>{{ $course->code }}</span>
                     <span class="dosen-assignment-form__dot" aria-hidden="true"></span>
@@ -125,5 +125,5 @@
                 </button>
             </footer>
         </form>
-    </div>
+    </main>
 </x-layout>
