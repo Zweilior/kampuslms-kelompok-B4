@@ -28,7 +28,7 @@ class DosenCourseEnrollmentTest extends TestCase
             ->assertSee('1 mahasiswa');
     }
 
-    public function test_enrollment_lists_are_paginated(): void
+    public function test_enrollment_lists_include_all_students_without_pagination(): void
     {
         $lecturer = User::factory()->dosen()->create();
         $course = Course::factory()->for($lecturer, 'lecturer')->create();
@@ -36,31 +36,34 @@ class DosenCourseEnrollmentTest extends TestCase
 
         $response = $this->actingAs($lecturer)
             ->get(route('dosen.courses.enrollments.index', $course))
-            ->assertOk()
-            ->assertSee('available_students_page=2');
+            ->assertOk();
 
-        $this->assertSame(15, $response->viewData('availableStudents')->count());
-        $this->assertSame(16, $response->viewData('availableStudents')->total());
+        $this->assertCount(16, $response->viewData('availableStudents'));
     }
 
-    public function test_owner_can_enroll_a_student_and_duplicate_enrollment_is_safe(): void
+    public function test_owner_can_enroll_multiple_students_and_duplicate_enrollment_is_safe(): void
     {
         $lecturer = User::factory()->dosen()->create();
         $course = Course::factory()->for($lecturer, 'lecturer')->create();
         $student = User::factory()->mahasiswa()->create();
+        $secondStudent = User::factory()->mahasiswa()->create();
 
         $this->actingAs($lecturer)
             ->post(route('dosen.courses.enrollments.store', $course), [
-                'student_id' => $student->id,
+                'student_ids' => [$student->id, $secondStudent->id],
             ])
             ->assertRedirect(route('dosen.courses.enrollments.index', $course))
             ->assertSessionHas('success');
 
         $enrolledAt = $course->students()->whereKey($student->id)->firstOrFail()->pivot->enrolled_at;
         $this->assertNotNull($enrolledAt);
+        $this->assertDatabaseHas('course_user', [
+            'course_id' => $course->id,
+            'user_id' => $secondStudent->id,
+        ]);
 
         $this->post(route('dosen.courses.enrollments.store', $course), [
-            'student_id' => $student->id,
+            'student_ids' => [$student->id],
         ])->assertRedirect(route('dosen.courses.enrollments.index', $course));
 
         $this->assertSame(1, $course->students()->whereKey($student->id)->count());
@@ -77,12 +80,12 @@ class DosenCourseEnrollmentTest extends TestCase
 
         $this->actingAs($lecturer)
             ->post(route('dosen.courses.enrollments.store', $course), [
-                'student_id' => $admin->id,
+                'student_ids' => [$admin->id],
             ])
-            ->assertSessionHasErrors('student_id');
+            ->assertSessionHasErrors('student_ids.0');
 
         $this->post(route('dosen.courses.enrollments.store', $course), [
-            'student_id' => $student->id,
+            'student_ids' => [$student->id],
         ])->assertRedirect(route('dosen.courses.enrollments.index', $course));
 
         $this->assertDatabaseHas('course_user', [
@@ -122,7 +125,7 @@ class DosenCourseEnrollmentTest extends TestCase
             ->assertForbidden();
 
         $this->post(route('dosen.courses.enrollments.store', $course), [
-            'student_id' => $student->id,
+            'student_ids' => [$student->id],
         ])->assertForbidden();
     }
 }

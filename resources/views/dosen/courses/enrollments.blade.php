@@ -37,16 +37,18 @@
                 <form action="{{ route('dosen.courses.enrollments.store', $course) }}" method="POST" class="dosen-enrollments__form">
                     @csrf
                     <div class="dosen-enrollments__select-group">
-                        <label for="student_id">Mahasiswa</label>
-                        <select id="student_id" name="student_id" required>
-                            <option value="">Pilih mahasiswa</option>
+                        <label for="student_ids">Mahasiswa</label>
+                        <select id="student_ids" name="student_ids[]" multiple required size="8">
                             @foreach ($availableStudents as $student)
-                                <option value="{{ $student->id }}" @selected((string) old('student_id') === (string) $student->id)>
+                                <option value="{{ $student->id }}" @selected(in_array((string) $student->id, array_map('strval', old('student_ids', [])), true))>
                                     {{ $student->name }} · {{ $student->nim_nip }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('student_id')
+                        @error('student_ids')
+                            <p class="dosen-enrollments__error">{{ $message }}</p>
+                        @enderror
+                        @error('student_ids.*')
                             <p class="dosen-enrollments__error">{{ $message }}</p>
                         @enderror
                     </div>
@@ -55,7 +57,6 @@
                         Daftarkan
                     </button>
                 </form>
-                {{ $availableStudents->links('vendor.pagination.custom-pagination') }}
             @else
                 <p class="dosen-enrollments__empty-option">Semua mahasiswa sudah terdaftar atau belum ada akun mahasiswa.</p>
             @endif
@@ -67,7 +68,7 @@
                     <h2 id="enrolled-students-title">Daftar Peserta</h2>
                     <p>Mahasiswa yang dapat mengakses materi, tugas, dan nilai kelas.</p>
                 </div>
-                <span class="dosen-enrollments__count">{{ $students->total() }} mahasiswa</span>
+                <span class="dosen-enrollments__count">{{ $students->count() }} mahasiswa</span>
             </div>
 
             @if ($students->isNotEmpty())
@@ -94,7 +95,6 @@
                         </article>
                     @endforeach
                 </div>
-                {{ $students->links('vendor.pagination.custom-pagination') }}
             @else
                 <div class="dosen-enrollments__empty">
                     <span class="material-symbols-outlined" aria-hidden="true">group_off</span>
