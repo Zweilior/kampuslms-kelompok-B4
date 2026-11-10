@@ -37,7 +37,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # dan document root diarahkan ke folder public Laravel.
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
-RUN a2enmod rewrite \
+RUN (a2dismod mpm_event || true) \
+    && (a2dismod mpm_worker || true) \
+    && a2enmod mpm_prefork \
+    && a2enmod rewrite \
     && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
     && sed -ri -e 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
