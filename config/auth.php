@@ -122,6 +122,12 @@ return [
     |
     */
     
-    'demo_password' => env('DEMO_PASSWORD', 'password'),
+    // Fallback 'password' HANYA untuk lingkungan lokal/testing. Di produksi variabel
+    // ini wajib diisi; kalau kosong nilainya null dan DatabaseSeeder berhenti dengan
+    // pesan jelas (bukan diam-diam membuat akun demo ber-kata sandi 'password').
+    'demo_password' => env(
+        'DEMO_PASSWORD',
+        in_array(env('APP_ENV', 'production'), ['local', 'testing'], true) ? 'password' : null
+    ),
 
 ];
