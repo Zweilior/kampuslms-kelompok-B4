@@ -21,6 +21,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'role' => \App\Http\Middleware\EnsureUserHasRole::class,
         ]);
+
+        // Produksi (Railway): aplikasi berjalan di belakang proxy HTTPS milik
+        // Railway. Tanpa ini Laravel menganggap request-nya HTTP, sehingga
+        // url()/asset() menghasilkan http:// dan cookie Secure bisa tidak terkirim.
+        // '*' aman di sini karena container hanya bisa dijangkau lewat proxy Railway.
+        $middleware->trustProxies(at: '*');
     })
 
     ->withExceptions(function (Exceptions $exceptions) {
