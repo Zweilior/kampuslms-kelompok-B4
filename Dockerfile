@@ -42,12 +42,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # =============================================================================
 # Konfigurasi Apache
 # =============================================================================
-RUN a2dismod mpm_event || true
-
-RUN a2dismod mpm_worker || true
-
-RUN a2enmod mpm_prefork
-RUN a2enmod rewrite
+# Pastikan HANYA satu MPM yang aktif: mpm_prefork
+RUN a2dismod mpm_event || true \
+    && a2dismod mpm_worker || true \
+    && a2dismod mpm_prefork || true \
+    && a2enmod mpm_prefork \
+    && a2enmod rewrite
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
 
