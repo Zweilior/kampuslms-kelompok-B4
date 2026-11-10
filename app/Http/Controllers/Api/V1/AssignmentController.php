@@ -99,7 +99,23 @@ class AssignmentController extends Controller
 
         // Pastikan hanya dosen pemilik course yang boleh mengubah.
         if ($assignment->course->lecturer_id !== $user->id) {
-            return response()->json(['message' => 'Forbidden. Anda bukan pemilik tugas ini.'], 403);
+            return response()->json([
+                'message' => 'Forbidden. Anda bukan pemilik tugas ini.'
+            ], 403);
+        }
+
+        // Minimal harus ada satu data yang dikirim untuk diperbarui.
+        if (! $request->hasAny([
+            'title',
+            'instructions',
+            'due_at',
+            'max_score',
+            'allow_late',
+            'status',
+        ])) {
+            return response()->json([
+                'message' => 'Minimal satu data harus diisi untuk memperbarui tugas.',
+            ], 422);
         }
 
         $validated = $request->validate([
