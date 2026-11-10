@@ -60,8 +60,8 @@ run_test "POST" "/assignments" "none" "401" "Akses buat tugas tanpa token"
 # 2. OTORISASI PERAN / ROLE-BASED ACCESS CONTROL (403)
 # ---------------------------------------------------------
 echo ">> [2/5] MENGUJI HAK AKSES PERAN MAHASISWA VS DOSEN"
-run_test "POST" "/assignments" "$TOKEN_MAHASISWA" "422" "Mahasiswa mencoba buat tugas (Forbidden)"
-run_test "POST" "/grade-components" "$TOKEN_MAHASISWA" "422" "Mahasiswa buat komponen nilai (Forbidden)"
+run_test "POST" "/assignments" "$TOKEN_MAHASISWA" "403" "Mahasiswa mencoba buat tugas (Forbidden)"
+run_test "POST" "/grade-components" "$TOKEN_MAHASISWA" "403" "Mahasiswa buat komponen nilai (Forbidden)"
 
 # ---------------------------------------------------------
 # 3. PENCEGAHAN IDOR: CROSS-LECTURER (403)
@@ -75,8 +75,8 @@ run_test "PUT" "/submissions/$ID_SUBMISSION/grade" "$TOKEN_DOSEN_B" "403" "Dosen
 # ---------------------------------------------------------
 echo ">> [4/5] MENGUJI AKSES VALID DENGAN HAK AKSES BENAR"
 run_test "GET" "/courses" "$TOKEN_DOSEN_A" "200" "Dosen A mengambil daftar course"
-run_test "PUT" "/assignments/$ID_TUGAS_DOSEN_A" "$TOKEN_DOSEN_A" "403" "Dosen A mengedit tugas miliknya"
-run_test "PUT" "/submissions/$ID_SUBMISSION/grade" "$TOKEN_DOSEN_A" "403" "Dosen A menilai tugas miliknya (Otorisasi Lolos, Form Kosong/422)"
+run_test "PUT" "/assignments/$ID_TUGAS_DOSEN_A" "$TOKEN_DOSEN_A" "422" "Dosen A mengedit tugas miliknya (Otorisasi Lolos, Form Kosong/422)"
+run_test "PUT" "/submissions/$ID_SUBMISSION/grade" "$TOKEN_DOSEN_A" "422" "Dosen A menilai tugas miliknya (Otorisasi Lolos, Form Kosong/422)"
 
 # ---------------------------------------------------------
 # 5. OTORISASI HAK AKSES ADMIN (200)

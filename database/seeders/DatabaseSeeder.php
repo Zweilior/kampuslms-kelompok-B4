@@ -195,8 +195,9 @@ class DatabaseSeeder extends Seeder
     {
         $user = User::firstOrNew(['email' => $email]);
 
+        // Mengambil password dari config, bukan hardcode lagi
         $user->forceFill($attributes + [
-            'password' => 'password', 
+            'password' => config('auth.demo_password'), 
             'email_verified_at' => now(),
         ])->save();
 
