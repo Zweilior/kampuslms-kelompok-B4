@@ -15,9 +15,17 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
+use Faker\Generator;
 
 class DatabaseSeeder extends Seeder
 {
+    private Generator $faker;
+
+    public function __construct()
+    {
+        $this->faker = \Faker\Factory::create();
+    }
+
     private const FIXED_COURSES = [
         'Pemrograman Web',
         'Basis Data',
@@ -232,7 +240,7 @@ class DatabaseSeeder extends Seeder
             $definitions[] = [
                 'name' => $name,
                 'status' => $statuses[$i],
-                'sks' => fake()->numberBetween(2, 4),
+                'sks' => $this->faker->numberBetween(2, 4),
             ];
         }
 
@@ -261,7 +269,7 @@ class DatabaseSeeder extends Seeder
 
         $payload = $selected
             ->mapWithKeys(fn (User $student) => [
-                $student->id => ['enrolled_at' => now()->subDays(fake()->numberBetween(30, 130))],
+                $student->id => ['enrolled_at' => now()->subDays($this->faker->numberBetween(30, 130))],
             ])
             ->all();
 
@@ -292,7 +300,7 @@ class DatabaseSeeder extends Seeder
                 'original_name' => $type === 'file'
                     ? 'pertemuan-'.$number.'-'.str($course->name)->slug().'.'.$source
                     : null,
-                'file_size' => $type === 'file' ? fake()->numberBetween(200_000, 8_000_000) : null,
+                'file_size' => $type === 'file' ? $this->faker->numberBetween(200_000, 8_000_000) : null,
                 'mime_type' => $type === 'file' ? $mime : null,
                 'external_url' => $type === 'link' ? $source : null,
             ]);
@@ -315,7 +323,7 @@ class DatabaseSeeder extends Seeder
      */
     private function createGradeComponents(Course $course): Collection
     {
-        $template = fake()->randomElement(self::RUBRIC_TEMPLATES);
+        $template = $this->faker->randomElement(self::RUBRIC_TEMPLATES);
 
         return collect($template)->map(
             fn (array $item) => GradeComponent::updateOrCreate(
@@ -378,7 +386,7 @@ class DatabaseSeeder extends Seeder
 
         // kemampuan dasar tiap mahasiswa di mata kuliah ini
         $ability = $students->mapWithKeys(
-            fn (User $student) => [$student->id => fake()->numberBetween(62, 95)]
+            fn (User $student) => [$student->id => $this->faker->numberBetween(62, 95)]
         );
 
         foreach ($assignments->values() as $i => $assignment) {
@@ -409,18 +417,18 @@ class DatabaseSeeder extends Seeder
 
         if ($isPastDue) {
             // 75% tepat waktu, 25% terlambat
-            $late = fake()->boolean(25);
+            $late = $this->faker->boolean(25);
 
             $submittedAt = $late
-                ? $assignment->due_at->copy()->addDays(fake()->numberBetween(1, 2))
-                : $assignment->due_at->copy()->subDays(fake()->numberBetween(1, 5));
+                ? $assignment->due_at->copy()->addDays($this->faker->numberBetween(1, 2))
+                : $assignment->due_at->copy()->subDays($this->faker->numberBetween(1, 5));
         } else {
             // deadline belum lewat -> dikumpulkan beberapa jam/hari lalu
             $late = false;
-            $submittedAt = now()->subHours(fake()->numberBetween(2, 72));
+            $submittedAt = now()->subHours($this->faker->numberBetween(2, 72));
         }
 
-        $submittedAt->setTime(fake()->numberBetween(7, 22), fake()->numberBetween(0, 59));
+        $submittedAt->setTime($this->faker->numberBetween(7, 22), $this->faker->numberBetween(0, 59));
 
         if ($submittedAt->isFuture()) {
             $submittedAt = now()->subHour();
@@ -436,8 +444,8 @@ class DatabaseSeeder extends Seeder
             [
                 'file_path' => 'submissions/'.$assignment->id.'-'.$student->id.'.pdf',
                 'original_name' => 'tugas-'.$assignment->id.'-'.$student->id.'.pdf',
-                'file_size' => fake()->numberBetween(100_000, 5_000_000),
-                'note' => fake()->optional(0.4)->sentence(),
+                'file_size' => $this->faker->numberBetween(100_000, 5_000_000),
+                'note' => $this->faker->optional(0.4)->sentence(),
                 'submitted_at' => $submittedAt,
                 'is_late' => $late,
             ]
@@ -452,7 +460,7 @@ class DatabaseSeeder extends Seeder
 
     private function createGrade(Submission $submission, User $lecturer, int $ability): Grade
     {
-        $score = $ability + fake()->randomFloat(2, -10, 8);
+        $score = $ability + $this->faker->randomFloat(2, -10, 8);
 
         if ($submission->is_late) {
             $score -= 5;
@@ -460,7 +468,7 @@ class DatabaseSeeder extends Seeder
 
         $score = round(max(40, min(100, $score)), 2);
 
-        $gradedAt = $submission->submitted_at->copy()->addDays(fake()->numberBetween(1, 4));
+        $gradedAt = $submission->submitted_at->copy()->addDays($this->faker->numberBetween(1, 4));
 
         if ($gradedAt->isFuture()) {
             $gradedAt = Carbon::now();
@@ -482,19 +490,19 @@ class DatabaseSeeder extends Seeder
     private function feedbackFor(float $score): string
     {
         return match (true) {
-            $score >= 86 => fake()->randomElement([
+            $score >= 86 => $this->faker->randomElement([
                 'Hasil pekerjaan sangat baik.',
                 'Pemahaman materi sangat baik, pertahankan.',
             ]),
-            $score >= 76 => fake()->randomElement([
+            $score >= 76 => $this->faker->randomElement([
                 'Pekerjaan sudah baik.',
                 'Hasil pekerjaan sudah memenuhi kriteria.',
             ]),
-            $score >= 66 => fake()->randomElement([
+            $score >= 66 => $this->faker->randomElement([
                 'Pemahaman materi sudah cukup baik.',
                 'Sudah memenuhi sebagian besar kriteria.',
             ]),
-            default => fake()->randomElement([
+            default => $this->faker->randomElement([
                 'Perlu memperbaiki beberapa bagian.',
                 'Pelajari kembali materi dan lengkapi bagian yang kurang.',
             ]),
