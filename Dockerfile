@@ -84,11 +84,10 @@ WORKDIR /var/www/html
 # Install dependency PHP terlebih dahulu agar cache Docker lebih efisien.
 COPY composer.json composer.lock ./
 
-RUN composer install 
-        --no-dev 
-        --no-scripts 
-        --no-autoloader 
-        --prefer-dist 
+RUN composer install \
+        --no-scripts \
+        --no-autoloader \
+        --prefer-dist \
         --no-interaction
 
 
@@ -102,9 +101,8 @@ COPY . .
 COPY --from=assets /app/public/build ./public/build
 
 # Generate autoloader Laravel yang sudah dioptimasi.
-RUN composer dump-autoload 
-        --no-dev 
-        --optimize 
+RUN composer dump-autoload \
+        --optimize \
         --no-interaction
 
 
