@@ -27,6 +27,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     git \
     curl \
+    supervisor \
     && docker-php-ext-install \
     pdo_mysql \
     mbstring \
@@ -63,6 +64,11 @@ RUN composer install \
 # =============================================================================
 COPY . .
 
+# =============================================================================
+# Supervisor
+# =============================================================================
+COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+
 # Copy hasil build Vite
 COPY --from=assets /app/public/build ./public/build
 
@@ -93,4 +99,4 @@ EXPOSE 8080
 # =============================================================================
 # Startup
 # =============================================================================
-CMD ["sh", "-c", "php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force && exec php -S 0.0.0.0:${PORT:-8080} -t public"]
+CMD ["sh", "-c", "php artisan migrate --force && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan event:cache && exec supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
