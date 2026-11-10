@@ -117,6 +117,12 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
+        // Cegah akun demo dibuat tanpa kata sandi (atau dengan kata sandi bawaan).
+        if (blank(config('auth.demo_password'))) {
+            throw new \RuntimeException(
+                'DEMO_PASSWORD belum diisi. Isi variabel DEMO_PASSWORD sebelum menjalankan seeder (wajib di produksi).'
+            );
+        }
 
         $this->upsertUser('admin@kampuslms.test', [
             'name' => 'Administrator',
