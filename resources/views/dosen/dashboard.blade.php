@@ -5,10 +5,6 @@
                 <h1 class="dosen-dashboard__title">Halo, {{ auth()->user()->name }}</h1>
                 <p class="dosen-dashboard__description">Aktivitas dan penilaian untuk mata kuliah yang Anda ampu.</p>
             </div>
-            <a href="{{ route('dosen.courses.index') }}" class="dosen-dashboard__action">
-                <span class="material-symbols-outlined" aria-hidden="true">menu_book</span>
-                Mata kuliah saya
-            </a>
         </header>
 
         <section aria-label="Ringkasan aktivitas dosen" class="grid grid-cols-1 md:grid-cols-3 gap-bento-gap-desktop">

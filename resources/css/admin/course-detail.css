@@ -71,6 +71,12 @@
     border-radius: 1rem;
 }
 
+.admin-course-detail__panel--enrollment {
+    position: relative;
+    overflow: visible;
+    z-index: 2;
+}
+
 .admin-course-detail__panel-heading {
     display: flex;
     align-items: center;
@@ -156,9 +162,17 @@
     font-weight: 650;
 }
 
-.admin-course-detail__enroll-form select {
+.admin-course-detail__multi-select {
+    position: relative;
+}
+
+.admin-course-detail__multi-select-trigger {
+    display: flex;
     width: 100%;
     min-height: 2.65rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
     padding: 0.6rem 0.75rem;
     border: 1px solid var(--border-hairline);
     border-radius: 0.7rem;
@@ -166,6 +180,58 @@
     color: var(--text-primary);
     font: inherit;
     font-size: 0.84rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.admin-course-detail__multi-select-trigger:focus,
+.admin-course-detail__multi-select-trigger--open {
+    border-color: var(--primary-light);
+    outline: none;
+    box-shadow: 0 0 0 3px var(--glow-sage);
+}
+
+.admin-course-detail__multi-select-summary {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.admin-course-detail__multi-select-summary--placeholder {
+    color: var(--text-secondary);
+}
+
+.admin-course-detail__multi-select-options {
+    position: absolute;
+    z-index: 10;
+    top: calc(100% + 0.5rem);
+    width: 100%;
+    max-height: 15rem;
+    overflow-y: auto;
+    border: 1px solid var(--border-hairline);
+    border-radius: 0.7rem;
+    background: var(--bg-hover);
+    box-shadow: var(--shadow-md);
+}
+
+.admin-course-detail__student-option {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    color: var(--text-primary);
+    font-size: 0.84rem;
+    cursor: pointer;
+}
+
+.admin-course-detail__student-option:hover {
+    background: var(--bg-elevated);
+}
+
+.admin-course-detail__student-option input {
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--primary);
 }
 
 .admin-course-detail__button {

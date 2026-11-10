@@ -38,6 +38,7 @@ class AdminCourseEnrollmentTest extends TestCase
         ]);
         $enrolled = User::factory()->mahasiswa()->create(['name' => 'Mahasiswa Terdaftar']);
         $available = User::factory()->mahasiswa()->create(['name' => 'Mahasiswa Tersedia']);
+        $secondAvailable = User::factory()->mahasiswa()->create(['name' => 'Mahasiswa Kedua']);
         $course->students()->attach($enrolled->id, ['enrolled_at' => now()]);
 
         $this->actingAs($admin)
@@ -64,7 +65,7 @@ class AdminCourseEnrollmentTest extends TestCase
             ->assertSee('<option value="' . $course->id . '" selected', false);
 
         $this->post(route('admin.courses.enrollments.store', $course), [
-            'student_id' => $available->id,
+            'student_ids' => [$available->id, $secondAvailable->id],
         ])
             ->assertRedirect(route('admin.courses.show', $course))
             ->assertSessionHas('success');
@@ -72,6 +73,10 @@ class AdminCourseEnrollmentTest extends TestCase
         $this->assertDatabaseHas('course_user', [
             'course_id' => $course->id,
             'user_id' => $available->id,
+        ]);
+        $this->assertDatabaseHas('course_user', [
+            'course_id' => $course->id,
+            'user_id' => $secondAvailable->id,
         ]);
     }
 
@@ -157,12 +162,12 @@ class AdminCourseEnrollmentTest extends TestCase
 
         $this->actingAs($admin)
             ->post(route('admin.courses.enrollments.store', $course), [
-                'student_id' => $admin->id,
+                'student_ids' => [$admin->id],
             ])
-            ->assertSessionHasErrors('student_id');
+            ->assertSessionHasErrors('student_ids.0');
 
         $this->post(route('admin.courses.enrollments.store', $course), [
-            'student_id' => $student->id,
+            'student_ids' => [$student->id],
         ])->assertRedirect(route('admin.courses.show', $course));
 
         $this->assertSame(1, $course->students()->whereKey($student->id)->count());

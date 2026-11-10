@@ -26,7 +26,7 @@
             </div>
         @endif
 
-        <section class="dosen-enrollments__panel" aria-labelledby="enroll-student-title">
+        <section class="dosen-enrollments__panel dosen-enrollments__panel--enroll" aria-labelledby="enroll-student-title">
             <div class="dosen-enrollments__panel-heading">
                 <div>
                     <h2 id="enroll-student-title">Daftarkan Mahasiswa</h2>
@@ -34,17 +34,38 @@
                 </div>
             </div>
             @if ($availableStudents->isNotEmpty())
-                <form action="{{ route('dosen.courses.enrollments.store', $course) }}" method="POST" class="dosen-enrollments__form">
+                <form action="{{ route('dosen.courses.enrollments.store', $course) }}" method="POST" class="dosen-enrollments__form"
+                      x-data="{ open: false, selected: @js(array_map('strval', old('student_ids', []))), names: @js($availableStudents->mapWithKeys(fn ($student) => [(string) $student->id => $student->name])->all()) }"
+                      @keydown.escape.window="open = false">
                     @csrf
                     <div class="dosen-enrollments__select-group">
                         <label for="student_ids">Mahasiswa</label>
-                        <select id="student_ids" name="student_ids[]" multiple required size="8">
-                            @foreach ($availableStudents as $student)
-                                <option value="{{ $student->id }}" @selected(in_array((string) $student->id, array_map('strval', old('student_ids', [])), true))>
-                                    {{ $student->name }} · {{ $student->nim_nip }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <div class="dosen-enrollments__multi-select" @click.outside="open = false">
+                            <button type="button"
+                                    id="student_ids"
+                                    class="dosen-enrollments__multi-select-trigger"
+                                    :class="{ 'dosen-enrollments__multi-select-trigger--open': open }"
+                                    @click="open = !open"
+                                    :aria-expanded="open.toString()"
+                                    aria-required="true"
+                                    aria-controls="student-options">
+                                <span class="dosen-enrollments__multi-select-summary"
+                                      :class="{ 'dosen-enrollments__multi-select-summary--placeholder': selected.length === 0 }"
+                                      x-text="selected.length ? selected.map(id => names[id]).join(', ') : 'Pilih mahasiswa'"></span>
+                                <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+                            </button>
+                            <div id="student-options" class="dosen-enrollments__multi-select-options" x-cloak x-show="open" x-transition>
+                                @foreach ($availableStudents as $student)
+                                    <label class="dosen-enrollments__student-option">
+                                        <input type="checkbox"
+                                               name="student_ids[]"
+                                               value="{{ $student->id }}"
+                                               x-model="selected">
+                                        <span>{{ $student->name }} · {{ $student->nim_nip }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                         @error('student_ids')
                             <p class="dosen-enrollments__error">{{ $message }}</p>
                         @enderror

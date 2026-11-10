@@ -7,10 +7,6 @@
                 <h1 class="mahasiswa-page__title">Halo, {{ auth()->user()->name }}</h1>
                 <p class="mahasiswa-page__description">Ringkasan mata kuliah, tugas, pengumpulan, dan akses cepat ke nilai akademikmu.</p>
             </div>
-            <a href="{{ route('mahasiswa.courses.index') }}" class="mahasiswa-page__action">
-                <span class="material-symbols-outlined" aria-hidden="true">menu_book</span>
-                Semua mata kuliah
-            </a>
         </header>
 
         <div class="mahasiswa-page__stats">

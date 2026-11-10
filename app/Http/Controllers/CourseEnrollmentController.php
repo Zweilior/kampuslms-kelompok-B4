@@ -15,18 +15,21 @@ class CourseEnrollmentController extends Controller
         Gate::authorize('manageEnrollment', $course);
 
         $validated = $request->validate([
-            'student_id' => [
+            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids.*' => [
                 'required',
                 Rule::exists('users', 'id')->where('role', 'mahasiswa'),
             ],
         ], [
-            'student_id.required' => 'Pilih mahasiswa yang akan didaftarkan.',
-            'student_id.exists' => 'Mahasiswa yang dipilih tidak valid.',
+            'student_ids.required' => 'Pilih setidaknya satu mahasiswa yang akan didaftarkan.',
+            'student_ids.min' => 'Pilih setidaknya satu mahasiswa yang akan didaftarkan.',
+            'student_ids.*.exists' => 'Mahasiswa yang dipilih tidak valid.',
         ]);
 
-        $course->students()->syncWithoutDetaching([
-            $validated['student_id'] => ['enrolled_at' => now()],
-        ]);
+        $enrollments = collect($validated['student_ids'])
+            ->mapWithKeys(fn ($studentId) => [$studentId => ['enrolled_at' => now()]])
+            ->all();
+        $course->students()->syncWithoutDetaching($enrollments);
 
         return redirect()
             ->route('admin.courses.show', $course)

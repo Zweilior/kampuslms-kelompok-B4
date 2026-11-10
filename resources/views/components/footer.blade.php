@@ -28,7 +28,7 @@
             </div>
             <a class="eduspace-footer__contact-method" href="mailto:admin@kampus.lms.test">
                 <span class="material-symbols-outlined" aria-hidden="true">mail</span>
-                <span>admin@kampus.lms.test</span>
+                <span>admin@kampuslms.test</span>
             </a>
             <div class="eduspace-footer__contact-method" aria-label="WhatsApp: 08xx-xxxx-xxxx">
                 <svg viewBox="0 0 24 24" aria-hidden="true">

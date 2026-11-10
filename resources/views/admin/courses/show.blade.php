@@ -18,7 +18,7 @@
         </header>
 
         {{-- Section Enrollment --}}
-        <section class="admin-course-detail__panel" aria-labelledby="course-students-title">
+        <section class="admin-course-detail__panel admin-course-detail__panel--enrollment" aria-labelledby="course-students-title">
             <div class="admin-course-detail__panel-heading">
                 <div>
                     <h2 id="course-students-title">
@@ -43,18 +43,37 @@
             @endif
 
             @if ($availableStudents->isNotEmpty())
-                <form action="{{ route('admin.courses.enrollments.store', $course) }}" method="POST" class="admin-course-detail__enroll-form">
+                <form action="{{ route('admin.courses.enrollments.store', $course) }}" method="POST" class="admin-course-detail__enroll-form"
+                      x-data="{ open: false, selected: @js(array_map('strval', old('student_ids', []))), names: @js($availableStudents->mapWithKeys(fn ($student) => [(string) $student->id => $student->name])->all()) }"
+                      @keydown.escape.window="open = false">
                     @csrf
                     <div>
-                        <label for="student_id">Tambah mahasiswa</label>
-                        <select id="student_id" name="student_id" required>
-                            <option value="">Pilih mahasiswa yang belum terdaftar</option>
-                            @foreach ($availableStudents as $student)
-                                <option value="{{ $student->id }}" @selected((string) old('student_id') === (string) $student->id)>
-                                    {{ $student->name }} · {{ $student->nim_nip }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <label for="student_ids">Tambah mahasiswa</label>
+                        <div class="admin-course-detail__multi-select" @click.outside="open = false">
+                            <button type="button"
+                                    id="student_ids"
+                                    class="admin-course-detail__multi-select-trigger"
+                                    :class="{ 'admin-course-detail__multi-select-trigger--open': open }"
+                                    @click="open = !open"
+                                    :aria-expanded="open.toString()"
+                                    aria-controls="admin-student-options">
+                                <span class="admin-course-detail__multi-select-summary"
+                                      :class="{ 'admin-course-detail__multi-select-summary--placeholder': selected.length === 0 }"
+                                      x-text="selected.length ? selected.map(id => names[id]).join(', ') : 'Pilih mahasiswa yang belum terdaftar'"></span>
+                                <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+                            </button>
+                            <div id="admin-student-options" class="admin-course-detail__multi-select-options" x-cloak x-show="open" x-transition>
+                                @foreach ($availableStudents as $student)
+                                    <label class="admin-course-detail__student-option">
+                                        <input type="checkbox"
+                                               name="student_ids[]"
+                                               value="{{ $student->id }}"
+                                               x-model="selected">
+                                        <span>{{ $student->name }} · {{ $student->nim_nip }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                     <button type="submit" class="admin-course-detail__button admin-course-detail__button--primary">
                         <span class="material-symbols-outlined" aria-hidden="true">person_add</span>
