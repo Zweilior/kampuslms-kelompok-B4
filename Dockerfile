@@ -42,10 +42,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # =============================================================================
 # Konfigurasi Apache
 # =============================================================================
-# Pastikan HANYA satu MPM yang aktif: mpm_prefork
-RUN a2dismod mpm_event || true \
-    && a2dismod mpm_worker || true \
-    && a2dismod mpm_prefork || true \
+# =============================================================================
+# Konfigurasi Apache
+# =============================================================================
+
+# Hapus SEMUA konfigurasi MPM yang aktif terlebih dahulu.
+# Apache hanya boleh memuat SATU MPM.
+RUN rm -f /etc/apache2/mods-enabled/mpm_*.load \
+          /etc/apache2/mods-enabled/mpm_*.conf \
     && a2enmod mpm_prefork \
     && a2enmod rewrite
 
