@@ -33,19 +33,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Apache: mod_rewrite untuk route Laravel, hanya satu MPM (prefork), dan
 # document root ke public/ (bukan akar proyek, supaya .env dan composer.json
 # tidak bisa diunduh). Port dibaca dari variabel PORT milik Railway.
-ENV APACHE_DOCUMENT_ROOT=/var/www/html/public \
-    PORT=8080
-# ${APACHE_DOCUMENT_ROOT} dan ${PORT} di dalam sed sengaja memakai kutip tunggal:
-# yang memperluasnya nanti adalah Apache saat start, bukan shell saat build.
-# hadolint ignore=SC2016
+# Apache: mod_rewrite, hanya satu MPM (prefork),
+# dan document root diarahkan ke folder public Laravel.
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+
 RUN a2enmod rewrite \
     && rm -f /etc/apache2/mods-enabled/mpm_event.* /etc/apache2/mods-enabled/mpm_worker.* \
     && a2enmod mpm_prefork \
     && sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/sites-available/*.conf \
     && sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf \
-    && sed -ri -e 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf \
-    && sed -ri -e 's/^Listen 80$/Listen ${PORT}/' /etc/apache2/ports.conf \
-    && sed -ri -e 's/<VirtualHost \*:80>/<VirtualHost *:${PORT}>/' /etc/apache2/sites-available/000-default.conf
+    && sed -ri -e 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf
 
 # Batas unggah PHP (selaras dengan validasi aplikasi).
 COPY docker/php/uploads.ini /usr/local/etc/php/conf.d/uploads.ini

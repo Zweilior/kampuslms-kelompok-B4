@@ -6,6 +6,12 @@
 set -e
 cd /var/www/html
 
+# Konfigurasi port Apache sesuai PORT dari Railway
+PORT="${PORT:-8080}"
+
+sed -ri "s/^Listen .*/Listen ${PORT}/" /etc/apache2/ports.conf
+sed -ri "s/<VirtualHost \*:.*>/<VirtualHost *:${PORT}>/" /etc/apache2/sites-available/000-default.conf
+
 # 1. Tanpa APP_KEY, enkripsi session/cookie gagal dengan pesan yang membingungkan.
 if [ -z "${APP_KEY:-}" ]; then
     echo "[start] APP_KEY kosong. Isi di Variables Railway (php artisan key:generate --show)." >&2
