@@ -1,0 +1,36 @@
+# Rahasia: jangan pernah ikut masuk ke image.
+.env
+.env.*
+!.env.example
+
+# Dibangun ulang di dalam image (composer install / npm ci / npm run build).
+vendor
+node_modules
+public/build
+public/hot
+
+# Riwayat Git dan editor.
+.git
+.gitignore
+.gitattributes
+.idea
+.vscode
+.zed
+.fleet
+.nova
+
+# Data lokal dan log. Hanya berkasnya, folder storage/ tetap ikut
+# supaya struktur direktori yang dibutuhkan Laravel tetap ada.
+storage/logs/*.log
+storage/debugbar
+storage/pail
+/kampus_db
+/lara
+
+# Tidak dibutuhkan saat runtime.
+tests
+docs
+README.md
+phpunit.xml
+.phpunit.cache
+.phpunit.result.cache
