@@ -1,65 +1,50 @@
 @if ($paginator->hasPages())
-    <nav role="navigation" aria-label="Pagination Navigation" class="flex justify-center my-4">
-        {{-- Capsule/Pill Container Light Mode --}}
-        <div class="custom-pagination__container inline-flex items-center gap-1.5 p-1.5 rounded-full backdrop-blur-md">
+    <nav role="navigation" aria-label="Navigasi Halaman" class="custom-pagination-nav flex justify-center my-4 w-full px-2">
+        {{-- Capsule/Pill Container (< X of Y >) --}}
+        <div class="custom-pagination__pill-container inline-flex items-center justify-between gap-3 sm:gap-4 p-1.5 rounded-full backdrop-blur-md shadow-sm">
 
-            {{-- Tombol Previous --}}
+            {{-- Tombol Previous (<) --}}
             @if ($paginator->onFirstPage())
                 <span
-                    class="custom-pagination__previous-disabled px-5 py-2 rounded-full text-body-sm font-label-md cursor-not-allowed select-none">
-                    Previous
+                    class="custom-pagination__circle-btn custom-pagination__circle-btn--disabled"
+                    aria-disabled="true" aria-label="Halaman sebelumnya">
+                    <span class="material-symbols-outlined text-[1.25rem]" aria-hidden="true">chevron_left</span>
                 </span>
             @else
                 <a href="{{ $paginator->previousPageUrl() }}"
                     rel="prev"
-                    class="custom-pagination__previous px-5 py-2 rounded-full text-body-sm font-label-md transition-all shadow-sm">
-                    Previous
+                    class="custom-pagination__circle-btn custom-pagination__circle-btn--prev"
+                    aria-label="Halaman sebelumnya">
+                    <span class="material-symbols-outlined text-[1.25rem]" aria-hidden="true">chevron_left</span>
                 </a>
             @endif
 
-            {{-- Elemen Angka Halaman --}}
-            @foreach ($elements as $element)
-                {{-- "Three Dots" Separator --}}
-                @if (is_string($element))
-                    <span class="custom-pagination__ellipsis px-3 py-2 font-label-md text-body-sm select-none">
-                        {{ $element }}
-                    </span>
-                @endif
+            {{-- Status Halaman (X of Y) --}}
+            <div class="custom-pagination__info flex items-center gap-1.5 px-3 select-none">
+                <span class="custom-pagination__current-page font-bold text-sm sm:text-base text-on-surface">
+                    {{ $paginator->currentPage() }}
+                </span>
+                <span class="custom-pagination__separator text-xs sm:text-sm font-medium text-on-surface-variant/70 uppercase tracking-wider">
+                    of
+                </span>
+                <span class="custom-pagination__total-pages font-bold text-sm sm:text-base text-on-surface">
+                    {{ $paginator->lastPage() }}
+                </span>
+            </div>
 
-                {{-- Array Of Links --}}
-                @if (is_array($element))
-                    @foreach ($element as $page => $url)
-                        @if ($page == $paginator->currentPage())
-                            {{-- Halaman Aktif (Lingkaran Putih/Surface dengan Shadow) --}}
-                            <span
-                                aria-current="page"
-                                aria-label="Current page, {{ $page }}"
-                                class="custom-pagination__page-active w-9 h-9 flex items-center justify-center rounded-full font-bold text-body-sm shadow-md select-none">
-                                {{ $page }}
-                            </span>
-                        @else
-                            {{-- Halaman Tidak Aktif --}}
-                            <a href="{{ $url }}"
-                            aria-label="Go to page {{ $page }}"
-                            class="custom-pagination__page w-9 h-9 flex items-center justify-center rounded-full font-label-md text-body-sm transition-all">
-                                {{ $page }}
-                            </a>
-                        @endif
-                    @endforeach
-                @endif
-            @endforeach
-
-            {{-- Tombol Next (Warna Primary sama seperti tombol 'Tambah Mata Kuliah') --}}
+            {{-- Tombol Next (>) --}}
             @if ($paginator->hasMorePages())
                 <a href="{{ $paginator->nextPageUrl() }}"
                     rel="next"
-                    class="custom-pagination__next px-5 py-2 rounded-full font-label-md text-body-sm transition-all">
-                    Next
+                    class="custom-pagination__circle-btn custom-pagination__circle-btn--next custom-pagination__circle-btn--primary"
+                    aria-label="Halaman berikutnya">
+                    <span class="material-symbols-outlined text-[1.25rem]" aria-hidden="true">chevron_right</span>
                 </a>
             @else
                 <span
-                    class="custom-pagination__next-disabled px-5 py-2 rounded-full text-body-sm font-label-md cursor-not-allowed select-none">
-                    Next
+                    class="custom-pagination__circle-btn custom-pagination__circle-btn--disabled"
+                    aria-disabled="true" aria-label="Halaman berikutnya">
+                    <span class="material-symbols-outlined text-[1.25rem]" aria-hidden="true">chevron_right</span>
                 </span>
             @endif
 

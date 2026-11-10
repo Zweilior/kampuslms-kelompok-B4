@@ -112,6 +112,9 @@
         .error-code--401 { color: #4b83c4; }
         .error-code--403 { color: #c87832; }
         .error-code--404 { color: #c65050; }
+        .error-code--419 { color: #d97706; }
+        .error-code--500 { color: #dc2626; }
+        .error-code--503 { color: #6366f1; }
 
         .error-title {
             margin: 0 0 0.75rem;
@@ -193,6 +196,9 @@
             .error-code--401 { color: #79a9e2; }
             .error-code--403 { color: #e4a15f; }
             .error-code--404 { color: #e77d7d; }
+            .error-code--419 { color: #fbbf24; }
+            .error-code--500 { color: #f87171; }
+            .error-code--503 { color: #818cf8; }
             .btn-primary { color: #17220f; }
         }
 

@@ -76,4 +76,32 @@ class AuthorizationErrorPagesTest extends TestCase
                 ->assertSee('x-teleport="body"', false);
         }
     }
+
+    public function test_error_pages_500_419_503_render_correctly(): void
+    {
+        $view500 = view('errors.500')->render();
+        $this->assertStringContainsString('500', $view500);
+        $this->assertStringContainsString('Terjadi Kesalahan pada Server', $view500);
+
+        $view419 = view('errors.419')->render();
+        $this->assertStringContainsString('419', $view419);
+        $this->assertStringContainsString('Sesi Halaman Telah Berakhir', $view419);
+
+        $view503 = view('errors.503')->render();
+        $this->assertStringContainsString('503', $view503);
+        $this->assertStringContainsString('Sistem Dalam Pemeliharaan', $view503);
+    }
+
+    public function test_navbar_has_mobile_hamburger_and_brand(): void
+    {
+        $user = new User();
+        $user->name = 'Pengguna Tes';
+        $user->role = 'mahasiswa';
+
+        $view = $this->actingAs($user)->view('components.navbar');
+        $view->assertSee('navbar__hamburger', false)
+            ->assertSee('navbar__brand-name', false)
+            ->assertSee('EduSpace')
+            ->assertSee('navbar__mobile-drawer', false);
+    }
 }

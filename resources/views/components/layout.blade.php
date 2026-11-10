@@ -33,7 +33,7 @@
 
     {{-- KONTEN UTAMA --}}
     <div class="{{ auth()->check() ? 'main-content main-content--with-navbar' : 'main-content' }}">
-        <div class="layout-feedback max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="layout-feedback max-w-7xl mx-auto mb-3">
             @if (session('success'))
                 <div class="my-space-sm flex items-center gap-space-xs rounded-xl border border-primary/20 bg-primary/10 px-space-md py-space-sm text-primary" role="status">
                     <span class="material-symbols-outlined shrink-0 text-xl" aria-hidden="true">check_circle</span>
