@@ -424,7 +424,16 @@ Aplikasi juga berhasil menerima request untuk asset tambahan seperti:
 GET /js/tailwind-config.js
 GET /favicon.ico
 ```
+## 12.1 Verifikasi Supervisor dan Queue Worker
 
+Aplikasi KampusLMS menggunakan Supervisor untuk menjaga proses utama yang berjalan di dalam container Railway, yaitu web server Laravel dan Laravel queue worker.
+
+Supervisor dapat diperiksa dari terminal container Railway menggunakan perintah:
+
+```bash
+supervisorctl status
+```
+![alt text](verifikasi-supervisor.png)
 ---
 
 # 13. Pengujian API Production
