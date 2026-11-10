@@ -6,6 +6,12 @@
 /storage/*.key
 /storage/pail
 /storage/debugbar
+# Tambahan Wajib: Abaikan logs dan data framework/sesi
+/storage/framework/cache/data/
+/storage/framework/sessions/
+/storage/framework/testing/
+/storage/framework/views/
+/storage/logs/
 /vendor
 .env
 .env.backup
