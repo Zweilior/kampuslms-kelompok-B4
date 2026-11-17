@@ -1,20 +1,17 @@
-
 # Deployment KampusLMS
 
 ## 1. Deskripsi
 
-KampusLMS merupakan aplikasi **Learning Management System (LMS)** berbasis Laravel. Aplikasi dideploy ke platform Railway menggunakan Docker sebagai lingkungan container dan layanan MySQL Railway sebagai database production.
+KampusLMS (nama tampilan aplikasi: EduSpace) merupakan aplikasi **Learning Management System (LMS)** berbasis Laravel. Aplikasi dideploy ke platform Railway menggunakan Docker dan layanan MySQL Railway sebagai database production.
 
-Proses deployment mencakup:
+Dokumen ini menjelaskan deployment sesuai berkas yang benar-benar dipakai repo:
 
-- Build aset frontend menggunakan Node.js dan Vite.
-- Instalasi dependency PHP menggunakan Composer.
-- Konfigurasi environment Laravel di Railway.
-- Koneksi aplikasi dengan database MySQL Railway.
-- Menjalankan migration database.
-- Menjalankan aplikasi menggunakan PHP built-in server.
-- Verifikasi deployment melalui log dan pengujian API production.
-- Pengujian authentication dan authorization menggunakan script Bash.
+| Berkas | Fungsi |
+| --- | --- |
+| `Dockerfile` | Build image dua tahap (aset frontend, lalu aplikasi PHP) dan perintah startup (`CMD`). |
+| `docker/supervisord.conf` | Konfigurasi Supervisor: menjalankan web server dan queue worker dalam satu container. |
+| `.dockerignore` | Mencegah `.env`, `vendor`, `node_modules`, dan `public/build` lokal ikut masuk ke image. |
+| `deploy.sh` | Skrip prosedur deploy ulang manual (maintenance, migrasi, cache, `queue:restart`, cek kesehatan). **Tidak dipanggil oleh Dockerfile.** |
 
 Aplikasi menggunakan timezone **WITA (Asia/Makassar / UTC+8)**.
 
@@ -22,94 +19,71 @@ Aplikasi menggunakan timezone **WITA (Asia/Makassar / UTC+8)**.
 
 ## 2. Teknologi yang Digunakan
 
-Teknologi yang digunakan dalam proses deployment adalah:
-
-- Laravel
-- PHP 8.4
-- MySQL
-- Docker
-- Railway
-- Node.js 22
-- Vite
+- Laravel 12
+- PHP 8.4 (image `php:8.4-cli`)
+- MySQL (layanan Railway)
+- Docker (multi-stage build)
+- Supervisor
+- Node.js 22 dan Vite (hanya pada tahap build)
 - Composer
-- Bash
-- cURL
+- Bash dan cURL (untuk pengujian)
 
 ---
 
 ## 3. Persiapan Project
 
-Sebelum melakukan deployment, beberapa file dan konfigurasi berikut harus tersedia:
+Berkas yang dibutuhkan saat build image:
 
-- `composer.json`
-- `composer.lock`
-- `package.json`
-- `package-lock.json`
-- `Dockerfile`
-- Konfigurasi environment Laravel
-- Migration database
-- Seeder database untuk inisialisasi awal
+- `composer.json` dan `composer.lock`
+- `package.json` dan `package-lock.json`
+- `Dockerfile` dan `docker/supervisord.conf`
+- Migration dan seeder database
 - Konfigurasi Vite
 
-Aset frontend perlu dibangun selama proses Docker build karena folder hasil build Vite, yaitu `public/build`, tidak digunakan langsung dari repository.
+Folder `public/build` tidak diambil dari repository (diabaikan oleh `.dockerignore` dan `.gitignore`). Folder ini selalu dibangun ulang di dalam image pada tahap build frontend.
 
 ---
 
-## 4. Dockerfile
+## 4. Arsitektur Docker
 
-Deployment menggunakan konsep **multi-stage build**.
-
-### 4.1 Tahap Pertama: Build Frontend
-
-Tahap pertama menggunakan Node.js untuk menginstal dependency frontend dan membangun aset menggunakan Vite.
+### 4.1 Tahap 1: Build Aset Frontend (`node:22-slim`)
 
 ```dockerfile
 FROM node:22-slim AS assets
-
 WORKDIR /app
-
 COPY package.json package-lock.json ./
-
 RUN npm ci --no-audit --no-fund
-
 COPY . .
-
 RUN npm run build
 ```
 
-Hasil build dari Vite kemudian digunakan oleh aplikasi Laravel melalui folder:
+Tahap ini hanya menghasilkan folder `/app/public/build`. Node.js dan `node_modules` **tidak ikut** ke image akhir.
 
-```text
-public/build
-```
+### 4.2 Tahap 2: Aplikasi Laravel (`php:8.4-cli`)
 
-Dengan proses ini, aset frontend dapat tersedia di production meskipun hasil build tidak disimpan langsung di repository.
+Urutan langkah pada tahap kedua:
 
----
+1. **Paket sistem dan ekstensi PHP.** Menginstal `supervisor`, `git`, `curl`, `zip`, `unzip`, dan library pendukung, lalu ekstensi PHP `pdo_mysql`, `mbstring`, `exif`, `pcntl`, `bcmath`, `gd`, dan `zip`.
+2. **Composer.** Diambil dari image `composer:2`.
+3. **Dependency produksi.** `composer.json` dan `composer.lock` disalin lebih dulu agar layer ini bisa di-cache Docker, lalu dijalankan:
+   ```bash
+   composer install --no-dev --no-scripts --no-autoloader --prefer-dist --no-interaction
+   ```
+   Paket pengembangan (`--no-dev`) tidak terpasang di production.
+4. **Source aplikasi.** `COPY . .`
+5. **Konfigurasi Supervisor.** `docker/supervisord.conf` disalin ke `/etc/supervisor/conf.d/supervisord.conf`.
+6. **Aset frontend.** `public/build` disalin dari tahap 1 (`COPY --from=assets`).
+7. **Autoloader.** `composer dump-autoload --no-dev --optimize --no-interaction`.
+8. **Folder storage.** Membuat `storage/app/private`, `storage/framework/{cache,sessions,views}`, `storage/logs`, `bootstrap/cache`, lalu `chmod -R 775 storage bootstrap/cache`.
+9. **Port.** `EXPOSE 8080`. Port sebenarnya ditentukan oleh variabel `PORT` dari Railway (lihat bagian 7.2).
 
-### 4.2 Tahap Kedua: Aplikasi Laravel
-
-Aplikasi Laravel menggunakan PHP 8.4 CLI.
-
-Beberapa dependency dan ekstensi PHP yang digunakan antara lain:
-
-- `pdo_mysql`
-- `mbstring`
-- `exif`
-- `pcntl`
-- `bcmath`
-- `gd`
-- `zip`
-
-Composer digunakan untuk menginstal dependency PHP aplikasi.
-
-Aplikasi tidak menggunakan Apache pada konfigurasi deployment akhir. Hal ini dilakukan untuk menghindari konflik konfigurasi Apache yang sebelumnya terjadi selama deployment.
+Aplikasi **tidak menggunakan Apache**. Konfigurasi Apache sebelumnya menyebabkan konflik MPM (lihat 11.2) dan skrip startup lamanya (`docker/start.sh`) sudah dihapus dari repo.
 
 ---
 
 ## 5. Konfigurasi Environment Railway
 
-Variabel environment utama yang digunakan pada Railway adalah sebagai berikut:
+Variabel environment utama pada Railway:
 
 ```env
 APP_NAME=KampusLMS
@@ -142,131 +116,141 @@ LOG_LEVEL=error
 DEMO_PASSWORD=PASSWORD_AKUN_DEMO
 ```
 
-Nilai sensitif seperti berikut tidak disimpan di repository:
+Catatan:
 
-- `APP_KEY`
-- Password database
-- Password akun demo
-- Token authentication
-
-Nilai tersebut dikonfigurasi melalui environment variables pada Railway.
+- `APP_KEY`, password database, dan `DEMO_PASSWORD` hanya diisi melalui **Variables Railway**, tidak pernah di-commit.
+- `QUEUE_CONNECTION=database` wajib sama dengan yang dipakai worker (lihat 7.3).
+- `DEMO_PASSWORD` wajib diisi pada production karena seeder berhenti jika nilainya kosong.
+- `PORT` disediakan otomatis oleh Railway; tidak perlu diisi manual.
+- Seluruh perubahan variabel memicu redeploy. Nilai config di-cache saat startup (`config:cache`), jadi perubahan variabel hanya berlaku setelah container dibuat ulang.
 
 ---
 
 ## 6. Konfigurasi Database
 
-Aplikasi menggunakan layanan MySQL yang disediakan oleh Railway.
-
-Pada proses deployment normal, aplikasi menjalankan migration:
+Aplikasi menggunakan layanan MySQL Railway. Migration dijalankan **otomatis pada setiap startup container** (bagian awal `CMD`):
 
 ```bash
 php artisan migrate --force
 ```
 
-Perintah tersebut menjalankan migration yang belum diterapkan tanpa menghapus data yang telah tersedia pada database.
+Perintah ini hanya menerapkan migration yang belum dijalankan dan tidak menghapus data.
 
 ### 6.1 Seeder Database
 
-Seeder digunakan untuk melakukan inisialisasi data pada database pertama kali.
+Seeder **tidak dijalankan otomatis** pada startup. Hal ini mencegah data demo (misalnya akun pengguna) bertambah setiap kali deployment.
 
-Namun, seeder **tidak dijalankan pada setiap deployment** karena dapat menyebabkan data demo ditambahkan kembali secara berulang.
-
-Pada konfigurasi startup normal, perintah berikut tidak digunakan:
+Untuk inisialisasi data pertama kali, jalankan secara manual dari shell service Railway (setelah `DEMO_PASSWORD` terisi):
 
 ```bash
 php artisan db:seed --force
 ```
 
-Seeder hanya dijalankan ketika database perlu diinisialisasi.
-
-Dengan konfigurasi ini:
-
-- Migration baru tetap dapat diterapkan.
-- Data yang sudah ada tetap dipertahankan.
-- Data demo tidak terus bertambah setiap deployment.
+Lakukan sekali saja saat database baru. Jangan ulangi pada setiap deploy.
 
 ---
 
-## 7. Menjalankan Aplikasi
+## 7. Menjalankan Aplikasi di Container
 
-Aplikasi dijalankan menggunakan PHP built-in server:
+### 7.1 Perintah Startup (`CMD`)
+
+Saat container menyala, Docker menjalankan rantai perintah berikut secara berurutan:
 
 ```bash
-php -S 0.0.0.0:${PORT:-8080} -t public
+php artisan migrate --force
+php artisan optimize:clear
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
+php artisan event:cache
+exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
 ```
 
-Railway menyediakan environment variable `PORT` yang digunakan aplikasi untuk menerima request.
+Semua perintah dihubungkan dengan `&&`. **Jika salah satu gagal, container berhenti dan Supervisor tidak pernah berjalan.** Dua kegagalan yang paling mungkin:
 
-Log deployment menunjukkan aplikasi berhasil dijalankan pada port yang digunakan Railway, misalnya:
+- **`migrate` gagal**, misalnya database MySQL belum siap saat container pertama menyala. Tidak ada percobaan ulang otomatis di level `CMD`; Railway akan menjalankan ulang container sesuai kebijakan restart service. Cek variabel `DB_*` dan status service MySQL.
+- **`route:cache` gagal** jika ada route yang tidak dapat di-cache (misalnya closure yang tidak bisa diserialisasi). `routes/web.php` memuat beberapa route berbentuk closure (`/`, `/tentang`, `/dashboard`, `/courses`). Pastikan build production benar-benar lolos pada tahap ini; periksa log deployment pertama setelah perubahan route. Jika ingin menjadikan `route:cache` opsional, ubah di `Dockerfile` secara eksplisit (misalnya `php artisan route:cache || true`) dan catat alasannya, bukan membiarkan kegagalan terjadi diam-diam.
 
-```text
-PHP 8.4.27 Development Server (http://0.0.0.0:8080) started
+`exec` membuat Supervisor menjadi proses utama (PID 1) container, sehingga sinyal stop dari Railway diterima Supervisor dan diteruskan ke proses anak.
+
+### 7.2 Proses Web dan Konfigurasi Port Railway
+
+Supervisor menjalankan web server melalui program `web`:
+
+```ini
+[program:web]
+command=/bin/sh -c "php -S 0.0.0.0:${PORT:-8080} -t public"
 ```
 
-Penggunaan PHP built-in server dipilih sebagai solusi deployment setelah konfigurasi Apache sebelumnya mengalami konflik.
+- Railway menyuntikkan variabel `PORT`. Server PHP built-in mendengarkan pada nilai tersebut; jika `PORT` kosong (misalnya saat uji lokal) dipakai port `8080`.
+- Document root adalah `public/`, sehingga `.env` dan source di luar `public/` tidak dapat diakses lewat HTTP.
+- Pada service Railway, pastikan networking (domain publik) mengarah ke port yang sama dengan `PORT` yang dipakai container. Jika domain mengembalikan 502, cek apakah port target pada pengaturan domain cocok dengan port yang tampil di log (`Development Server (http://0.0.0.0:PORT) started`).
+- Variabel opsional `PHP_CLI_SERVER_WORKERS` (tercantum di `.env.example`) mengatur jumlah worker server PHP built-in.
+
+### 7.3 Proses Queue Worker
+
+Program `worker` memproses job dari `QUEUE_CONNECTION=database`:
+
+```ini
+[program:worker]
+command=php /var/www/html/artisan queue:work --sleep=3 --tries=3 --max-time=3600
+```
+
+| Opsi | Arti |
+| --- | --- |
+| `--sleep=3` | Jeda 3 detik saat antrean kosong. |
+| `--tries=3` | Job dicoba maksimal 3 kali sebelum masuk `failed_jobs`. |
+| `--max-time=3600` | Worker berhenti setelah 1 jam; Supervisor langsung menyalakannya kembali sehingga memori dan kode segar. |
+
+Pengaturan Supervisor yang relevan: `autorestart=true` (proses yang mati dinyalakan ulang), `stopwaitsecs=60` (memberi waktu job yang sedang berjalan selesai sebelum dipaksa berhenti), serta `stopasgroup` dan `killasgroup` agar seluruh proses anak ikut dihentikan.
+
+### 7.4 Log
+
+Supervisor sendiri tidak menulis ke file log (`logfile=/dev/null`). Output program `web` dan `worker` diarahkan ke `stdout`/`stderr` container, sehingga seluruh log dapat dilihat di tab **Deployments → View Logs** Railway. Aplikasi Laravel juga menulis ke `stderr` melalui `LOG_STACK=single,stderr`.
 
 ---
 
 ## 8. Konfigurasi Routing
 
-Route utama aplikasi diarahkan ke halaman login.
-
-Konfigurasi route:
+Route utama aplikasi diarahkan ke halaman login:
 
 ```php
 Route::get('/', fn () => redirect()->route('login'));
 ```
 
-Dengan konfigurasi tersebut, pengguna yang membuka halaman utama aplikasi akan diarahkan ke halaman login.
-
-Alur request menjadi:
+Alur request:
 
 ```text
-GET /
-   ↓
-302 Redirect
-   ↓
-GET /login
-   ↓
-200 OK
+GET /        -> 302 Redirect
+GET /login   -> 200 OK
 ```
+
+Endpoint kesehatan bawaan Laravel tersedia di `/up` (dikonfigurasi pada `bootstrap/app.php`) dan dipakai untuk pemeriksaan setelah deploy.
 
 ---
 
 ## 9. Konfigurasi Timezone
 
-Aplikasi menggunakan timezone WITA dengan konfigurasi:
-
 ```env
 APP_TIMEZONE=Asia/Makassar
 ```
 
-Timezone `Asia/Makassar` digunakan karena sesuai dengan zona waktu WITA atau:
-
-```text
-UTC+8
-```
-
-Konfigurasi ini diterapkan agar waktu yang digunakan dan ditampilkan aplikasi sesuai dengan waktu lokal WITA.
+`Asia/Makassar` sesuai dengan WITA (UTC+8), sehingga waktu yang disimpan dan ditampilkan aplikasi sesuai waktu lokal.
 
 ---
 
 ## 10. Proses Deployment di Railway
 
-Langkah deployment dilakukan sebagai berikut:
+1. Hubungkan repository ke Railway; Railway mendeteksi `Dockerfile` di root.
+2. Buat service MySQL dan hubungkan variabel `DB_*` seperti pada bagian 5.
+3. Isi seluruh Variables (termasuk `APP_KEY` dan `DEMO_PASSWORD`).
+4. Railway membangun image: tahap 1 (build Vite), tahap 2 (dependency Composer production, source, aset, folder storage).
+5. Container menjalankan `CMD`: migrasi, bersihkan dan buat ulang cache, lalu menjalankan Supervisor.
+6. Supervisor menyalakan proses `web` (port `PORT`) dan `worker`.
+7. Buat domain publik pada service, pastikan port target sesuai (bagian 7.2).
+8. Jalankan verifikasi pasca-deploy (bagian 12).
 
-1. Repository project dihubungkan ke Railway.
-2. Service MySQL dibuat dan dikonfigurasikan.
-3. Environment variables Laravel ditambahkan ke Railway.
-4. Railway melakukan build berdasarkan `Dockerfile`.
-5. Dependency frontend diinstal menggunakan Node.js.
-6. Aset frontend dibangun menggunakan Vite.
-7. Dependency PHP diinstal menggunakan Composer.
-8. Container aplikasi dijalankan.
-9. Laravel menjalankan migration database.
-10. Aplikasi dijalankan menggunakan PHP built-in server.
-11. Railway menyediakan public domain untuk mengakses aplikasi.
-12. Deployment diverifikasi melalui log Railway dan pengujian API production.
+Untuk deployment berikutnya, `git push` ke `main` memicu build dan container baru. Container lama diganti, sehingga worker baru otomatis memakai kode terbaru.
 
 ---
 
@@ -274,166 +258,115 @@ Langkah deployment dilakukan sebagai berikut:
 
 ## 11.1 Dockerfile Parse Error
 
-Pada proses awal deployment, terjadi error:
+Error awal:
 
 ```text
 unknown instruction: libpng-dev
 ```
 
-Masalah terjadi karena penulisan multi-line command pada Dockerfile tidak terbaca dengan benar.
+Penyebab: penulisan perintah `RUN` multi-baris tanpa backslash (`\`) yang benar.
 
-### Solusi
-
-Penulisan perintah `RUN` diperbaiki dan penggunaan backslash (`\`) pada setiap baris disesuaikan dengan sintaks Dockerfile.
+**Solusi:** backslash pada setiap baris `RUN` diperbaiki.
 
 ---
 
 ## 11.2 Apache More Than One MPM Loaded
 
-Pada deployment menggunakan Apache, muncul error:
+Pada deployment dengan Apache muncul error:
 
 ```text
 AH00534: apache2: Configuration error: More than one MPM loaded.
 ```
 
-Error tersebut menyebabkan Apache tidak dapat dijalankan dengan benar.
-
-### Solusi
-
-Konfigurasi deployment diubah dari PHP Apache menjadi PHP CLI.
-
-Aplikasi kemudian dijalankan menggunakan:
-
-```bash
-php -S 0.0.0.0:${PORT:-8080} -t public
-```
-
-Dengan perubahan tersebut, aplikasi tidak lagi menggunakan Apache sehingga konflik Multiple Processing Module (MPM) dapat dihindari.
+**Solusi:** base image diganti dari PHP Apache menjadi `php:8.4-cli`, dan aplikasi dijalankan lewat server PHP built-in yang dikelola Supervisor. Skrip `docker/start.sh` yang berisi konfigurasi Apache (`/etc/apache2`) tidak lagi digunakan oleh Dockerfile dan telah dihapus dari repo agar tidak ada dua sumber instruksi startup yang bertentangan. Satu-satunya alur startup aktif adalah `CMD` di `Dockerfile` bersama `docker/supervisord.conf`.
 
 ---
 
 ## 11.3 Data Database Bertambah Setiap Deployment
 
-Pada konfigurasi awal, proses startup menjalankan:
+Startup awal menjalankan `migrate` dan `db:seed` pada setiap container menyala, sehingga data demo (misalnya akun pengguna) terus bertambah.
 
-```bash
-php artisan migrate --force
-php artisan db:seed --force
-```
-
-Karena container dapat dijalankan kembali ketika deployment dilakukan, perintah seeder menyebabkan data demo ditambahkan kembali.
-
-Akibatnya, jumlah data seperti akun pengguna terus bertambah pada setiap deployment.
-
-### Solusi
-
-Perintah:
-
-```bash
-php artisan db:seed --force
-```
-
-dihapus dari proses startup normal.
-
-Deployment selanjutnya hanya menjalankan:
-
-```bash
-php artisan migrate --force
-```
-
-Dengan demikian, migration baru tetap diterapkan tanpa membuat data demo berulang.
+**Solusi:** `db:seed` dikeluarkan dari startup. Startup hanya menjalankan `php artisan migrate --force`; seeder dijalankan manual satu kali (bagian 6.1).
 
 ---
 
 ## 11.4 Halaman Utama Menampilkan Welcome Laravel
 
-Route utama sebelumnya masih menggunakan halaman bawaan Laravel:
+Route `/` sebelumnya menampilkan `view('welcome')`.
 
-```php
-Route::get('/', fn () => view('welcome'));
-```
-
-Akibatnya, pengguna melihat halaman `welcome` ketika membuka domain utama aplikasi.
-
-### Solusi
-
-Route utama diubah menjadi:
-
-```php
-Route::get('/', fn () => redirect()->route('login'));
-```
-
-Sekarang pengguna yang membuka halaman utama akan langsung diarahkan ke halaman login.
+**Solusi:** route diubah menjadi redirect ke halaman login (bagian 8).
 
 ---
 
 ## 11.5 Perbedaan Timezone
 
-Waktu aplikasi sebelumnya masih menggunakan UTC sehingga waktu yang ditampilkan tidak sesuai dengan waktu lokal WITA.
+Waktu aplikasi sebelumnya UTC dan tidak sesuai waktu lokal.
 
-### Solusi
-
-Timezone aplikasi diatur menjadi:
-
-```text
-Asia/Makassar
-```
-
-yang sesuai dengan:
-
-```text
-WITA (UTC+8)
-```
+**Solusi:** `APP_TIMEZONE=Asia/Makassar` (WITA, UTC+8).
 
 ---
 
 # 12. Verifikasi Deployment
 
-Deployment berhasil diverifikasi melalui log Railway.
+Lakukan langkah berikut setelah setiap deployment. Ganti `DOMAIN_APLIKASI` dengan domain publik Railway.
 
-Salah satu indikator adalah:
+## 12.1 Status Proses (Supervisor)
 
-```text
-Nothing to migrate.
-```
-
-Pesan tersebut menunjukkan bahwa seluruh migration yang tersedia telah diterapkan dan tidak terdapat migration baru yang perlu dijalankan.
-
-Aplikasi juga berhasil menerima request:
-
-```text
-[302]: GET /
-[200]: GET /login
-```
-
-Status tersebut menunjukkan:
-
-- `302` — halaman utama berhasil melakukan redirect.
-- `200` — halaman login berhasil diakses.
-
-Aset frontend juga berhasil dimuat dari hasil build Vite, misalnya:
-
-```text
-GET /build/assets/app-*.css
-GET /build/assets/login-*.css
-```
-
-Aplikasi juga berhasil menerima request untuk asset tambahan seperti:
-
-```text
-GET /js/tailwind-config.js
-GET /favicon.ico
-```
-## 12.1 Verifikasi Supervisor dan Queue Worker
-
-Aplikasi KampusLMS menggunakan Supervisor untuk menjaga proses utama yang berjalan di dalam container Railway, yaitu web server Laravel dan Laravel queue worker.
-
-Supervisor dapat diperiksa dari terminal container Railway menggunakan perintah:
+Dari terminal service Railway (shell container):
 
 ```bash
 supervisorctl status
 ```
-![alt text](verifikasi-supervisor.png)
+
+Hasil yang diharapkan: program `web` dan `worker` berstatus `RUNNING`.
+
+```text
+web      RUNNING   pid ..., uptime ...
+worker   RUNNING   pid ..., uptime ...
+```
+
+![Hasil supervisorctl status](verifikasi-supervisor.png)
+
+Jika salah satu berstatus `FATAL` atau terus restart, lihat log (12.2).
+
+## 12.2 Pemeriksaan Log
+
+Buka **Deployments → View Logs** pada Railway dan cari:
+
+- `Nothing to migrate.` atau daftar migration yang berhasil: migrasi lolos.
+- `INFO  Configuration cached successfully` dan `Routes cached successfully`: cache terbentuk (jika langkah ini gagal, container berhenti sebelum Supervisor jalan).
+- `PHP 8.4.x Development Server (http://0.0.0.0:PORT) started`: web server aktif.
+- Baris `[302]: GET /` dan `[200]: GET /login`: request diterima.
+- Log `queue:work` / pemrosesan job: worker aktif.
+
+## 12.3 Pemeriksaan HTTP dan Keamanan
+
+```bash
+curl -I https://DOMAIN_APLIKASI/up        # harapan: 200
+curl -I https://DOMAIN_APLIKASI/login     # harapan: 200
+curl -I https://DOMAIN_APLIKASI/          # harapan: 302 ke /login
+curl -I https://DOMAIN_APLIKASI/.env      # harapan: 404 (atau 403), bukan 200
+```
+
+Pastikan juga: `APP_DEBUG=false`, `SESSION_SECURE_COOKIE=true`, aplikasi diakses lewat HTTPS, dan aset `/build/assets/*` termuat (tidak 404).
+
+## 12.4 Verifikasi Queue Worker
+
+Status `RUNNING` belum membuktikan job benar-benar diproses. Buat job nyata (misalnya aksi yang memicu notifikasi, seperti dosen memberi nilai) lalu periksa:
+
+```bash
+php artisan tinker --execute="echo DB::table('jobs')->count();"       # harapan: 0 setelah diproses
+php artisan tinker --execute="echo DB::table('failed_jobs')->count();" # harapan: 0
+```
+
+Jumlah `jobs` yang tertahan di atas 0 dalam waktu lama menandakan worker tidak memproses antrean.
+
+## 12.5 Redeploy dan `queue:restart`
+
+Pada Railway, setiap deployment membuat container baru sehingga worker lama ikut diganti dan memakai kode terbaru. `php artisan queue:restart` hanya diperlukan jika kode diperbarui **tanpa** mengganti container (misalnya deploy ke VPS memakai `deploy.sh`). Skrip tersebut sudah memanggil `queue:restart` pada langkah 7/9 dan dapat dijalankan manual dengan `bash deploy.sh`.
+
+> **Batasan verifikasi:** langkah 12.1 sampai 12.4 harus dijalankan langsung pada deployment Railway. Dokumen ini tidak menyatakan hasil build image lokal sebagai bukti deployment berhasil.
+
 ---
 
 # 13. Pengujian API Production
