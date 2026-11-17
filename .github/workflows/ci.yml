@@ -30,15 +30,22 @@ jobs:
       - name: Install dependency PHP
         run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Siapkan environment
+      - name: Siapkan environment & database
         run: |
           cp .env.example .env
           php artisan key:generate --force
+          touch database/database.sqlite
 
       - name: Install dan build frontend (Vite)
         run: |
           npm ci
           npm run build
+
+      - name: Jalankan migrasi database
+        run: php artisan migrate --force
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
 
       - name: Jalankan tes
         run: php artisan test
