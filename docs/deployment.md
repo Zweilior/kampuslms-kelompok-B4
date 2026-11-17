@@ -169,7 +169,7 @@ exec supervisord -c /etc/supervisor/conf.d/supervisord.conf
 Semua perintah dihubungkan dengan `&&`. **Jika salah satu gagal, container berhenti dan Supervisor tidak pernah berjalan.** Dua kegagalan yang paling mungkin:
 
 - **`migrate` gagal**, misalnya database MySQL belum siap saat container pertama menyala. Tidak ada percobaan ulang otomatis di level `CMD`; Railway akan menjalankan ulang container sesuai kebijakan restart service. Cek variabel `DB_*` dan status service MySQL.
-- **`route:cache` gagal** jika ada route yang tidak dapat di-cache (misalnya closure yang tidak bisa diserialisasi). `routes/web.php` memuat beberapa route berbentuk closure (`/`, `/tentang`, `/dashboard`, `/courses`). Pastikan build production benar-benar lolos pada tahap ini; periksa log deployment pertama setelah perubahan route. Jika ingin menjadikan `route:cache` opsional, ubah di `Dockerfile` secara eksplisit (misalnya `php artisan route:cache || true`) dan catat alasannya, bukan membiarkan kegagalan terjadi diam-diam.
+- **`route:cache` gagal** jika ada route yang tidak dapat di-cache (misalnya closure yang tidak bisa diserialisasi). `routes/web.php` memuat beberapa route berbentuk closure (`/`, `/tentang`, `/dashboard`, `/courses`). Pada deployment Railway tanggal 17 November 2026, log menunjukkan `Routes cached successfully`, sehingga route saat ini dapat di-cache. Tetap periksa log setiap kali ada perubahan route. Jika ingin menjadikan `route:cache` opsional, ubah di `Dockerfile` secara eksplisit (misalnya `php artisan route:cache || true`) dan catat alasannya, bukan membiarkan kegagalan terjadi diam-diam.
 
 `exec` membuat Supervisor menjadi proses utama (PID 1) container, sehingga sinyal stop dari Railway diterima Supervisor dan diteruskan ke proses anak.
 
@@ -206,7 +206,7 @@ Pengaturan Supervisor yang relevan: `autorestart=true` (proses yang mati dinyala
 
 ### 7.4 Log
 
-Supervisor sendiri tidak menulis ke file log (`logfile=/dev/null`). Output program `web` dan `worker` diarahkan ke `stdout`/`stderr` container, sehingga seluruh log dapat dilihat di tab **Deployments → View Logs** Railway. Aplikasi Laravel juga menulis ke `stderr` melalui `LOG_STACK=single,stderr`.
+Supervisor sendiri tidak menulis ke file log (`logfile=/dev/null`). Output program `web` dan `worker` diarahkan ke `stdout`/`stderr` container, sehingga seluruh log dapat dilihat di tab **Deployments → View Logs** Railway. Aplikasi Laravel juga menulis ke `stderr` melalui `LOG_STACK=single,stderr`. Perlu diketahui: Railway menandai semua output `stderr` sebagai `[error]`, termasuk baris `PHP ... Development Server ... started` yang sebenarnya normal. Supervisor juga mencetak peringatan `CRIT Server 'unix_http_server' running without any HTTP authentication checking`; ini wajar karena socket hanya dapat diakses lewat file (`chmod=0700`) di dalam container.
 
 ---
 
