@@ -2,7 +2,7 @@
 
 Dokumen ini menjelaskan seluruh endpoint REST API KampusLMS sesuai kontrak
 Bagian 5 spesifikasi proyek. Semua contoh dapat dijalankan langsung terhadap
-data seeder.
+data seeder.[cite: 14]
 
 - [1. Ikhtisar](#1-ikhtisar)
 - [2. Konvensi](#2-konvensi)
@@ -10,7 +10,7 @@ data seeder.
 - [4. Detail endpoint](#4-detail-endpoint)
 - [5. Matriks hak akses](#5-matriks-hak-akses)
 - [6. Catatan keamanan](#6-catatan-keamanan)
-- [7. Batasan yang diketahui](#7-batasan-yang-diketahui)
+- [7. Batasan yang diketahui](#7-batasan-yang-diketahui)[cite: 14]
 
 ---
 
@@ -22,7 +22,7 @@ data seeder.
 | Autentikasi | Laravel Sanctum, Bearer token |
 | Format | JSON (`Accept: application/json`) |
 | Zona waktu tanggal | ISO 8601, UTC |
-| Rate limit | `POST /auth/login`: 5 permintaan/menit. Endpoint lain: 60 permintaan/menit |
+| Rate limit | `POST /auth/login`: 5 permintaan/menit. Endpoint lain: 60 permintaan/menit |[cite: 14]
 
 ### Menyiapkan data demo
 
@@ -33,17 +33,23 @@ php artisan serve
 
 ### Akun demo (dari seeder)
 
-| Peran | Email | Password |
-|-------|-------|----------|
-| Admin | `admin@kampuslms.test` | `password` |
-| Dosen | `dosen@kampuslms.test` (Budi Santoso, mengajar Pemrograman Web) | `password` |
-| Mahasiswa | `mahasiswa@kampuslms.test` (Andi Pratama, mengikuti Basis Data, Rekayasa Perangkat Lunak, dan Analisis dan Perancangan Sistem) | `password` |
+Kata sandi akun demo diatur melalui konfigurasi `auth.demo_password` (`config/auth.php`) yang membaca variabel lingkungan `DEMO_PASSWORD`:
+- **Lingkungan `local` / `testing`**: Jika `DEMO_PASSWORD` dikosongkan di `.env`, seeder otomatis memakai *fallback* kata sandi **`password`**[cite: 9]. Jika `DEMO_PASSWORD` diisi nilai khusus, gunakan nilai tersebut[cite: 9].
+- **Lingkungan `production`**: *Fallback* dinonaktifkan (`null`)[cite: 9]. Seeder hanya berjalan jika `DEMO_PASSWORD` diisi secara eksplisit melalui *environment variable* server (misalnya Railway)[cite: 9]. Kredensial *production* tidak dicantumkan di dalam dokumentasi maupun *repository*[cite: 4, 9].
+
+| Peran | Email | Password (Fallback Lokal/Testing) |
+|-------|-------|-----------------------------------|
+| Admin | `admin@kampuslms.test` | `password` *(atau sesuai `DEMO_PASSWORD`)*[cite: 9, 14] |
+| Dosen | `dosen@kampuslms.test` (Budi Santoso, mengajar Pemrograman Web) | `password` *(atau sesuai `DEMO_PASSWORD`)*[cite: 9, 14] |
+| Mahasiswa | `mahasiswa@kampuslms.test` (Andi Pratama, mengikuti Basis Data, Rekayasa Perangkat Lunak, dan Analisis dan Perancangan Sistem) | `password` *(atau sesuai `DEMO_PASSWORD`)*[cite: 9, 14] |
 
 > ID pada contoh response (course, tugas, submission) dapat berbeda di database
 > lokal Anda, tergantung data tambahan yang pernah dibuat. Untuk hasil yang sama
-> dengan dokumen ini, gunakan `migrate:fresh --seed`.
+> dengan dokumen ini, gunakan `migrate:fresh --seed`.[cite: 14]
 
 ### Cara mengambil token
+
+Contoh di bawah menggunakan kata sandi *fallback* lokal (`password`). Sesuaikan nilai `password` dengan `DEMO_PASSWORD` yang aktif di lingkungan pengujian Anda[cite: 9, 14]:
 
 ```bash
 curl -s -X POST http://localhost:8000/api/v1/auth/login \
@@ -51,7 +57,7 @@ curl -s -X POST http://localhost:8000/api/v1/auth/login \
   -d "email=dosen@kampuslms.test" -d "password=password"
 ```
 
-Salin nilai `token` (lengkap dengan bagian `angka|`), lalu pakai di semua contoh:
+Salin nilai `token` (lengkap dengan bagian `angka|`), lalu pakai di semua contoh:[cite: 14]
 
 ```bash
 export TOKEN="isi-token-di-sini"
@@ -59,7 +65,7 @@ export TOKEN="isi-token-di-sini"
 
 > **Windows CMD:** perintah `curl` pada dokumen ini ditulis multi-baris dengan
 > `\`. Di CMD tulis dalam satu baris, dan ganti `$TOKEN` dengan token Anda.
-> Setiap login menghapus token lama milik akun yang sama.
+> Setiap login menghapus token lama milik akun yang sama.[cite: 14]
 
 ---
 
@@ -73,17 +79,17 @@ Authorization: Bearer <token>        (kecuali POST /auth/login)
 ```
 
 Seluruh error di bawah `/api/*` selalu dikembalikan sebagai JSON, walaupun
-header `Accept` terlupa.
+header `Accept` terlupa.[cite: 14]
 
 ### Format response sukses
 
-Satu objek:
+Satu objek:[cite: 14]
 
 ```json
 { "data": { "id": 1 } }
 ```
 
-Koleksi (dengan paginasi 15 item per halaman, gunakan `?page=2` dst.):
+Koleksi (dengan paginasi 15 item per halaman, gunakan `?page=2` dst.):[cite: 14]
 
 ```json
 {
@@ -93,7 +99,7 @@ Koleksi (dengan paginasi 15 item per halaman, gunakan `?page=2` dst.):
 ```
 
 `POST` yang membuat data baru mengembalikan **201**. `DELETE` dan `logout`
-mengembalikan **204** tanpa isi.
+mengembalikan **204** tanpa isi.[cite: 14]
 
 ### Format response error
 
@@ -104,14 +110,14 @@ mengembalikan **204** tanpa isi.
 | 404 | Sumber daya tidak ada (atau sengaja disembunyikan) | `{"message":"Sumber daya tidak ditemukan."}` |
 | 409 | Konflik keadaan data | `{"message":"<penjelasan>"}` |
 | 422 | Validasi gagal | `{"message":"Data yang diberikan tidak valid.","errors":{"<field>":["..."]}}` |
-| 429 | Melebihi rate limit | `{"message":"Too Many Attempts."}` + header `Retry-After` |
+| 429 | Melebihi rate limit | `{"message":"Too Many Attempts."}` + header `Retry-After` |[cite: 14]
 
 Perbedaan penting: **401** berarti belum terautentikasi, **403** berarti sudah
-login tetapi perannya atau kepemilikannya tidak sesuai.
+login tetapi perannya atau kepemilikannya tidak sesuai.[cite: 14]
 
 > Dengan `APP_DEBUG=true` (lingkungan lokal), Laravel menambahkan field debug
 > (`exception`, `file`, `trace`) pada beberapa error seperti 409 dan 429. Di
-> produksi `APP_DEBUG=false`, jadi hanya `message` yang tampil.
+> produksi `APP_DEBUG=false`, jadi hanya `message` yang tampil.[cite: 14]
 
 ---
 
@@ -133,7 +139,7 @@ login tetapi perannya atau kepemilikannya tidak sesuai.
 | 12 | POST | `/assignments/{id}/submissions` | Mahasiswa terdaftar |
 | 13 | PUT | `/submissions/{id}/grade` | Dosen pemilik |
 | 14 | GET | `/notifications` | Semua peran (milik sendiri) |
-| 15 | POST | `/notifications/{id}/read` | Semua peran (milik sendiri) |
+| 15 | POST | `/notifications/{id}/read` | Semua peran (milik sendiri) |[cite: 14]
 
 ---
 
@@ -143,15 +149,15 @@ login tetapi perannya atau kepemilikannya tidak sesuai.
 
 #### 1. `POST /auth/login`
 
-- **Akses:** publik. Dibatasi 5 permintaan per menit.
-- **Parameter (body):**
+- **Akses:** publik. Dibatasi 5 permintaan per menit.[cite: 14]
+- **Parameter (body):**[cite: 14]
 
 | Field | Aturan |
 |-------|--------|
 | `email` | wajib, format email |
-| `password` | wajib |
+| `password` | wajib |[cite: 14]
 
-**Request**
+**Request** *(menggunakan fallback password lokal)*[cite: 9, 14]
 
 ```bash
 curl -s -X POST http://localhost:8000/api/v1/auth/login \
@@ -159,7 +165,7 @@ curl -s -X POST http://localhost:8000/api/v1/auth/login \
   -d "email=dosen@kampuslms.test" -d "password=password"
 ```
 
-**Sukses: 200**
+**Sukses: 200**[cite: 14]
 
 ```json
 {
@@ -170,48 +176,48 @@ curl -s -X POST http://localhost:8000/api/v1/auth/login \
 }
 ```
 
-**Gagal**
+**Gagal**[cite: 14]
 
 - 401, email atau password salah (pesan sama untuk keduanya, agar email yang
-  terdaftar tidak bisa ditebak):
+  terdaftar tidak bisa ditebak):[cite: 14]
   ```json
   { "message": "Email atau password salah." }
   ```
-- 422, field kosong:
+- 422, field kosong:[cite: 14]
   ```json
   {
     "message": "Data yang diberikan tidak valid.",
     "errors": { "email": ["The email field is required."] }
   }
   ```
-- 429, lebih dari 5 percobaan dalam semenit:
+- 429, lebih dari 5 percobaan dalam semenit:[cite: 14]
   ```json
   { "message": "Too Many Attempts." }
   ```
 
 #### 2. `POST /auth/logout`
 
-- **Akses:** semua peran yang login. Hanya mencabut token yang sedang dipakai.
+- **Akses:** semua peran yang login. Hanya mencabut token yang sedang dipakai.[cite: 14]
 
 ```bash
 curl -i -X POST http://localhost:8000/api/v1/auth/logout \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 204 No Content** (tanpa isi).
-**Gagal: 401** `{"message":"Unauthenticated."}`
+**Sukses: 204 No Content** (tanpa isi).[cite: 14]
+**Gagal: 401** `{"message":"Unauthenticated."}`[cite: 14]
 
 #### 3. `GET /me`
 
-- **Akses:** semua peran yang login.
-- Pemilik akun melihat `email` dan `nim_nip` miliknya sendiri.
+- **Akses:** semua peran yang login.[cite: 14]
+- Pemilik akun melihat `email` dan `nim_nip` miliknya sendiri.[cite: 14]
 
 ```bash
 curl -s http://localhost:8000/api/v1/me \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 200**
+**Sukses: 200**[cite: 14]
 
 ```json
 {
@@ -225,7 +231,7 @@ curl -s http://localhost:8000/api/v1/me \
 }
 ```
 
-**Gagal: 401** `{"message":"Unauthenticated."}`
+**Gagal: 401** `{"message":"Unauthenticated."}`[cite: 14]
 
 ---
 
@@ -233,19 +239,19 @@ curl -s http://localhost:8000/api/v1/me \
 
 #### 4. `GET /courses`
 
-- **Akses:** semua peran, hasil disaring di level query.
-  - Dosen: mata kuliah yang diajar.
-  - Mahasiswa: mata kuliah yang diikuti.
-  - Admin: semua mata kuliah.
-- **Parameter:** `?page=` (opsional).
-- Untuk mahasiswa, `assignments_count` hanya menghitung tugas `published`.
+- **Akses:** semua peran, hasil disaring di level query.[cite: 14]
+  - Dosen: mata kuliah yang diajar.[cite: 14]
+  - Mahasiswa: mata kuliah yang diikuti.[cite: 14]
+  - Admin: semua mata kuliah.[cite: 14]
+- **Parameter:** `?page=` (opsional).[cite: 14]
+- Untuk mahasiswa, `assignments_count` hanya menghitung tugas `published`.[cite: 14]
 
 ```bash
 curl -s "http://localhost:8000/api/v1/courses?page=1" \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 200** (response mahasiswa, dipersingkat dari 3 item)
+**Sukses: 200** (response mahasiswa, dipersingkat dari 3 item)[cite: 14]
 
 ```json
 {
@@ -267,20 +273,20 @@ curl -s "http://localhost:8000/api/v1/courses?page=1" \
 ```
 
 Objek `lecturer` memuat `nim_nip` dan `email` hanya untuk admin. Mahasiswa tidak
-mendapatkannya.
+mendapatkannya.[cite: 14]
 
-**Gagal: 401** tanpa token.
+**Gagal: 401** tanpa token.[cite: 14]
 
 #### 5. `GET /courses/{id}`
 
-- **Akses:** admin, dosen pemilik course, atau mahasiswa yang terdaftar.
+- **Akses:** admin, dosen pemilik course, atau mahasiswa yang terdaftar.[cite: 14]
 
 ```bash
 curl -s http://localhost:8000/api/v1/courses/2 \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 200**
+**Sukses: 200**[cite: 14]
 
 ```json
 {
@@ -298,23 +304,23 @@ curl -s http://localhost:8000/api/v1/courses/2 \
 }
 ```
 
-**Gagal**
+**Gagal**[cite: 14]
 
 - 403, bukan pemilik atau tidak terdaftar:
-  `{"message":"Anda tidak memiliki akses ke sumber daya ini."}`
-- 404, course tidak ada: `{"message":"Sumber daya tidak ditemukan."}`
+  `{"message":"Anda tidak memiliki akses ke sumber daya ini."}`[cite: 14]
+- 404, course tidak ada: `{"message":"Sumber daya tidak ditemukan."}`[cite: 14]
 
 #### 6. `GET /courses/{id}/materials`
 
-- **Akses:** sama dengan `GET /courses/{id}`.
-- **Parameter:** `?page=` (opsional).
+- **Akses:** sama dengan `GET /courses/{id}`.[cite: 14]
+- **Parameter:** `?page=` (opsional).[cite: 14]
 
 ```bash
 curl -s http://localhost:8000/api/v1/courses/1/materials \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 200** (nilai contoh)
+**Sukses: 200** (nilai contoh)[cite: 14]
 
 ```json
 {
@@ -336,28 +342,28 @@ curl -s http://localhost:8000/api/v1/courses/1/materials \
 ```
 
 Path penyimpanan internal file tidak pernah ditampilkan. Pengunduhan file
-dibuat sebagai endpoint terpisah pada minggu berikutnya.
+dibuat sebagai endpoint terpisah pada minggu berikutnya.[cite: 14]
 
-**Gagal:** 403 (tidak berhak), 404 (course tidak ada).
+**Gagal:** 403 (tidak berhak), 404 (course tidak ada).[cite: 14]
 
 #### 7. `GET /courses/{id}/assignments`
 
-- **Akses:** sama dengan `GET /courses/{id}`.
-- **Parameter:**
+- **Akses:** sama dengan `GET /courses/{id}`.[cite: 14]
+- **Parameter:**[cite: 14]
 
 | Parameter | Keterangan |
 |-----------|------------|
 | `?status=` | opsional: `draft` atau `published` |
-| `?page=` | opsional |
+| `?page=` | opsional |[cite: 14]
 
-- Mahasiswa hanya pernah melihat tugas `published`, apa pun nilai `?status=`.
+- Mahasiswa hanya pernah melihat tugas `published`, apa pun nilai `?status=`.[cite: 14]
 
 ```bash
 curl -s "http://localhost:8000/api/v1/courses/2/assignments?status=published" \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 200**
+**Sukses: 200**[cite: 14]
 
 ```json
 {
@@ -377,7 +383,7 @@ curl -s "http://localhost:8000/api/v1/courses/2/assignments?status=published" \
 }
 ```
 
-**Gagal:** 403 (tidak berhak), 404 (course tidak ada).
+**Gagal:** 403 (tidak berhak), 404 (course tidak ada).[cite: 14]
 
 ---
 
@@ -385,8 +391,8 @@ curl -s "http://localhost:8000/api/v1/courses/2/assignments?status=published" \
 
 #### 8. `POST /assignments`
 
-- **Akses:** dosen, hanya pada course yang diajarnya.
-- **Parameter (body):**
+- **Akses:** dosen, hanya pada course yang diajarnya.[cite: 14]
+- **Parameter (body):**[cite: 14]
 
 | Field | Aturan |
 |-------|--------|
@@ -396,7 +402,7 @@ curl -s "http://localhost:8000/api/v1/courses/2/assignments?status=published" \
 | `due_at` | wajib, tanggal (mis. `2026-12-31 23:59:00`) |
 | `max_score` | wajib, integer, minimal 0 |
 | `allow_late` | wajib, boolean (`1`/`0`/`true`/`false`) |
-| `status` | wajib: `draft` atau `published` |
+| `status` | wajib: `draft` atau `published` |[cite: 14]
 
 ```bash
 curl -s -X POST http://localhost:8000/api/v1/assignments \
@@ -407,7 +413,7 @@ curl -s -X POST http://localhost:8000/api/v1/assignments \
   -d "allow_late=1" -d "status=draft"
 ```
 
-**Sukses: 201**
+**Sukses: 201**[cite: 14]
 
 ```json
 {
@@ -424,12 +430,12 @@ curl -s -X POST http://localhost:8000/api/v1/assignments \
 }
 ```
 
-**Gagal**
+**Gagal**[cite: 14]
 
 - 403, bukan dosen, atau course bukan milik dosen ini. Course yang tidak ada
   juga dijawab 403, supaya ID course tidak bisa ditebak:
-  `{"message":"Anda tidak memiliki akses ke sumber daya ini."}`
-- 422, validasi gagal:
+  `{"message":"Anda tidak memiliki akses ke sumber daya ini."}`[cite: 14]
+- 422, validasi gagal:[cite: 14]
   ```json
   {
     "message": "Data yang diberikan tidak valid.",
@@ -442,9 +448,9 @@ curl -s -X POST http://localhost:8000/api/v1/assignments \
 
 #### 9. `PUT` / `PATCH /assignments/{id}`
 
-- **Akses:** dosen pemilik course dari tugas ini.
+- **Akses:** dosen pemilik course dari tugas ini.[cite: 14]
 - **Parameter:** sama dengan `POST /assignments` (tanpa `course_id`), semuanya
-  **opsional**. Hanya field yang dikirim yang diubah.
+  **opsional**. Hanya field yang dikirim yang diubah.[cite: 14]
 
 ```bash
 curl -s -X PATCH http://localhost:8000/api/v1/assignments/19 \
@@ -452,7 +458,7 @@ curl -s -X PATCH http://localhost:8000/api/v1/assignments/19 \
   -d "status=published" -d "max_score=90"
 ```
 
-**Sukses: 200** (objek tugas yang sudah diperbarui)
+**Sukses: 200** (objek tugas yang sudah diperbarui)[cite: 14]
 
 ```json
 {
@@ -469,25 +475,25 @@ curl -s -X PATCH http://localhost:8000/api/v1/assignments/19 \
 }
 ```
 
-**Gagal:** 403 (bukan dosen pemilik), 404 (tugas tidak ada), 422 (nilai tidak valid).
+**Gagal:** 403 (bukan dosen pemilik), 404 (tugas tidak ada), 422 (nilai tidak valid).[cite: 14]
 
 #### 10. `DELETE /assignments/{id}`
 
-- **Akses:** dosen pemilik course dari tugas ini.
-- Tugas yang **sudah memiliki pengumpulan mahasiswa tidak dapat dihapus**.
+- **Akses:** dosen pemilik course dari tugas ini.[cite: 14]
+- Tugas yang **sudah memiliki pengumpulan mahasiswa tidak dapat dihapus**.[cite: 14]
 
 ```bash
 curl -i -X DELETE http://localhost:8000/api/v1/assignments/19 \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 204 No Content**
+**Sukses: 204 No Content**[cite: 14]
 
-**Gagal**
+**Gagal**[cite: 14]
 
-- 403, bukan dosen pemilik.
-- 404, tugas tidak ada.
-- 409, sudah ada pengumpulan:
+- 403, bukan dosen pemilik.[cite: 14]
+- 404, tugas tidak ada.[cite: 14]
+- 409, sudah ada pengumpulan:[cite: 14]
   ```json
   { "message": "Tugas tidak dapat dihapus karena sudah memiliki pengumpulan mahasiswa." }
   ```
@@ -498,16 +504,16 @@ curl -i -X DELETE http://localhost:8000/api/v1/assignments/19 \
 
 #### 11. `GET /assignments/{id}/submissions`
 
-- **Akses:** dosen pemilik course dari tugas ini. Admin dan mahasiswa mendapat 403.
-- **Parameter:** `?page=` (opsional). Terbaru lebih dulu.
-- Dosen melihat `nim_nip` mahasiswa tetapi tidak melihat email mereka.
+- **Akses:** dosen pemilik course dari tugas ini. Admin dan mahasiswa mendapat 403.[cite: 14]
+- **Parameter:** `?page=` (opsional). Terbaru lebih dulu.[cite: 14]
+- Dosen melihat `nim_nip` mahasiswa tetapi tidak melihat email mereka.[cite: 14]
 
 ```bash
 curl -s http://localhost:8000/api/v1/assignments/1/submissions \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 200** (dipersingkat dari 10 item)
+**Sukses: 200** (dipersingkat dari 10 item)[cite: 14]
 
 ```json
 {
@@ -539,31 +545,31 @@ curl -s http://localhost:8000/api/v1/assignments/1/submissions \
 }
 ```
 
-`grade` bernilai `null` untuk submission yang belum dinilai.
+`grade` bernilai `null` untuk submission yang belum dinilai.[cite: 14]
 
-**Gagal:** 403 (bukan dosen pemilik, termasuk dosen lain), 404 (tugas tidak ada).
+**Gagal:** 403 (bukan dosen pemilik, termasuk dosen lain), 404 (tugas tidak ada).[cite: 14]
 
 #### 12. `POST /assignments/{id}/submissions`
 
-- **Akses:** mahasiswa yang terdaftar di course tugas ini.
-- **Format:** `multipart/form-data`.
-- **Parameter:**
+- **Akses:** mahasiswa yang terdaftar di course tugas ini.[cite: 14]
+- **Format:** `multipart/form-data`.[cite: 14]
+- **Parameter:**[cite: 14]
 
 | Field | Aturan |
 |-------|--------|
 | `file` | wajib, tipe `pdf`, `doc`, `docx`, atau `zip`, maks 5 MB |
-| `note` | opsional, teks, maks 1000 karakter |
+| `note` | opsional, teks, maks 1000 karakter |[cite: 14]
 
-**Aturan bisnis**
+**Aturan bisnis**[cite: 14]
 
-- Tugas harus berstatus `published`. Tugas draft dijawab **404**.
+- Tugas harus berstatus `published`. Tugas draft dijawab **404**.[cite: 14]
 - Lewat tenggat: ditandai `is_late: true`. Jika `allow_late` bernilai `false`,
-  pengumpulan ditolak dengan 422.
+  pengumpulan ditolak dengan 422.[cite: 14]
 - **Kirim ulang** menimpa pengumpulan sebelumnya (file lama dihapus) selama belum
-  dinilai: **200**. Jika sudah dinilai: **409**.
+  dinilai: **200**. Jika sudah dinilai: **409**.[cite: 14]
 - File disimpan di penyimpanan privat dengan nama acak. Path internal tidak
-  pernah ditampilkan.
-- Dosen pemilik course menerima notifikasi `PengumpulanBaru`.
+  pernah ditampilkan.[cite: 14]
+- Dosen pemilik course menerima notifikasi `PengumpulanBaru`.[cite: 14]
 
 ```bash
 curl -s -X POST http://localhost:8000/api/v1/assignments/4/submissions \
@@ -571,7 +577,7 @@ curl -s -X POST http://localhost:8000/api/v1/assignments/4/submissions \
   -F "file=@tugas.pdf" -F "note=Pengumpulan pertama"
 ```
 
-**Sukses: 201** (pertama kali) atau **200** (kirim ulang)
+**Sukses: 201** (pertama kali) atau **200** (kirim ulang)[cite: 14]
 
 ```json
 {
@@ -587,15 +593,15 @@ curl -s -X POST http://localhost:8000/api/v1/assignments/4/submissions \
 }
 ```
 
-**Gagal**
+**Gagal**[cite: 14]
 
-- 403, bukan mahasiswa, atau tidak terdaftar di course ini.
-- 404, tugas tidak ada atau masih draft.
-- 409, sudah dinilai:
+- 403, bukan mahasiswa, atau tidak terdaftar di course ini.[cite: 14]
+- 404, tugas tidak ada atau masih draft.[cite: 14]
+- 409, sudah dinilai:[cite: 14]
   ```json
   { "message": "Tugas ini sudah dinilai dan tidak dapat dikumpulkan ulang." }
   ```
-- 422, file salah atau tenggat lewat:
+- 422, file salah atau tenggat lewat:[cite: 14]
   ```json
   {
     "message": "Data yang diberikan tidak valid.",
@@ -611,18 +617,18 @@ curl -s -X POST http://localhost:8000/api/v1/assignments/4/submissions \
 
 #### 13. `PUT /submissions/{id}/grade`
 
-- **Akses:** dosen pemilik course dari tugas tempat submission ini berada.
+- **Akses:** dosen pemilik course dari tugas tempat submission ini berada.[cite: 14]
 - **Sifat:** *upsert*, aman dipanggil berulang. **201** saat nilai dibuat
   pertama kali, **200** saat diperbarui. Penilaian ulang tanpa `feedback`
-  mengosongkan feedback sebelumnya.
-- **Parameter (body):**
+  mengosongkan feedback sebelumnya.[cite: 14]
+- **Parameter (body):**[cite: 14]
 
 | Field | Aturan |
 |-------|--------|
 | `score` | wajib, angka, antara 0 dan `max_score` tugas |
-| `feedback` | opsional, teks, maks 2000 karakter |
+| `feedback` | opsional, teks, maks 2000 karakter |[cite: 14]
 
-- Mahasiswa pemilik submission menerima notifikasi `NilaiDiberikan`.
+- Mahasiswa pemilik submission menerima notifikasi `NilaiDiberikan`.[cite: 14]
 
 ```bash
 curl -s -X PUT http://localhost:8000/api/v1/submissions/1/grade \
@@ -630,7 +636,7 @@ curl -s -X PUT http://localhost:8000/api/v1/submissions/1/grade \
   -d "score=85" -d "feedback=Bagus"
 ```
 
-**Sukses: 201** (pertama kali) atau **200** (diperbarui)
+**Sukses: 201** (pertama kali) atau **200** (diperbarui)[cite: 14]
 
 ```json
 {
@@ -651,20 +657,22 @@ curl -s -X PUT http://localhost:8000/api/v1/submissions/1/grade \
 }
 ```
 
-**Gagal**
+**Gagal**[cite: 14]
 
-- 403, mahasiswa, atau dosen yang bukan pemilik course.
-- 404, submission tidak ada.
-- 422, nilai di luar rentang:
+- 403, mahasiswa, atau dosen yang bukan pemilik course.[cite: 14]
+- 404, submission tidak ada.[cite: 14]
+- 422, nilai di luar rentang:[cite: 14]
   ```json
   {
     "message": "Data yang diberikan tidak valid.",
     "errors": { "score": ["The score field must not be greater than 100."] }
   }
   ```
+
 #### 14. Submission
 - Mahasiswa TIDAK dapat mengubah atau menghapus submission sendiri. 
-  Untuk submit ulang, hubungi dosen atau admin.
+  Untuk submit ulang, hubungi dosen atau admin.[cite: 14]
+
 ---
 
 ### 4.5 Notifications
@@ -672,15 +680,15 @@ curl -s -X PUT http://localhost:8000/api/v1/submissions/1/grade \
 #### 14. `GET /notifications`
 
 - **Akses:** semua peran. Hanya notifikasi milik user yang login, terbaru lebih
-  dulu.
-- **Parameter:** `?page=` (opsional).
+  dulu.[cite: 14]
+- **Parameter:** `?page=` (opsional).[cite: 14]
 
 ```bash
 curl -s http://localhost:8000/api/v1/notifications \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 200**
+**Sukses: 200**[cite: 14]
 
 ```json
 {
@@ -699,14 +707,14 @@ curl -s http://localhost:8000/api/v1/notifications \
 ```
 
 Nilai `type` yang ada: `TugasBaru`, `NilaiDiberikan`, `PengingatTenggat`,
-`PengumpulanBaru`.
+`PengumpulanBaru`.[cite: 14]
 
-**Gagal: 401** tanpa token.
+**Gagal: 401** tanpa token.[cite: 14]
 
 #### 15. `POST /notifications/{id}/read`
 
-- **Akses:** semua peran, hanya untuk notifikasi miliknya. `id` berupa UUID.
-- **Idempoten:** dipanggil berulang tetap 200 dan `read_at` tidak berubah.
+- **Akses:** semua peran, hanya untuk notifikasi miliknya. `id` berupa UUID.[cite: 14]
+- **Idempoten:** dipanggil berulang tetap 200 dan `read_at` tidak berubah.[cite: 14]
 
 ```bash
 curl -s -X POST \
@@ -714,7 +722,7 @@ curl -s -X POST \
   -H "Accept: application/json" -H "Authorization: Bearer $TOKEN"
 ```
 
-**Sukses: 200**
+**Sukses: 200**[cite: 14]
 
 ```json
 {
@@ -730,12 +738,12 @@ curl -s -X POST \
 ```
 
 (`data` yang di dalam adalah isi notifikasi; `data` di luar adalah pembungkus
-response.)
+response.)[cite: 14]
 
-**Gagal**
+**Gagal**[cite: 14]
 
-- 403, notifikasi milik pengguna lain.
-- 404, notifikasi tidak ada: `{"message":"Sumber daya tidak ditemukan."}`
+- 403, notifikasi milik pengguna lain.[cite: 14]
+- 404, notifikasi tidak ada: `{"message":"Sumber daya tidak ditemukan."}`[cite: 14]
 
 ---
 
@@ -753,7 +761,7 @@ response.)
 | `GET /assignments/{id}/submissions` | ❌ 403 | pemilik | ❌ 403 |
 | `POST /assignments/{id}/submissions` | ❌ 403 | ❌ 403 | terdaftar |
 | `PUT /submissions/{id}/grade` | ❌ 403 | pemilik | ❌ 403 |
-| `GET /notifications`, `POST /notifications/{id}/read` | milik sendiri | milik sendiri | milik sendiri |
+| `GET /notifications`, `POST /notifications/{id}/read` | milik sendiri | milik sendiri | milik sendiri |[cite: 14]
 
 ---
 
@@ -761,29 +769,29 @@ response.)
 
 - **Otorisasi dicek di level query atau sebelum aksi**, bukan sekadar
   menyembunyikan tombol di tampilan. Mengganti ID di URL tidak memberi akses ke
-  data pengguna lain.
+  data pengguna lain.[cite: 14]
 - **Otorisasi dicek sebelum validasi.** Pengguna yang tidak berhak selalu
-  mendapat 403, bukan 422.
+  mendapat 403, bukan 422.[cite: 14]
 - **Daftar putih field.** API Resource hanya mengeluarkan field yang
   diizinkan. `password`, token, dan path internal file tidak pernah dikeluarkan.
   `email` hanya terlihat oleh pemilik akun dan admin, `nim_nip` oleh pemilik,
-  admin, dan dosen.
-- **Pesan login seragam** untuk email salah maupun password salah.
-- **Rate limiting** pada login (5/menit) dan seluruh endpoint lain (60/menit).
+  admin, dan dosen.[cite: 14]
+- **Pesan login seragam** untuk email salah maupun password salah.[cite: 14]
+- **Rate limiting** pada login (5/menit) dan seluruh endpoint lain (60/menit).[cite: 14]
 - **File unggahan** disimpan di penyimpanan privat (bukan folder publik)
-  dengan nama acak. Nama dari klien tidak dipakai sebagai path.
+  dengan nama acak. Nama dari klien tidak dipakai sebagai path.[cite: 14]
 - **Tugas draft** tidak terlihat oleh mahasiswa, termasuk jumlahnya pada
-  `assignments_count` dan saat mencoba mengumpulkan.
+  `assignments_count` dan saat mencoba mengumpulkan.[cite: 14]
 
 ---
 
 ## 7. Batasan yang diketahui
 
 - Pesan di dalam `errors` (detail per field) masih berbahasa Inggris bawaan
-  Laravel. Field `message` utamanya sudah berbahasa Indonesia sesuai kontrak.
+  Laravel. Field `message` utamanya sudah berbahasa Indonesia sesuai kontrak.[cite: 14]
 - Belum ada endpoint pengunduhan file materi dan submission (direncanakan pada
-  minggu berikutnya).
+  minggu berikutnya).[cite: 14]
 - Pengecekan kepemilikan saat ini ada di controller. Pada Minggu 7 logika ini
-  dipindahkan ke Policy.
+  dipindahkan ke Policy.[cite: 14]
 - Satu akun hanya memiliki satu token aktif. Login baru mencabut token lama
-  (termasuk di perangkat lain).
+  (termasuk di perangkat lain).[cite: 14]
