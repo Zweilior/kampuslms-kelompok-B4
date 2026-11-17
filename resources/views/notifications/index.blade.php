@@ -2,10 +2,6 @@
 
 @section('content')
     <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        @php
-            $unreadCount = auth()->user()->unreadNotifications()->count();
-        @endphp
-
         <header class="lms-page-header">
             <div class="lms-page-header__copy">
                 <div class="flex items-center gap-2 text-xs uppercase tracking-wider font-semibold opacity-90 mb-1">

@@ -41,6 +41,7 @@ class NotificationWebTest extends TestCase
         $this->actingAs($me)
             ->get(route('notifications.index'))
             ->assertOk()
+            ->assertViewHas('unreadCount', 1)
             ->assertViewHas('notifications', fn ($page) => $page->total() === 1);
     }
 
