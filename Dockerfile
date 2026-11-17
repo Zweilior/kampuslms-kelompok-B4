@@ -99,4 +99,4 @@ EXPOSE 8080
 # =============================================================================
 # Startup
 # =============================================================================
-CMD ["sh", "-c", "php artisan migrate -- force && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan event:cache && exec supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
+CMD ["sh", "-c", "php artisan migrate --force && php artisan optimize:clear && php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan event:cache && exec supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
