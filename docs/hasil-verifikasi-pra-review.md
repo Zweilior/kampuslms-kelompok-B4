@@ -7,7 +7,7 @@ Tanggal pengujian: 17 November 2026
 - Windows, PHP 8.5.12 CLI dari Laragon.
 - Composer dependencies tersedia (`vendor/`); Node dependencies juga tersedia.
 - Konfigurasi PHPUnit menggunakan SQLite in-memory (`DB_CONNECTION=sqlite`, `DB_DATABASE=:memory:`).
-- PHP CLI memuat `pdo_mysql`, tetapi tidak memuat `pdo_sqlite` atau `sqlite3`.
+- PHP CLI memuat `pdo_mysql`, `pdo_sqlite`, dan `sqlite3`.
 - Working tree bersih saat pengujian. Pengujian dilakukan pada branch `laudya-38`.
 
 ## Perintah dan hasil aktual
@@ -22,14 +22,11 @@ php artisan test
 
 Hasil:
 
-- **122 gagal, 15 lulus, 77 assertion**, durasi 19,79 detik, exit code 2.
-- Test yang lulus mencakup `Tests\Unit\ExampleTest`, `Tests\Unit\FileSizeTest`,
-  `Tests\Feature\AboutPageTest`, dan `Tests\Feature\AuthorizationErrorPagesTest`.
-- Kegagalan feature test memiliki penyebab yang sama: `QueryException: could not
-  find driver` saat Laravel membuka koneksi SQLite `:memory:`.
-- Hasil ini belum dapat dipakai untuk menyimpulkan fitur aplikasi gagal. Driver
-  SQLite perlu diaktifkan pada PHP CLI, kemudian seluruh suite perlu dijalankan
-  ulang.
+- **137 lulus, 806 assertion**, durasi 9,16 detik, exit code 0.
+- Tidak ada test gagal.
+- Suite mencakup pengujian role dan policy, akses mahasiswa/dosen/admin,
+  pencegahan IDOR, unduhan material privat, notifikasi, lazy loading, dan
+  pembersihan file.
 
 ### Skrip API dan otorisasi
 
@@ -66,10 +63,10 @@ bukan eksekusi ulang dalam sesi ini. ID data uji dicatat di
 ## Verifikasi akses berbasis hasil yang tersedia
 
 Verifikasi API production yang terdokumentasi telah mencakup role mahasiswa,
-dosen, dan admin, termasuk pembatasan IDOR antar dosen. Namun, pengujian
-resource privat secara khusus belum tercatat pada kedua skrip tersebut.
-Feature test lokal terkait policy dan unduhan material privat tetap belum
-tervalidasi karena terhenti sebelum database SQLite dapat dibuat.
+dosen, dan admin, termasuk pembatasan IDOR antar dosen. Feature test lokal juga
+memvalidasi akses resource privat: admin, pemilik/enrolled user dapat
+mengunduh material, sedangkan outsider dan tamu ditolak; akses material melalui
+course yang tidak sesuai menghasilkan 404.
 
 ## Tinjauan performa dan keamanan
 
@@ -85,14 +82,7 @@ tenggat nilai antara web dan API.
 
 ## Tindak lanjut
 
-1. Aktifkan ekstensi `pdo_sqlite` dan `sqlite3` pada PHP CLI yang dipakai
-   Composer/PHPUnit.
-2. Jalankan ulang `php artisan test` dan simpan daftar test serta pesan gagal
-   aktual setelah hambatan environment hilang.
-3. Jika diperlukan bukti terbaru, ulangi kedua skrip dengan secret melalui
+1. Jika diperlukan bukti terbaru, ulangi kedua skrip dengan secret melalui
    environment lokal/CI, bukan dokumentasi atau commit.
-4. Tambahkan atau jalankan skenario unduhan material privat untuk admin, dosen
-   pemilik, mahasiswa terdaftar, pengguna lain, dan tamu; catat status HTTP
-   tanpa mencatat token.
-5. Koordinasikan kegagalan fungsional yang tersisa dengan pemilik fitur sebelum
+2. Koordinasikan kegagalan fungsional yang tersisa dengan pemilik fitur sebelum
    mengajukan pull request.
