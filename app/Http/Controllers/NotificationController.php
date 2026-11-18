@@ -83,17 +83,7 @@ class NotificationController extends Controller
         $assignmentId = $data['assignment_id'] ?? null;
         $submissionId = $data['submission_id'] ?? null;
 
-        // Cari course_id atau assignment_id jika salah satunya belum ada di data payload
-        if (! $courseId && $assignmentId) {
-            $assignment = \App\Models\Assignment::find($assignmentId);
-            $courseId = $assignment?->course_id;
-        }
-
-        if (! $assignmentId && $submissionId) {
-            $submission = \App\Models\Submission::find($submissionId);
-            $assignmentId = $submission?->assignment_id;
-            $courseId = $courseId ?? $submission?->assignment?->course_id;
-        }
+        // Resolusi URL murni mengandalkan data payload terstruktur tanpa query database susulan (bebas N+1)
 
         $user = auth()->user() ?? $notification->notifiable;
         $isMahasiswa = $user?->role === 'mahasiswa';
