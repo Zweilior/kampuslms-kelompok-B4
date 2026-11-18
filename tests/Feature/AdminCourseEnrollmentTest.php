@@ -192,4 +192,20 @@ class AdminCourseEnrollmentTest extends TestCase
         ]);
         $this->assertDatabaseHas('users', ['id' => $student->id]);
     }
+
+    public function test_admin_cannot_enroll_more_than_50_students_at_once(): void
+    {
+        $admin = User::factory()->admin()->create();
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $students = User::factory()->mahasiswa()->count(51)->create();
+
+        $this->actingAs($admin)
+            ->post(route('admin.courses.enrollments.store', $course), [
+                'student_ids' => $students->modelKeys(),
+            ])
+            ->assertSessionHasErrors('student_ids');
+
+        $this->assertDatabaseCount('course_user', 0);
+    }
 }

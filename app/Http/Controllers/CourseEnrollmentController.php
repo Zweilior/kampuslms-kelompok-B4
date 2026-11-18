@@ -15,7 +15,7 @@ class CourseEnrollmentController extends Controller
         Gate::authorize('manageEnrollment', $course);
 
         $validated = $request->validate([
-            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids' => ['required', 'array', 'min:1', 'max:50'],
             'student_ids.*' => [
                 'required',
                 Rule::exists('users', 'id')->where('role', 'mahasiswa'),
@@ -79,7 +79,7 @@ class CourseEnrollmentController extends Controller
         Gate::authorize('manageEnrollment', $course);
 
         $validated = $request->validate([
-            'student_ids' => ['required', 'array', 'min:1'],
+            'student_ids' => ['required', 'array', 'min:1', 'max:50'],
             'student_ids.*' => [
                 'required',
                 Rule::exists('users', 'id')->where('role', 'mahasiswa'),
