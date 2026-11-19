@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Course;
 use App\Models\User;
+use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -12,6 +13,11 @@ class CourseEnrollmentController extends Controller
 {
     public function adminStore(Request $request, Course $course)
     {
+        return $this->storeEnrollment(
+            $request,
+            $course,
+            'admin.courses.show'
+        );
         Gate::authorize('manageEnrollment', $course);
 
         $validated = $request->validate([
@@ -38,22 +44,14 @@ class CourseEnrollmentController extends Controller
 
     public function adminDestroy(Course $course, User $student)
     {
-        Gate::authorize('manageEnrollment', $course);
-
-        abort_unless(
-            $student->role === 'mahasiswa'
-                && $course->students()->whereKey($student->id)->exists(),
-            404
+        return $this->destroyEnrollment(
+            $course,
+            $student,
+            'admin.courses.show'
         );
-
-        $course->students()->detach($student->id);
-
-        return redirect()
-            ->route('admin.courses.show', $course)
-            ->with('success', 'Mahasiswa berhasil dikeluarkan dari mata kuliah.');
     }
 
-    public function dosenIndex(Course $course)
+    public function dosenIndex(Request $request, Course $course)
     {
         Gate::authorize('manageEnrollment', $course);
 
@@ -61,11 +59,23 @@ class CourseEnrollmentController extends Controller
             ->where('users.role', 'mahasiswa')
             ->orderBy('users.name')
             ->get(['users.*']);
-        $availableStudents = User::query()
+        $availableStudentsQuery = User::query()
             ->where('role', 'mahasiswa')
-            ->whereDoesntHave('courses', fn ($query) => $query->where('courses.id', $course->id))
+            ->whereDoesntHave('courses', fn ($query) => $query->where('courses.id', $course->id));
+
+        if ($request->filled('search')) {
+            $search = trim((string) $request->input('search'));
+            $availableStudentsQuery->where(function ($query) use ($search) {
+                $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('nim_nip', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $availableStudents = $availableStudentsQuery
             ->orderBy('name')
-            ->get();
+            ->paginate(50)
+            ->withQueryString();
 
         return view('dosen.courses.enrollments', compact(
             'course',
@@ -75,6 +85,24 @@ class CourseEnrollmentController extends Controller
     }
 
     public function dosenStore(Request $request, Course $course)
+    {
+        return $this->storeEnrollment(
+            $request,
+            $course,
+            'dosen.courses.enrollments.index'
+        );
+    }
+
+    public function dosenDestroy(Course $course, User $student)
+    {
+        return $this->destroyEnrollment(
+            $course,
+            $student,
+            'dosen.courses.enrollments.index'
+        );
+    }
+
+    private function storeEnrollment(Request $request, Course $course, string $redirectRoute)
     {
         Gate::authorize('manageEnrollment', $course);
 
@@ -87,6 +115,7 @@ class CourseEnrollmentController extends Controller
         ], [
             'student_ids.required' => 'Pilih setidaknya satu mahasiswa yang akan didaftarkan.',
             'student_ids.min' => 'Pilih setidaknya satu mahasiswa yang akan didaftarkan.',
+            'student_ids.max' => 'Paling banyak 50 mahasiswa dapat didaftarkan sekaligus.',
             'student_ids.*.exists' => 'Mahasiswa yang dipilih tidak valid.',
         ]);
 
@@ -96,11 +125,11 @@ class CourseEnrollmentController extends Controller
         $course->students()->syncWithoutDetaching($enrollments);
 
         return redirect()
-            ->route('dosen.courses.enrollments.index', $course)
+            ->route($redirectRoute, $course)
             ->with('success', 'Mahasiswa berhasil didaftarkan ke mata kuliah.');
     }
 
-    public function dosenDestroy(Course $course, User $student)
+    private function destroyEnrollment(Course $course, User $student, string $redirectRoute)
     {
         Gate::authorize('manageEnrollment', $course);
 
@@ -110,10 +139,25 @@ class CourseEnrollmentController extends Controller
             404
         );
 
+        $hasSubmission = Submission::query()
+            ->where('user_id', $student->id)
+            ->whereHas('assignment', fn ($query) => $query->where('course_id', $course->id))
+            ->exists();
+
+        $hasFinalGrade = $course->finalGrades()
+            ->where('user_id', $student->id)
+            ->exists();
+
+        if ($hasSubmission || $hasFinalGrade) {
+            return redirect()
+                ->route($redirectRoute, $course)
+                ->with('error', 'Mahasiswa tidak dapat dikeluarkan karena masih memiliki riwayat pengumpulan tugas atau nilai pada mata kuliah ini.');
+        }
+
         $course->students()->detach($student->id);
 
         return redirect()
-            ->route('dosen.courses.enrollments.index', $course)
+            ->route($redirectRoute, $course)
             ->with('success', 'Mahasiswa berhasil dikeluarkan dari mata kuliah.');
     }
 }

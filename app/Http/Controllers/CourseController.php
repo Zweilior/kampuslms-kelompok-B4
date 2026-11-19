@@ -93,7 +93,7 @@ class CourseController extends Controller
             ->with('success', 'Mata kuliah berhasil ditambahkan.');
     }
 
-    public function show(Course $course)
+    public function show(Request $request, Course $course)
     {
         Gate::authorize('view', $course);
 
@@ -119,11 +119,23 @@ class CourseController extends Controller
                 ->whereIn('user_id', $students->modelKeys())
                 ->get()
                 ->keyBy('user_id');
-            $availableStudents = User::query()
+            $availableStudentsQuery = User::query()
                 ->where('role', 'mahasiswa')
-                ->whereDoesntHave('courses', fn ($query) => $query->where('courses.id', $course->id))
+                ->whereDoesntHave('courses', fn ($query) => $query->where('courses.id', $course->id));
+
+            if ($request->filled('search')) {
+                $search = trim((string) $request->input('search'));
+                $availableStudentsQuery->where(function ($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('nim_nip', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                });
+            }
+
+            $availableStudents = $availableStudentsQuery
                 ->orderBy('name')
-                ->get();
+                ->paginate(50)
+                ->withQueryString();
 
             return view('admin.courses.show', compact(
                 'course',
