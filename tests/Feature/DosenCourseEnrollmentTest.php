@@ -3,6 +3,8 @@
 namespace Tests\Feature;
 
 use App\Models\Course;
+use App\Models\Assignment;
+use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -28,7 +30,7 @@ class DosenCourseEnrollmentTest extends TestCase
             ->assertSee('1 mahasiswa');
     }
 
-    public function test_enrollment_lists_include_all_students_without_pagination(): void
+    public function test_available_student_list_is_paginated(): void
     {
         $lecturer = User::factory()->dosen()->create();
         $course = Course::factory()->for($lecturer, 'lecturer')->create();
@@ -111,6 +113,39 @@ class DosenCourseEnrollmentTest extends TestCase
             'user_id' => $student->id,
         ]);
         $this->assertDatabaseHas('users', ['id' => $student->id]);
+    }
+
+    public function test_owner_cannot_remove_student_with_submission_history(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $student = User::factory()->mahasiswa()->create();
+        $assignment = Assignment::factory()->for($course)->create();
+        $course->students()->attach($student->id, ['enrolled_at' => now()]);
+        Submission::factory()->for($assignment)->for($student, 'student')->create();
+
+        $this->actingAs($lecturer)
+            ->delete(route('dosen.courses.enrollments.destroy', [$course, $student]))
+            ->assertRedirect(route('dosen.courses.enrollments.index', $course))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('course_user', [
+            'course_id' => $course->id,
+            'user_id' => $student->id,
+        ]);
+    }
+
+    public function test_enrollment_rejects_more_than_50_students(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $studentIds = User::factory()->mahasiswa()->count(51)->create()->modelKeys();
+
+        $this->actingAs($lecturer)
+            ->post(route('dosen.courses.enrollments.store', $course), [
+                'student_ids' => $studentIds,
+            ])
+            ->assertSessionHasErrors('student_ids');
     }
 
     public function test_other_lecturer_cannot_view_or_change_course_enrollment(): void

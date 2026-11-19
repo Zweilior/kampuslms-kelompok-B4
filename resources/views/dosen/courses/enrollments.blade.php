@@ -25,6 +25,12 @@
                 {{ session('success') }}
             </div>
         @endif
+        @if (session('error'))
+            <div class="dosen-enrollments__notice" role="alert">
+                <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                {{ session('error') }}
+            </div>
+        @endif
 
         <section class="dosen-enrollments__panel dosen-enrollments__panel--enroll" aria-labelledby="enroll-student-title">
             <div class="dosen-enrollments__panel-heading">
@@ -33,6 +39,15 @@
                     <p>Pilih akun mahasiswa yang belum terdaftar pada kelas ini.</p>
                 </div>
             </div>
+            <form method="GET" action="{{ route('dosen.courses.enrollments.index', $course) }}" class="dosen-enrollments__search">
+                <label for="available-student-search">Cari mahasiswa</label>
+                <input id="available-student-search"
+                       type="search"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Nama, NIM, atau email">
+                <button type="submit" class="dosen-course-edit__button dosen-course-edit__button--primary">Cari</button>
+            </form>
             @if ($availableStudents->isNotEmpty())
                 <form action="{{ route('dosen.courses.enrollments.store', $course) }}" method="POST" class="dosen-enrollments__form"
                       x-data="{ open: false, selected: @js(array_map('strval', old('student_ids', []))), names: @js($availableStudents->mapWithKeys(fn ($student) => [(string) $student->id => $student->name])->all()) }"
@@ -78,6 +93,9 @@
                         Daftarkan
                     </button>
                 </form>
+                <div class="dosen-enrollments__pagination">
+                    {{ $availableStudents->links('vendor.pagination.custom-pagination') }}
+                </div>
             @else
                 <p class="dosen-enrollments__empty-option">Semua mahasiswa sudah terdaftar atau belum ada akun mahasiswa.</p>
             @endif

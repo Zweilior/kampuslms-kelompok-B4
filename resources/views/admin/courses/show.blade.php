@@ -35,12 +35,27 @@
                     {{ session('success') }}
                 </div>
             @endif
+            @if (session('error'))
+                <div class="admin-course-detail__notice admin-course-detail__notice--error" role="alert">
+                    {{ session('error') }}
+                </div>
+            @endif
 
             @if ($errors->any())
                 <div class="admin-course-detail__notice admin-course-detail__notice--error" role="alert">
                     {{ $errors->first() }}
                 </div>
             @endif
+
+            <form method="GET" action="{{ route('admin.courses.show', $course) }}" class="admin-course-detail__search">
+                <label for="available-student-search">Cari mahasiswa</label>
+                <input id="available-student-search"
+                       type="search"
+                       name="search"
+                       value="{{ request('search') }}"
+                       placeholder="Nama, NIM, atau email">
+                <button type="submit" class="admin-course-detail__button admin-course-detail__button--primary">Cari</button>
+            </form>
 
             @if ($availableStudents->isNotEmpty())
                 <form action="{{ route('admin.courses.enrollments.store', $course) }}" method="POST" class="admin-course-detail__enroll-form"
@@ -80,6 +95,9 @@
                         Enroll Mahasiswa
                     </button>
                 </form>
+                <div class="admin-course-detail__pagination">
+                    {{ $availableStudents->links('vendor.pagination.custom-pagination') }}
+                </div>
             @else
                 <p class="admin-course-detail__empty-note">Semua mahasiswa sudah terdaftar atau belum ada akun mahasiswa.</p>
             @endif
