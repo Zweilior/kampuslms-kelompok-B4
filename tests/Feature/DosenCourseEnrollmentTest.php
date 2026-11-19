@@ -163,4 +163,19 @@ class DosenCourseEnrollmentTest extends TestCase
             'student_ids' => [$student->id],
         ])->assertForbidden();
     }
+
+    public function test_owner_cannot_enroll_more_than_50_students_at_once(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $students = User::factory()->mahasiswa()->count(51)->create();
+
+        $this->actingAs($lecturer)
+            ->post(route('dosen.courses.enrollments.store', $course), [
+                'student_ids' => $students->modelKeys(),
+            ])
+            ->assertSessionHasErrors('student_ids');
+
+        $this->assertDatabaseCount('course_user', 0);
+    }
 }

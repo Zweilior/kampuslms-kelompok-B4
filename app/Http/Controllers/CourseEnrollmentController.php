@@ -18,6 +18,28 @@ class CourseEnrollmentController extends Controller
             $course,
             'admin.courses.show'
         );
+        Gate::authorize('manageEnrollment', $course);
+
+        $validated = $request->validate([
+            'student_ids' => ['required', 'array', 'min:1', 'max:50'],
+            'student_ids.*' => [
+                'required',
+                Rule::exists('users', 'id')->where('role', 'mahasiswa'),
+            ],
+        ], [
+            'student_ids.required' => 'Pilih setidaknya satu mahasiswa yang akan didaftarkan.',
+            'student_ids.min' => 'Pilih setidaknya satu mahasiswa yang akan didaftarkan.',
+            'student_ids.*.exists' => 'Mahasiswa yang dipilih tidak valid.',
+        ]);
+
+        $enrollments = collect($validated['student_ids'])
+            ->mapWithKeys(fn ($studentId) => [$studentId => ['enrolled_at' => now()]])
+            ->all();
+        $course->students()->syncWithoutDetaching($enrollments);
+
+        return redirect()
+            ->route('admin.courses.show', $course)
+            ->with('success', 'Mahasiswa berhasil didaftarkan ke mata kuliah.');
     }
 
     public function adminDestroy(Course $course, User $student)
