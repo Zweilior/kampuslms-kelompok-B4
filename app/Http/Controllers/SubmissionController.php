@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -228,15 +229,17 @@ class SubmissionController extends Controller
         Course $course,
         Assignment $assignment
     ) {
+        abort_unless((int) $assignment->course_id === (int) $course->id, 404);
         Gate::authorize('create', [Submission::class, $assignment]);
 
-        // Cek pengumpulan sebelumnya
+        // Cek pengumpulan sebelumnya sekaligus status penilaian tanpa query tambahan
         $existingSubmission = $assignment->submissions()
             ->where('user_id', $request->user()->id)
+            ->withExists('grade')
             ->first();
 
         // 1. Blokir kumpul ulang jika tugas sudah dinilai
-        if ($existingSubmission && $existingSubmission->grade()->exists()) {
+        if ($existingSubmission?->grade_exists) {
             throw ValidationException::withMessages([
                 'file' => 'Tugas sudah dinilai dan tidak dapat dikumpulkan ulang.',
             ]);
@@ -254,25 +257,34 @@ class SubmissionController extends Controller
         $file = $request->file('file');
         $newFilePath = $file->store("submissions/{$assignment->id}", 'local');
         $oldFilePath = $existingSubmission?->file_path;
+        $created = $existingSubmission === null;
 
         try {
-            // 4. Update atau buat baru (updateOrCreate)
-            $submission = Submission::updateOrCreate(
-                [
-                    'assignment_id' => $assignment->id,
-                    'user_id' => $request->user()->id,
-                ],
-                [
+            // 4. Simpan ke database secara atomik tanpa SELECT ulang dari updateOrCreate
+            $submission = DB::transaction(function () use ($request, $assignment, $existingSubmission, $file, $newFilePath, $isLate): Submission {
+                $attributes = [
                     'file_path' => $newFilePath,
                     'original_name' => $file->getClientOriginalName(),
                     'file_size' => $file->getSize(),
                     'note' => $request->validated()['note'] ?? null,
                     'submitted_at' => now(),
                     'is_late' => $isLate,
-                ]
-            );
+                ];
+
+                if ($existingSubmission) {
+                    $existingSubmission->update($attributes);
+
+                    return $existingSubmission;
+                }
+
+                return Submission::create([
+                    'assignment_id' => $assignment->id,
+                    'user_id' => $request->user()->id,
+                    ...$attributes,
+                ]);
+            });
         } catch (\Throwable $e) {
-            // Jika ada error saat simpan DB, hapus file baru yang terlanjur ter-upload
+            // Jika transaksi DB gagal, hapus file baru yang terlanjur ter-upload
             if (Storage::disk('local')->exists($newFilePath)) {
                 Storage::disk('local')->delete($newFilePath);
             }
@@ -280,12 +292,14 @@ class SubmissionController extends Controller
             throw $e;
         }
 
-        $created = $submission->wasRecentlyCreated;
-
-        // Hapus file lama hanya setelah record baru berhasil disimpan.
-        if ($oldFilePath && $oldFilePath !== $newFilePath) {
+        // Hapus file lama hanya setelah transaksi DB berhasil commit
+        if ($oldFilePath && $oldFilePath !== $newFilePath && Storage::disk('local')->exists($oldFilePath)) {
             Storage::disk('local')->delete($oldFilePath);
         }
+
+        // Eager load relasi course.lecturer sebelum event di-dispatch untuk mencegah lazy loading
+        $assignment->loadMissing('course.lecturer');
+        $submission->setRelation('assignment', $assignment);
 
         // Dispatch Event SubmissionCreated (Asinkron)
         SubmissionCreated::dispatch($submission, ! $created);
