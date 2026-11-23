@@ -296,4 +296,40 @@ class DosenAssignmentsTest extends TestCase
 
         $this->assertDatabaseMissing('assignments', ['title' => 'Invalid rubric']);
     }
+
+    public function test_other_lecturer_cannot_grade_submission_for_another_lecturers_course(): void
+    {
+        $ownerLecturer = User::factory()->dosen()->create();
+        $otherLecturer = User::factory()->dosen()->create();
+        $student = User::factory()->mahasiswa()->create();
+
+        $course = Course::factory()
+            ->for($ownerLecturer, 'lecturer')
+            ->create();
+
+        $assignment = Assignment::factory()
+            ->for($course)
+            ->past()
+            ->create();
+
+        $submission = Submission::factory()
+            ->for($assignment)
+            ->for($student, 'student')
+            ->create();
+
+        $this->actingAs($otherLecturer)
+            ->put(route(
+                'dosen.courses.assignments.submissions.grade',
+                [$course, $assignment, $submission]
+            ), [
+                'score' => 90,
+                'feedback' => 'Percobaan penilaian oleh dosen lain.',
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('grades', [
+            'submission_id' => $submission->id,
+        ]);
+    }
+
 }

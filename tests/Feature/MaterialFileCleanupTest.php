@@ -86,6 +86,33 @@ class MaterialFileCleanupTest extends TestCase
         $this->assertSame(3, Material::count());
     }
 
+    public function test_other_dosen_cannot_upload_material_to_another_dosens_course(): void
+    {
+        $otherLecturer = User::factory()->dosen()->create();
+
+        $file = UploadedFile::fake()->create(
+            'materi.pdf',
+            100,
+            'application/pdf'
+        );
+
+        $this->actingAs($otherLecturer)
+            ->post(route('dosen.courses.materials.store', $this->course), [
+                'title' => 'Materi milik dosen lain',
+                'description' => 'Percobaan upload tanpa hak akses.',
+                'type' => 'file',
+                'file' => $file,
+            ])
+            ->assertForbidden();
+
+        $this->assertDatabaseMissing('materials', [
+            'course_id' => $this->course->id,
+            'title' => 'Materi milik dosen lain',
+        ]);
+
+        $this->assertSame([], Storage::disk('local')->allFiles());
+    }
+
     public function test_dosen_upload_rejects_disallowed_types(): void
     {
         $files = [
