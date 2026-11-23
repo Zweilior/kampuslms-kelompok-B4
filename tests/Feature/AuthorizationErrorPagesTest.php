@@ -3,12 +3,14 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 class AuthorizationErrorPagesTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_guest_sees_the_401_page_for_a_protected_web_route(): void
     {
         $this->get('/admin/dashboard')
@@ -40,8 +42,6 @@ class AuthorizationErrorPagesTest extends TestCase
 
     public function test_invalid_login_message_is_shown_below_the_password_field(): void
     {
-        Auth::shouldReceive('attempt')->once()->andReturnFalse();
-
         $this->from('/login')
             ->followingRedirects()
             ->post('/login', [
