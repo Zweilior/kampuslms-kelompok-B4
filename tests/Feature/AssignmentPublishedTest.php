@@ -159,6 +159,28 @@ class AssignmentPublishedTest extends TestCase
         Event::assertDispatchedTimes(AssignmentPublished::class, 1);
     }
 
+    public function test_api_rejects_empty_assignment_update(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $assignment = Assignment::factory()->for($course)->create([
+            'title' => 'Judul Awal',
+        ]);
+
+        Sanctum::actingAs($lecturer);
+
+        $this->putJson("/api/v1/assignments/{$assignment->id}", [])
+            ->assertUnprocessable()
+            ->assertJson([
+                'message' => 'Minimal satu data harus diisi untuk memperbarui tugas.',
+            ]);
+
+        $this->assertDatabaseHas('assignments', [
+            'id' => $assignment->id,
+            'title' => 'Judul Awal',
+        ]);
+    }
+
     public function test_failure_settings_and_failed_hook_are_in_place(): void
     {
         Log::spy();

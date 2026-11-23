@@ -2,8 +2,9 @@
 
 namespace Tests\Feature;
 
-use App\Models\Course;
 use App\Models\Assignment;
+use App\Models\Course;
+use App\Models\FinalGrade;
 use App\Models\Submission;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -123,6 +124,32 @@ class DosenCourseEnrollmentTest extends TestCase
         $assignment = Assignment::factory()->for($course)->create();
         $course->students()->attach($student->id, ['enrolled_at' => now()]);
         Submission::factory()->for($assignment)->for($student, 'student')->create();
+
+        $this->actingAs($lecturer)
+            ->delete(route('dosen.courses.enrollments.destroy', [$course, $student]))
+            ->assertRedirect(route('dosen.courses.enrollments.index', $course))
+            ->assertSessionHas('error');
+
+        $this->assertDatabaseHas('course_user', [
+            'course_id' => $course->id,
+            'user_id' => $student->id,
+        ]);
+    }
+
+    public function test_owner_cannot_remove_student_with_final_grade(): void
+    {
+        $lecturer = User::factory()->dosen()->create();
+        $course = Course::factory()->for($lecturer, 'lecturer')->create();
+        $student = User::factory()->mahasiswa()->create();
+
+        $course->students()->attach($student->id, ['enrolled_at' => now()]);
+
+        FinalGrade::create([
+            'course_id' => $course->id,
+            'user_id' => $student->id,
+            'total_score' => 85,
+            'letter_grade' => 'A',
+        ]);
 
         $this->actingAs($lecturer)
             ->delete(route('dosen.courses.enrollments.destroy', [$course, $student]))
